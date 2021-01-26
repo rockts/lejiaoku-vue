@@ -33,11 +33,9 @@
         <a href="" class="btn btn-outline-light">注册</a>
       </li>
     </ul>
-    <ul v-else class="list-inline mb-0">
+    <ul v-else class="list-inline mb-0 px-5">
       <li class="list-inline-item">
-        <a href=""
-          ><img class="img-circle avatar" src="../assets/avatar.png" alt="你好"
-        /></a>
+        <dropdown :title="`你好， ${user.name}`"></dropdown>
       </li>
     </ul>
   </nav>
@@ -45,6 +43,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
+import Dropdown from './Dropdown.vue';
 
 export interface UserProps {
   isLogin: boolean;
@@ -92,7 +91,9 @@ export default defineComponent({
   /**
    * 使用组件
    */
-  components: {},
+  components: {
+    Dropdown,
+  },
 });
 </script>
 
