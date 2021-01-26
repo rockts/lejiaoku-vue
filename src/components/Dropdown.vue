@@ -11,12 +11,7 @@
       :style="{ display: 'block' }"
       v-if="isOpen"
     >
-      <li class="dropdown-item">
-        <a href="#">发布资源</a>
-      </li>
-      <li class="dropdown-item">
-        <a href="#">个人信息</a>
-      </li>
+      <slot></slot>
     </ul>
   </div>
 </template>
