@@ -17,37 +17,37 @@ const testData: CategoryProps[] = [
     id: 1,
     name: '教材',
     alias: 'textbook',
-    avatar: 'http://localhost:8080/img/res_cover.82160bf0.png',
+    cover: require('@/assets/catagory.png'),
   },
   {
     id: 2,
     name: '课件',
     alias: 'coursewarel',
-    avatar: 'http://localhost:8080/img/res_cover.82160bf0.png',
+    cover: require('@/assets/catagory.png'),
   },
   {
     id: 3,
     name: '同步练习',
     alias: 'questions',
-    avatar: 'http://localhost:8080/img/res_cover.82160bf0.png',
+    cover: require('@/assets/catagory.png'),
   },
   {
     id: 4,
     name: '教案',
     alias: 'essonplan',
-    avatar: 'http://localhost:8080/img/res_cover.82160bf0.png',
+    cover: require('@/assets/catagory.png'),
   },
   {
     id: 5,
     name: '视频',
     alias: 'video',
-    avatar: 'http://localhost:8080/img/res_cover.82160bf0.png',
+    cover: require('@/assets/catagory.png'),
   },
   {
     id: 6,
     name: '其他资源',
     alias: 'other',
-    avatar: 'http://localhost:8080/img/res_cover.82160bf0.png',
+    cover: require('@/assets/catagory.png'),
   },
 ];
 export default defineComponent({
