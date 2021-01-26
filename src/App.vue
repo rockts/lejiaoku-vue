@@ -1,10 +1,6 @@
 <template>
-  <div class="container">
-    <div id="nav">
-      <router-link to="/">主页</router-link> |
-      <router-link to="/res">资源</router-link> |
-      <router-link to="/about">关于</router-link>
-    </div>
+  <global-haeder :user="currentUser"></global-haeder>
+  <div class="container-fluid text-center">
     <router-view />
   </div>
 </template>
@@ -12,31 +8,34 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import GlobalHaeder, { UserProps } from './components/GlobalHaeder.vue';
+
+const currentUser: UserProps = {
+  isLogin: true,
+  name: 'gao',
+};
 
 export default defineComponent({
   name: 'App',
+  components: {
+    GlobalHaeder,
+  },
+
+  setup() {
+    return {
+      currentUser,
+    };
+  },
 });
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+a {
+  color: #fff;
 }
-
-#nav {
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
+.avatar {
+  /* height: 5vh; */
+  width: 5vh;
+  margin-right: 50px;
 }
 </style>
