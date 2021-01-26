@@ -7,6 +7,9 @@
     <h3>资源包括</h3>
     <ul>
       <li>
+        <a href="#" rel="noopener">课本</a>
+      </li>
+      <li>
         <a href="#" rel="noopener">课件</a>
       </li>
       <li>
@@ -16,7 +19,7 @@
         <a href="#" rel="noopener">同步练习</a>
       </li>
       <li>
-        <a href="#" rel="noopener">文档</a>
+        <a href="#" rel="noopener">其他文档</a>
       </li>
     </ul>
   </div>
