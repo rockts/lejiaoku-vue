@@ -7,6 +7,9 @@
     <h3>资源包括</h3>
     <ul>
       <li>
+        <a href="#" rel="noopener">课本</a>
+      </li>
+      <li>
         <a href="#" rel="noopener">课件</a>
       </li>
       <li>
@@ -17,6 +20,69 @@
       </li>
       <li>
         <a href="#" rel="noopener">文档</a>
+      </li>
+    </ul>
+    <h3>年级</h3>
+    <ul>
+      <li>
+        <a href="#" rel="noopener">一年级</a>
+      </li>
+      <li>
+        <a href="#" rel="noopener">二年级</a>
+      </li>
+      <li>
+        <a href="#" rel="noopener">三年级</a>
+      </li>
+      <li>
+        <a href="#" rel="noopener">四年级</a>
+      </li>
+      <li>
+        <a href="#" rel="noopener">五年级</a>
+      </li>
+    </ul>
+    <h3>学科</h3>
+    <ul>
+      <li>
+        <a href="#" rel="noopener">语文</a>
+      </li>
+      <li>
+        <a href="#" rel="noopener">数学</a>
+      </li>
+      <li>
+        <a href="#" rel="noopener">英语</a>
+      </li>
+      <li>
+        <a href="#" rel="noopener">品德</a>
+      </li>
+      <li>
+        <a href="#" rel="noopener">物理</a>
+      </li>
+      <li>
+        <a href="#" rel="noopener">化学</a>
+      </li>
+      <li>
+        <a href="#" rel="noopener">地理</a>
+      </li>
+    </ul>
+    <h3>版本</h3>
+    <ul>
+      <li>
+        <a href="#" rel="noopener">人教版</a>
+      </li>
+      <li>
+        <a href="#" rel="noopener">陕师大版</a>
+      </li>
+      <li>
+        <a href="#" rel="noopener">北师大版</a>
+      </li>
+      <li>
+        <a href="#" rel="noopener">冀版教材</a>
+      </li>
+      <li>
+        <a href="#" rel="noopener">上教版</a>
+      </li>
+      <li>
+        <a href="#" rel="noopener">苏教版</a>
       </li>
     </ul>
   </div>
