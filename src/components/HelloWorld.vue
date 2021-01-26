@@ -4,25 +4,7 @@
     <p>这是一个教学资源库。</p>
     <small>(项目正在开发中...)</small>
 
-    <h3>资源包括</h3>
-    <ul>
-      <li>
-        <a href="#" rel="noopener">课本</a>
-      </li>
-      <li>
-        <a href="#" rel="noopener">课件</a>
-      </li>
-      <li>
-        <a href="#" rel="noopener">教案</a>
-      </li>
-      <li>
-        <a href="#" rel="noopener">同步练习</a>
-      </li>
-      <li>
-        <a href="#" rel="noopener">文档</a>
-      </li>
-    </ul>
-    <h3>年级</h3>
+    <h4>年级</h4>
     <ul>
       <li>
         <a href="#" rel="noopener">一年级</a>
@@ -40,7 +22,7 @@
         <a href="#" rel="noopener">五年级</a>
       </li>
     </ul>
-    <h3>学科</h3>
+    <h4>学科</h4>
     <ul>
       <li>
         <a href="#" rel="noopener">语文</a>
@@ -64,7 +46,7 @@
         <a href="#" rel="noopener">地理</a>
       </li>
     </ul>
-    <h3>版本</h3>
+    <h4>版本</h4>
     <ul>
       <li>
         <a href="#" rel="noopener">人教版</a>
