@@ -12,7 +12,7 @@ import GlobalHaeder, { UserProps } from './components/GlobalHaeder.vue';
 
 const currentUser: UserProps = {
   isLogin: true,
-  name: 'gao',
+  name: '乐可高鹏',
 };
 
 export default defineComponent({
@@ -31,11 +31,15 @@ export default defineComponent({
 
 <style>
 a {
-  color: #fff;
+  color: #999999;
+}
+
+a:hover {
+  color: #e9e916;
 }
 .avatar {
   /* height: 5vh; */
-  width: 5vh;
-  margin-right: 50px;
+  width: 32px;
+  margin-right: 10px;
 }
 </style>

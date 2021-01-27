@@ -1,14 +1,26 @@
 <template>
-  <nav class="navbar navbar-light  bg-primary">
+  <nav class="navbar navbar-dark  bg-primary">
     <a href="#" class="navbar-brand px-5">
-      <img alt="LeJiaoKu logo" src="../assets/logo.png"
+      <img alt="LeJiaoKu-logo" src="../assets/logo.png"
     /></a>
     <ul class="list-inline  mb-0">
       <li class="list-inline-item px-4">
         <router-link to="/">主页</router-link>
       </li>
       <li class="list-inline-item px-4">
-        <router-link to="/res">资源</router-link>
+        <router-link to="/res">教材</router-link>
+      </li>
+      <li class="list-inline-item px-4">
+        <router-link to="/res">课件</router-link>
+      </li>
+      <li class="list-inline-item px-4">
+        <router-link to="/res">教案</router-link>
+      </li>
+      <li class="list-inline-item px-4">
+        <router-link to="/res">同步练习</router-link>
+      </li>
+      <li class="list-inline-item px-4">
+        <router-link to="/res">文档资源</router-link>
       </li>
       <li class="list-inline-item px-4">
         <router-link to="/about">关于</router-link>
@@ -19,7 +31,7 @@
       <input
         class="form-control me-2"
         type="search"
-        placeholder="Search"
+        placeholder="输入搜索资源"
         aria-label="Search"
       />
       <button class="btn btn-outline-light" type="submit">Search</button>
@@ -35,12 +47,12 @@
     </ul>
     <ul v-else class="list-inline mb-0 px-5">
       <li class="list-inline-item">
-        <dropdown :title="`你好， ${user.name}`">
+        <dropdown :title="`${user.name}`">
           <dropdown-item
-            ><a href="#" class="dropdown-item">新建文章</a></dropdown-item
+            ><a href="#" class="dropdown-item">个人中心</a></dropdown-item
           >
-          <dropdown-item disabled
-            ><a href="#" class="dropdown-item">个人信息</a></dropdown-item
+          <dropdown-item
+            ><a href="#" class="dropdown-item">设置账户</a></dropdown-item
           >
           <dropdown-item
             ><a href="#" class="dropdown-item">退出登录</a></dropdown-item
