@@ -1,7 +1,7 @@
 <template>
   <global-haeder :user="currentUser"></global-haeder>
   <div class="container-fluid text-center">
-    <form action="">
+    <validate-form @form-submit="onFormSubmit">
       <div class="mb-3">
         <label class="form-label">邮箱地址</label>
         <validate-input
@@ -21,15 +21,16 @@
         >
         </validate-input>
       </div>
-    </form>
+    </validate-form>
     <router-view />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref } from 'vue';
+import { defineComponent, ref } from 'vue';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ValidateInput, { RulesProp } from './components/ValidateInput.vue';
+import ValidateForm from './components/ValidateForm.vue';
 import GlobalHaeder, { UserProps } from './components/GlobalHaeder.vue';
 
 const currentUser: UserProps = {
@@ -37,42 +38,36 @@ const currentUser: UserProps = {
   name: '乐可高鹏',
 };
 
-// eslint-disable-next-line no-useless-escape
-const emailReg = /^([A-Za-z0-9_\-\.\u4e00-\u9fa5])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,8})$/;
-
 export default defineComponent({
   name: 'App',
   components: {
     GlobalHaeder,
     ValidateInput,
+    ValidateForm,
   },
 
   setup() {
-    const emailVal = ref('rockts');
+    const emailVal = ref('');
     const emailRules: RulesProp = [
       { type: 'required', message: '电子邮箱地址不能为空' },
       { type: 'email', message: '请输入正确的电子邮箱格式' },
     ];
-    const emailRef = reactive({
-      val: '',
-      error: false,
-      message: '',
-    });
-    const validateEmail = () => {
-      if (emailRef.val.trim() == '') {
-        emailRef.error = true;
-        emailRef.message = 'can not be empty';
-      } else if (!emailReg.test(emailRef.val)) {
-        emailRef.error = true;
-        emailRef.message = 'should be valid email';
-      }
+    const passwordVal = ref('');
+    const passwordRules: RulesProp = [
+      { type: 'required', message: '密码不能为空' },
+    ];
+
+    const onFormSubmit = (result: boolean) => {
+      console.log('1234', result);
     };
+
     return {
       currentUser,
-      emailRef,
-      validateEmail,
       emailRules,
       emailVal,
+      passwordVal,
+      passwordRules,
+      onFormSubmit,
     };
   },
 });
