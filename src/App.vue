@@ -1,14 +1,17 @@
 <template>
   <global-haeder :user="currentUser"></global-haeder>
   <div class="container-fluid text-center">
-    <form>
+    <form action="">
+      <div class="mb-3">
+        <label class="form-label">邮箱地址</label>
+        <validate-input :rules="emailRules"></validate-input>
+      </div>
       <div class="mb-3">
         <label for="exampleInputEmail1" class="form-label">邮箱地址</label>
         <input
           type="email"
           class="form-control"
           id="exampleInputEmail1"
-          aria-describedby="emailHelp"
           v-model="emailRef.val"
           @blur="validateEmail"
         />
@@ -24,11 +27,6 @@
           id="exampleInputPassword1"
         />
       </div>
-      <div class="mb-3 form-check">
-        <input type="checkbox" class="form-check-input" id="exampleCheck1" />
-        <label class="form-check-label" for="exampleCheck1">Check me out</label>
-      </div>
-      <button type="submit" class="btn btn-primary">Submit</button>
     </form>
     <router-view />
   </div>
@@ -37,6 +35,7 @@
 <script lang="ts">
 import { defineComponent, reactive } from 'vue';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import ValidateInput, { RulesProp } from './components/ValidateInput.vue';
 import GlobalHaeder, { UserProps } from './components/GlobalHaeder.vue';
 
 const currentUser: UserProps = {
@@ -51,16 +50,21 @@ export default defineComponent({
   name: 'App',
   components: {
     GlobalHaeder,
+    ValidateInput,
   },
 
   setup() {
+    const emailRules: RulesProp = [
+      { type: 'required', message: '电子邮箱地址不能为空' },
+      { type: 'email', message: '请输入正确的电子邮箱格式' },
+    ];
     const emailRef = reactive({
       val: '',
       error: false,
       message: '',
     });
     const validateEmail = () => {
-      if (emailRef.val.trim() === '') {
+      if (emailRef.val.trim() == '') {
         emailRef.error = true;
         emailRef.message = 'can not be empty';
       } else if (!emailReg.test(emailRef.val)) {
@@ -72,6 +76,8 @@ export default defineComponent({
       currentUser,
       emailRef,
       validateEmail,
+      emailRules,
+      // ValidateInput,
     };
   },
 });
