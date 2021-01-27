@@ -4,29 +4,22 @@
     <form action="">
       <div class="mb-3">
         <label class="form-label">邮箱地址</label>
-        <validate-input :rules="emailRules" v-model="emailVal"></validate-input>
-        {{ emailVal }}
+        <validate-input
+          :rules="emailRules"
+          v-model="emailVal"
+          placeholder="请输入邮箱地址"
+          type="text"
+        ></validate-input>
       </div>
       <div class="mb-3">
-        <label for="exampleInputEmail1" class="form-label">邮箱地址</label>
-        <input
-          type="email"
-          class="form-control"
-          id="exampleInputEmail1"
-          v-model="emailRef.val"
-          @blur="validateEmail"
-        />
-        <div class="form-text" v-if="emailRef.error">
-          {{ emailRef.message }}
-        </div>
-      </div>
-      <div class="mb-3">
-        <label for="exampleInputPassword1" class="form-label">密码</label>
-        <input
+        <label class="form-label">密码</label>
+        <validate-input
           type="password"
-          class="form-control"
-          id="exampleInputPassword1"
-        />
+          placeholder="请输入密码"
+          :rules="passwordRules"
+          v-model="passwordVal"
+        >
+        </validate-input>
       </div>
     </form>
     <router-view />
