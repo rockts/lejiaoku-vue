@@ -1,8 +1,8 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    <p>这是一个教学资源库。</p>
-    <small>(项目正在开发中...)</small>
+
+    <p>(项目正在开发中...)</p>
 
     <h4>年级</h4>
     <ul>

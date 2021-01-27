@@ -1,5 +1,6 @@
 <template>
-  <div class="about">
-    <h1>This is an about page</h1>
+  <div class="content">
+    <h1>关于我们</h1>
+    <p>这是一个教学资源库。</p>
   </div>
 </template>
