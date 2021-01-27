@@ -16,7 +16,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, PropType } from 'vue';
+import { defineComponent, reactive, PropType, onMounted } from 'vue';
+import { emitter } from './ValidateForm.vue';
 // eslint-disable-next-line no-useless-escape
 const emailReg = /^([A-Za-z0-9_\-\.\u4e00-\u9fa5])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,8})$/;
 interface RuleProp {
@@ -30,6 +31,7 @@ export default defineComponent({
     modelValue: String,
   },
   inheritAttrs: false,
+
   setup(props, context) {
     const inputRef = reactive({
       val: props.modelValue || '',
@@ -64,6 +66,9 @@ export default defineComponent({
       }
       return true;
     };
+    onMounted(() => {
+      emitter.emit('form-item-created', validateInput);
+    });
     return {
       inputRef,
       validateInput,
