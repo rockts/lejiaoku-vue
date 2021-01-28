@@ -75,49 +75,15 @@ export interface UserProps {
   id?: number;
 }
 
-export const currentUser: UserProps = {
-  isLogin: true,
-  name: '乐可高鹏',
-};
-
 export default defineComponent({
   name: 'GlobalHaeder',
 
-  /**
-   * 属性
-   */
   props: {
     user: {
       type: Object as PropType<UserProps>,
       required: true,
     },
   },
-
-  /**
-   * 数据
-   */
-  data() {
-    return {
-      currentUser,
-    };
-  },
-
-  /**
-   * 计算属性
-   */
-  computed: {},
-
-  /**
-   * 已创建
-   */
-  created() {
-    //
-  },
-
-  /**
-   * 组件方法
-   */
-  methods: {},
 
   /**
    * 使用组件

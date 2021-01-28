@@ -5,10 +5,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, computed } from 'vue';
+import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
+import { GlobalDataOProps } from '@/store/index';
 import CategoryList from '@/components/CategoryList.vue';
-import { testData } from '../data/testData';
 
 export default defineComponent({
   name: 'Resources',
@@ -17,8 +18,10 @@ export default defineComponent({
   },
   setup() {
     const route = useRoute();
+    const store = useStore<GlobalDataOProps>();
+    const list = computed(() => store.state.categorys);
     return {
-      list: testData,
+      list,
       route,
     };
   },

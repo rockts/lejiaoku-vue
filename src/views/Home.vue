@@ -6,11 +6,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, computed } from 'vue';
+import { useStore } from 'vuex';
+import { GlobalDataOProps } from '@/store/index';
 
 import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
 import CategoryList from '@/components/CategoryList.vue';
-import { testData } from '../data/testData';
 
 export default defineComponent({
   name: 'Home',
@@ -19,8 +20,10 @@ export default defineComponent({
     CategoryList,
   },
   setup() {
+    const store = useStore<GlobalDataOProps>();
+    const list = computed(() => store.state.categorys);
     return {
-      list: testData,
+      list,
     };
   },
 });

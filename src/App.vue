@@ -7,9 +7,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { computed, defineComponent } from 'vue';
+import { useStore } from 'vuex';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import GlobalHaeder, { currentUser } from './components/GlobalHaeder.vue';
+import GlobalHaeder, { UserProps } from './components/GlobalHaeder.vue';
 import GlobalFooter from './components/GlobalFooter.vue';
 
 export default defineComponent({
@@ -19,10 +20,9 @@ export default defineComponent({
     GlobalFooter,
   },
 
-  /**
-   * 数据
-   */
-  data() {
+  setup() {
+    const store = useStore();
+    const currentUser = computed(() => store.state.user);
     return {
       currentUser,
     };

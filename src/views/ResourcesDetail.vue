@@ -14,18 +14,21 @@
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
-import { testData, testResources } from '../data/testData';
+import { GlobalDataOProps } from '@/store/index';
 import ResourcesList from '@/components/ResourcesList.vue';
+
 export default defineComponent({
   components: {
     ResourcesList,
   },
   setup() {
     const route = useRoute();
+    const store = useStore<GlobalDataOProps>();
     const currnetId = +route.params.id;
-    const category = testData.find((c) => c.id == currnetId);
-    const list = testResources.filter(
+    const category = store.state.categorys.find((c) => c.id == currnetId);
+    const list = store.state.resources.filter(
       (resources) => resources.categoryId == currnetId
     );
     return {
