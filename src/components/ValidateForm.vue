@@ -25,7 +25,7 @@ export default defineComponent({
       context.emit('form-submit', result);
     };
     // 将监听得到的验证函数都存到一个数组中
-    const callback = (func: ValidateFunc) => {
+    const callback = (func: any) => {
       funcArr.push(func);
     };
     // 添加监听
