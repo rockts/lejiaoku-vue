@@ -14,7 +14,11 @@
           />
           <h5 class="card-title mt-4">{{ category.name }}</h5>
           <p class="card-text">{{ category.alias }}</p>
-          <a href="#" class="btn btn-outline-primary">点击进入</a>
+          <router-link
+            :to="`/category/${category.alias}`"
+            class="btn btn-outline-primary"
+            >点击进入</router-link
+          >
         </div>
       </div>
     </div>
