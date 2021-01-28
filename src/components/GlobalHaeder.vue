@@ -1,8 +1,8 @@
 <template>
   <nav class="navbar navbar-dark  bg-primary">
-    <a href="#" class="navbar-brand px-5">
+    <router-link to="/" class="navbar-brand px-5">
       <img alt="LeJiaoKu-logo" src="../assets/logo.png"
-    /></a>
+    /></router-link>
     <ul class="list-inline  mb-0">
       <li class="list-inline-item px-4">
         <router-link to="/">主页</router-link>
@@ -39,10 +39,14 @@
 
     <ul v-if="!user.isLogin" class="list-inline mb-0">
       <li class="list-inline-item">
-        <a href="" class="btn btn-outline-light">登录</a>
+        <router-link to="/login" class="btn btn-outline-light"
+          >登录</router-link
+        >
       </li>
       <li class="list-inline-item me-5">
-        <a href="" class="btn btn-outline-light">注册</a>
+        <router-link to="/login" class="btn btn-outline-light"
+          >注册</router-link
+        >
       </li>
     </ul>
     <ul v-else class="list-inline mb-0 px-5">
@@ -74,6 +78,11 @@ export interface UserProps {
   id?: number;
 }
 
+export const currentUser: UserProps = {
+  isLogin: true,
+  name: '乐可高鹏',
+};
+
 export default defineComponent({
   name: 'GlobalHaeder',
 
@@ -91,7 +100,9 @@ export default defineComponent({
    * 数据
    */
   data() {
-    return {};
+    return {
+      currentUser,
+    };
   },
 
   /**
