@@ -48,4 +48,11 @@ a:hover {
   text-align: center;
   margin: 20px 0;
 }
+.cover {
+  border-radius: 45px;
+  border: 2px solid #8ac007;
+  padding: 20px;
+  width: 200px;
+  height: 150px;
+}
 </style>

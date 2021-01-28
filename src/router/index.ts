@@ -13,7 +13,7 @@ const routes: Array<RouteRecordRaw> = [
     component: Home,
   },
   {
-    path: '/category/:alias',
+    path: '/category/:id',
     name: 'ResourcesDetail',
     component: ResourcesDetail,
   },

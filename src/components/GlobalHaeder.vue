@@ -8,22 +8,22 @@
         <router-link to="/">主页</router-link>
       </li>
       <li class="list-inline-item px-4">
-        <router-link to="/res">教材</router-link>
+        <router-link to="/category/1">教材</router-link>
       </li>
       <li class="list-inline-item px-4">
-        <router-link to="/res">课件</router-link>
+        <router-link to="/category/2">课件</router-link>
       </li>
       <li class="list-inline-item px-4">
-        <router-link to="/res">教案</router-link>
+        <router-link to="/category/3">教案</router-link>
       </li>
       <li class="list-inline-item px-4">
-        <router-link to="/res">同步练习</router-link>
+        <router-link to="/category/4">练习</router-link>
       </li>
       <li class="list-inline-item px-4">
-        <router-link to="/res">文档资源</router-link>
+        <router-link to="/category/5">其他</router-link>
       </li>
       <li class="list-inline-item px-4">
-        <router-link to="/about">关于</router-link>
+        <router-link to="/category/6">视频</router-link>
       </li>
     </ul>
 
