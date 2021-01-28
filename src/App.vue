@@ -1,7 +1,7 @@
 <template>
   <global-haeder :user="currentUser"></global-haeder>
   <div class="container-fluid text-center">
-    <router-view />
+    <router-view :key="$route.fullPath" />
     <global-footer></global-footer>
   </div>
 </template>

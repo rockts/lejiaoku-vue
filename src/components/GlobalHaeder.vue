@@ -5,9 +5,6 @@
     /></router-link>
     <ul class="list-inline  mb-0">
       <li class="list-inline-item px-4">
-        <router-link to="/">主页</router-link>
-      </li>
-      <li class="list-inline-item px-4">
         <router-link to="/category/1">教材</router-link>
       </li>
       <li class="list-inline-item px-4">

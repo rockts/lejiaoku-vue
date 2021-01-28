@@ -8,7 +8,7 @@
             <img
               :src="resources.cover"
               alt="resources.title"
-              class="round-lg"
+              class="round-lg cover"
             />
           </div>
           <p :class="{ 'col-9': resources.cover }">{{ resources.content }}</p>
