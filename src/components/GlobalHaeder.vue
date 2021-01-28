@@ -50,6 +50,9 @@
       <li class="list-inline-item">
         <dropdown :title="`${user.name}`">
           <dropdown-item
+            ><a href="/create" class="dropdown-item">发布文章</a></dropdown-item
+          >
+          <dropdown-item
             ><a href="#" class="dropdown-item">个人中心</a></dropdown-item
           >
           <dropdown-item

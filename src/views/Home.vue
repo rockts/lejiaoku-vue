@@ -1,5 +1,6 @@
 <template>
   <div class="home">
+    <h2>{{ biggerColumnLen }}</h2>
     <HelloWorld />
     <category-list :list="list"></category-list>
   </div>
@@ -22,8 +23,10 @@ export default defineComponent({
   setup() {
     const store = useStore<GlobalDataOProps>();
     const list = computed(() => store.state.categorys);
+    const biggerColumnLen = computed(() => store.getters.biggerColumnsLen);
     return {
       list,
+      biggerColumnLen,
     };
   },
 });
