@@ -16,7 +16,7 @@
 import { defineComponent } from 'vue';
 import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
-import { GlobalDataOProps } from '@/store/index';
+import { GlobalDataOProps } from '@/app/app-store';
 import ResourcesList from '@/components/ResourcesList.vue';
 
 export default defineComponent({

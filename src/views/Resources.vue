@@ -8,7 +8,7 @@
 import { defineComponent, computed } from 'vue';
 import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
-import { GlobalDataOProps } from '@/store/index';
+import { GlobalDataOProps } from '@/app/app-store';
 import CategoryList from '@/components/CategoryList.vue';
 
 export default defineComponent({

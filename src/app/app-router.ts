@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import Home from '../views/Home.vue';
-import UserLogin from '../components/UserLogin.vue';
-import Resources from '../views/Resources.vue';
-import ResourcesDetail from '../views/ResourcesDetail.vue';
+import Home from '@/views/Home.vue';
+import UserLogin from '@/components/UserLogin.vue';
+import Resources from '@/views/Resources.vue';
+import ResourcesDetail from '@/views/ResourcesDetail.vue';
 import CreateResources from '@/views/CreateResources.vue';
-import About from '../views/About.vue';
-import Test from '../views/Test.vue';
-import store from '../store/index';
+import About from '@/views/About.vue';
+import Test from '@/views/Test.vue';
+import store from '@/app/app-store';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -15,8 +15,13 @@ const routes: Array<RouteRecordRaw> = [
     component: Home,
   },
   {
+    path: '/categorys',
+    name: 'Catagorys',
+    component: Resources,
+  },
+  {
     path: '/category/:id',
-    name: 'ResourcesDetail',
+    name: 'CategoryDetail',
     component: ResourcesDetail,
   },
   {
@@ -35,11 +40,6 @@ const routes: Array<RouteRecordRaw> = [
     name: 'login',
     component: UserLogin,
     meta: { redirectAlreadyLogin: true },
-  },
-  {
-    path: '/res',
-    name: 'Resources',
-    component: Resources,
   },
   {
     path: '/about',

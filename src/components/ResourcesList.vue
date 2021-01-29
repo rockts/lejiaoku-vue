@@ -21,7 +21,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, PropType } from 'vue';
-import { ResourcesProps } from '../data/testData';
+import { ResourcesProps } from '@/data/testData';
 
 export default defineComponent({
   name: 'ResourcesList',

@@ -1,10 +1,6 @@
 import { createStore } from 'vuex';
-import {
-  testData,
-  testResources,
-  CategoryProps,
-  ResourcesProps,
-} from '@/data/testData';
+import axios from 'axios';
+import { testData, testResources } from '@/data/testData';
 
 interface UserProps {
   isLogin: boolean;
@@ -12,6 +8,23 @@ interface UserProps {
   id?: number;
   categoryId?: number;
 }
+
+export interface CategoryProps {
+  id: number;
+  name?: string;
+  cover?: string;
+  alias: string;
+}
+
+export interface ResourcesProps {
+  id: number;
+  title: string;
+  content: string;
+  cover?: string;
+  createdAt: string;
+  categoryId: number;
+}
+
 export interface GlobalDataOProps {
   categorys: CategoryProps[];
   resources: ResourcesProps[];
@@ -22,7 +35,7 @@ export default createStore<GlobalDataOProps>({
   state: {
     categorys: testData,
     resources: testResources,
-    user: { isLogin: true, name: 'lekeopen', categoryId: 1 },
+    user: { isLogin: false, name: 'lekeopen', categoryId: 1 },
   },
   mutations: {
     login(state) {
@@ -35,18 +48,17 @@ export default createStore<GlobalDataOProps>({
     CreateResources(state, newResources) {
       state.resources.push(newResources);
     },
-  },
-  getters: {
-    biggerColumnsLen(state) {
-      return state.categorys.filter((c) => c.id > 2).length;
-    },
-    getCategoryById: (state) => (id: number) => {
-      return state.categorys.find((c) => c.id === id);
-    },
-    getResourcesByCid: (state) => (cid: number) => {
-      return state.resources.filter((resources) => resources.id == cid);
+    fetchCategory(state, rawData) {
+      state.categorys = rawData.data.list;
     },
   },
-  actions: {},
+
+  actions: {
+    fetchCategory(context) {
+      axios.get('/categorys').then((resp) => {
+        context.commit('fetchCategory', resp.data);
+      });
+    },
+  },
   modules: {},
 });

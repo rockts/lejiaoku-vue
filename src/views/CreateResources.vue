@@ -33,10 +33,9 @@
 import { defineComponent, ref } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
-import { GlobalDataOProps } from '../store/index';
+import { GlobalDataOProps, ResourcesProps } from '@/app/app-store';
 import validateInput, { RulesProp } from '@/components/ValidateInput.vue';
 import ValidateForm from '@/components/ValidateForm.vue';
-import { ResourcesProps } from '@/data/testData';
 
 export default defineComponent({
   name: 'CreateResources',

@@ -1,33 +1,33 @@
 <template>
-  <div class="home">
-    <h2>{{ biggerColumnLen }}</h2>
-    <HelloWorld />
+  <div class="home py-3">
     <category-list :list="list"></category-list>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
+import { defineComponent, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
-import { GlobalDataOProps } from '@/store/index';
+import { GlobalDataOProps } from '@/app/app-store';
 
-import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
+// @ is an alias to /src
 import CategoryList from '@/components/CategoryList.vue';
 
 export default defineComponent({
   name: 'Home',
   components: {
-    HelloWorld,
     CategoryList,
   },
   setup() {
     const store = useStore<GlobalDataOProps>();
+    onMounted(() => {
+      store.dispatch('fetchCategory');
+    });
     const list = computed(() => store.state.categorys);
-    const biggerColumnLen = computed(() => store.getters.biggerColumnsLen);
+
     return {
       list,
-      biggerColumnLen,
     };
   },
 });
 </script>
+<style lang="stylus" scoped></style>
