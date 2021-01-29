@@ -1,5 +1,5 @@
 <template>
-  <div class="retriever text-center sticky-top">
+  <div class="retriever text-center fixed-bottom">
     <div class="container-fluid pt-5">
       这应该是个很牛逼的带筛选器带🔍！
     </div>
