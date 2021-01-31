@@ -1,6 +1,6 @@
 <template>
   <div class="home  py-3">
-    <HomeCategoryList :list="list"></HomeCategoryList>
+    <CategoryList :list="list"></CategoryList>
     <HomeJoin></HomeJoin>
   </div>
 </template>
@@ -11,13 +11,13 @@ import { useStore } from 'vuex';
 import { GlobalDataOProps } from '@/app/app-store';
 
 // @ is an alias to /src
-import HomeCategoryList from './components/HomeCategoryList.vue';
+import CategoryList from '@/app/components/CategoryList.vue';
 import HomeJoin from './components/HomeJoin.vue';
 
 export default defineComponent({
   name: 'Home',
   components: {
-    HomeCategoryList,
+    CategoryList,
     HomeJoin,
   },
   setup() {

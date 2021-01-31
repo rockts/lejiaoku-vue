@@ -2,7 +2,7 @@
   <div class="container">
     <div class="row gx-5">
       <div
-        v-for="category in HomeCategoryList"
+        v-for="category in CategoryList"
         :key="category.id"
         class="col-md-4  py-3 px-5"
       >
@@ -24,27 +24,27 @@
 <script lang="ts">
 import { computed, defineComponent, PropType } from 'vue';
 
-export interface HomeCategoryProps {
+export interface CategoryProps {
   id: number;
   name: string;
   alias: string;
 }
 
 export default defineComponent({
-  name: 'HomeCategoryList',
+  name: 'CategoryList',
   props: {
     list: {
-      type: Array as PropType<HomeCategoryProps[]>,
+      type: Array as PropType<CategoryProps[]>,
       required: true,
     },
   },
   setup(props) {
-    const HomeCategoryList = computed(() => {
+    const CategoryList = computed(() => {
       return props.list.map((category) => {
         return category;
       });
     });
-    return { HomeCategoryList };
+    return { CategoryList };
   },
 });
 </script>
