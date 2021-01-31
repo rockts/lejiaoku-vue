@@ -1,6 +1,6 @@
 import { createApp } from 'vue';
 import axios from 'axios';
-import App from './App.vue';
+import App from '@/app/App.vue';
 import router from '@/app/app-router';
 import store from '@/app/app-store';
 

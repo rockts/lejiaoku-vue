@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import Home from '@/views/Home.vue';
+import Home from '@/home/Home.vue';
 import UserLogin from '@/components/UserLogin.vue';
 import Resources from '@/views/Resources.vue';
 import ResourcesDetail from '@/views/ResourcesDetail.vue';

@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar    navbar-light bg-light">
-    <div class="container-fluid">
-      <router-link to="/" class="navbar-brand mb-0 px-5">
+    <div class="container">
+      <router-link to="/" class="navbar-brand mb-0">
         <img alt="LeJiaoKulogo" src="@/assets/logo.png"
       /></router-link>
       <!-- <button
@@ -25,6 +25,19 @@
           <router-link to="/">贡献者</router-link>
         </li>
       </ul>
+      <div class="mb-0 px-5">
+        <form class="d-flex">
+          <input
+            class="form-control me-2"
+            type="search"
+            placeholder="Search"
+            aria-label="Search"
+          />
+          <button class="btn btn-light" type="submit">
+            <i class="bi bi-search"></i>
+          </button>
+        </form>
+      </div>
       <ul v-if="!user.isLogin" class="list-inline mb-0  px-5">
         <li class="list-inline-item">
           <router-link to="/login" class="btn btn-outline-primary"
@@ -32,9 +45,7 @@
           >
         </li>
         <li class="list-inline-item">
-          <router-link to="/login" class="btn btn-outline-primary"
-            >注册</router-link
-          >
+          <router-link to="/login" class="btn btn-primary">注册</router-link>
         </li>
       </ul>
       <ul v-else class="list-inline mb-0 px-5">
@@ -101,7 +112,7 @@ export default defineComponent({
 
 <style>
 .list-inline-item {
-  padding: 0 15px;
+  padding-right: 10px;
 }
 .menu a {
   float: left;
