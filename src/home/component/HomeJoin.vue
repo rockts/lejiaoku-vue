@@ -5,7 +5,9 @@
         <div class="buttonAndHeader">
           <h3>欢迎加入成为贡献者</h3>
           <div class="button-container">
-            <a class="btn btn-premium btn-lg react-signup" href="#">现在加入</a>
+            <router-link class="btn btn-premium btn-lg react-signup" to="/login"
+              >现在加入</router-link
+            >
           </div>
         </div>
       </div>
