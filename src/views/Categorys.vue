@@ -1,6 +1,6 @@
 <template>
   <div class="res py-5">
-    <category-list :list="list"></category-list>
+    <HomeCategoryList :list="list"></HomeCategoryList>
   </div>
 </template>
 
@@ -9,12 +9,12 @@ import { defineComponent, computed } from 'vue';
 import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
 import { GlobalDataOProps } from '@/app/app-store';
-import CategoryList from '@/components/CategoryList.vue';
+import HomeCategoryList from '@/home/components/HomeCategoryList.vue';
 
 export default defineComponent({
-  name: 'Resources',
+  name: 'Categorys',
   components: {
-    CategoryList,
+    HomeCategoryList,
   },
   setup() {
     const route = useRoute();

@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from '@/home/Home.vue';
 import UserLogin from '@/components/UserLogin.vue';
-import Resources from '@/views/Resources.vue';
+import Categorys from '@/views/Categorys.vue';
 import ResourcesDetail from '@/views/ResourcesDetail.vue';
 import CreateResources from '@/views/CreateResources.vue';
 import About from '@/views/About.vue';
@@ -17,7 +17,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/categorys',
     name: 'Catagorys',
-    component: Resources,
+    component: Categorys,
   },
   {
     path: '/category/:id',

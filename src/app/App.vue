@@ -2,7 +2,6 @@
   <div class="container-fluid">
     <global-haeder :user="currentUser"></global-haeder>
     <Retriever />
-
     <router-view :key="$route.fullPath" />
     <global-footer></global-footer>
   </div>
@@ -13,9 +12,9 @@ import { computed, defineComponent } from 'vue';
 import { useStore } from 'vuex';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import GlobalHaeder from './component/GlobalHaeder.vue';
-import Retriever from './component/app-retriever.vue';
-import GlobalFooter from '@/app/component/GlobalFooter.vue';
+import GlobalHaeder from './components/GlobalHaeder.vue';
+import Retriever from './components/app-retriever.vue';
+import GlobalFooter from '@/app/components/GlobalFooter.vue';
 
 export default defineComponent({
   name: 'App',
