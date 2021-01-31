@@ -25,19 +25,7 @@
           <router-link to="/">贡献者</router-link>
         </li>
       </ul>
-      <div class="mb-0 px-5">
-        <form class="d-flex">
-          <input
-            class="form-control me-2"
-            type="search"
-            placeholder="Search"
-            aria-label="Search"
-          />
-          <button class="btn btn-light" type="submit">
-            <i class="bi bi-search"></i>
-          </button>
-        </form>
-      </div>
+
       <ul v-if="!user.isLogin" class="list-inline mb-0  px-5">
         <li class="list-inline-item">
           <router-link to="/login" class="btn btn-outline-primary"

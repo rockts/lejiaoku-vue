@@ -49,16 +49,16 @@ export default defineComponent({
 .join.section .buttonAndHeader {
   text-align: center;
   display: inline-block;
-  margin-left: -20%;
+  margin-left: 0%;
 }
 
 .join.section h3 {
   color: #fff;
   margin: 0;
   padding-bottom: 50px;
-  font-size: 48px;
+  font-size: 42px;
   white-space: nowrap;
-  text-align: left;
+  text-align: center;
 }
 
 .btn.btn-magenta,
