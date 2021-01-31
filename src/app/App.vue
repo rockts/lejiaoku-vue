@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid text-center">
+  <div class="container-fluid">
     <global-haeder :user="currentUser"></global-haeder>
     <Retriever />
 
@@ -43,10 +43,10 @@ export default defineComponent({
   text-align: center;
   color: #2c3e50;
 }
-.container-fluid {
+/* .container-fluid {
   padding-right: 0px;
   padding-left: 0px;
-}
+} */
 .avatar {
   /* height: 5vh; */
   width: 32px;
