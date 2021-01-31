@@ -2,7 +2,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from '@/home/Home.vue';
 import UserLogin from '@/components/UserLogin.vue';
 import Categorys from '@/views/Categorys.vue';
-import ResourcesDetail from '@/views/ResourcesDetail.vue';
+import CategoryDetail from '@/views/CategoryDetail.vue';
 import CreateResources from '@/views/CreateResources.vue';
 import About from '@/views/About.vue';
 import Test from '@/views/Test.vue';
@@ -22,7 +22,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/category/:id',
     name: 'CategoryDetail',
-    component: ResourcesDetail,
+    component: CategoryDetail,
   },
   {
     path: '/create',

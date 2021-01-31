@@ -1,15 +1,13 @@
 <template>
-  <div class="resources-detail-page w-75 mx-auto">
-    <div class="resources-info row border-bottom py-5 align-items-center">
-      <div class="col-3 text-center">
-        <img :src="category.cover" :alt="category.name" class="cover" />
-      </div>
-      <div class="col-9">
-        <h4>{{ category.name }}</h4>
+  <bread-crumbs></bread-crumbs>
+  <div class="category-detail-page">
+    <div class="container">
+      <div class="category-info  border-bottom py-5 align-items-center">
+        <h3>{{ category.name }}</h3>
         <p class="text-muted">{{ category.alias }}</p>
       </div>
+      <resources-list :list="list"></resources-list>
     </div>
-    <resources-list :list="list"></resources-list>
   </div>
 </template>
 <script lang="ts">
@@ -17,10 +15,12 @@ import { defineComponent } from 'vue';
 import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
 import { GlobalDataOProps } from '@/app/app-store';
-import ResourcesList from '@/components/ResourcesList.vue';
+import BreadCrumbs from '@/app/components/BreadCrumbs.vue';
+import ResourcesList from '@/resources/components/ResourcesList.vue';
 
 export default defineComponent({
   components: {
+    BreadCrumbs,
     ResourcesList,
   },
   setup() {
@@ -38,3 +38,9 @@ export default defineComponent({
   },
 });
 </script>
+
+<style>
+.category-info {
+  background: #ccc;
+}
+</style>
