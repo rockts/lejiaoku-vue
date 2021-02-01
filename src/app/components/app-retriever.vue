@@ -14,15 +14,23 @@
         <div class="search-field">
           <input
             type="text"
-            name="f.search"
+            v-model.trim="content"
+            name="search"
             class="search-input form-control"
             title="Search keywords"
             placeholder="可以搜索课件、教案、试题"
+            @input="onInputContent"
+            @change="onChangeContent"
           />
           <i class="bi bi-search"></i>
         </div>
 
-        <select name="f.general_subject" class="search-select form-control">
+        <select
+          name="subject"
+          v-model="subject"
+          class="search-select form-control"
+          placeholder="科学"
+        >
           <option value="">学科</option>
           <option value="语文">语文</option>
           <option value="数学">数学</option>
@@ -30,23 +38,26 @@
           <option value="物理">物理</option>
         </select>
 
-        <select name="f.sublevel" class="search-select form-control">
-          <option value="">年级</option>
-          <option value="preschool">一年级</option>
-          <option value="lower-primary">二年级</option>
+        <select name="grade" v-model="grade" class="search-select form-control">
+          <option>年级</option>
+          <option value="一年级上册">一年级上册</option>
+          <option value="一年级下册">一年级下册</option>
+          <option value="lower-primary">二年级上册</option>
+          <option value="upper-primary">二年级下册</option>
           <option value="upper-primary">三年级</option>
         </select>
 
         <select
-          name="f.alignment_standard"
-          id="id_curriculum_standard"
+          name="version"
+          id="id_textbook_version"
+          v-model="version"
           class="search-select form-control js-standards-select"
-          data-helper-url="/standards/align-widget-helper?existing"
         >
-          <option value="">版本</option>
-          <option value="curriculum.2">人教版</option>
-          <option value="curriculum.3">北师大版</option>
-          <option value="ngss.1">陕旅版</option>
+          <option>版本</option>
+          <option value="人教版">人教版</option>
+          <option value="北师大版">北师大版</option>
+          <option value="陕旅版">陕旅版</option>
+          <option value="冀教版">冀教版</option>
         </select>
         <button class="btn btn-big-link btn-search">搜索</button>
       </form>
@@ -62,6 +73,14 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'Retriever',
+  methods: {
+    onInputContent(event) {
+      console.log(event);
+    },
+    onChangeContent(event) {
+      console.log(event.target.value);
+    },
+  },
 });
 </script>
 

@@ -35,7 +35,7 @@ export default createStore<GlobalDataOProps>({
   state: {
     categorys: testData,
     resources: testResources,
-    user: { isLogin: false, name: 'lekeopen', categoryId: 1 },
+    user: { isLogin: true, name: 'lekeopen', categoryId: 1 },
   },
   mutations: {
     login(state) {
