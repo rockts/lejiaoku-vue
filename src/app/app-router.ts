@@ -37,8 +37,13 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiredLogin: true },
   },
   {
-    path: '/test/:id',
+    path: '/test',
     name: 'Test',
+    component: Test,
+  },
+  {
+    path: '/test/:id',
+    name: 'TestID',
     component: Test,
   },
   {

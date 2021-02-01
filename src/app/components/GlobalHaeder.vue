@@ -2,8 +2,8 @@
   <nav class="navbar    navbar-light bg-light">
     <div class="container">
       <router-link to="/" class="navbar-brand mb-0">
-        <img alt="LeJiaoKulogo" src="@/assets/logo.png"
-      /></router-link>
+        <img alt="LeJiaoKulogo" src="@/assets/logo.png" />
+      </router-link>
       <!-- <button
         class="navbar-toggler"
         type="button"
@@ -15,7 +15,7 @@
       >
         <span class="navbar-toggler-icon"></span>
       </button> -->
-      <!-- <div class="collapse navbar-collapse" id="navbarSupportedContent"> -->
+
       <ul class="me-auto list-inline mb-0  px-5">
         <li class="list-inline-item">
           <router-link to="/categorys">资源</router-link>
@@ -24,7 +24,12 @@
         <li class="list-inline-item">
           <router-link to="/">贡献者</router-link>
         </li>
+        <li class="list-inline-item">
+          <router-link to="/test">测试</router-link>
+        </li>
       </ul>
+
+      <!-- Button trigger modal -->
 
       <ul v-if="!user.isLogin" class="list-inline mb-0  px-5">
         <li class="list-inline-item">
@@ -36,6 +41,7 @@
           <router-link to="/login" class="btn btn-primary">注册</router-link>
         </li>
       </ul>
+
       <ul v-else class="list-inline mb-0 px-5">
         <li class="list-inline-items">
           <dropdown :title="`${user.name}`">
@@ -63,7 +69,6 @@
         </li>
       </ul>
     </div>
-    <!-- </div> -->
   </nav>
 </template>
 
