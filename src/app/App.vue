@@ -56,8 +56,4 @@ export default defineComponent({
   text-align: center;
   margin: 20px 0;
 }
-.cover {
-  border-radius: 40px;
-  padding: 10px;
-}
 </style>

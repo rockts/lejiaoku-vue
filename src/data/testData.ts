@@ -59,7 +59,7 @@ export const testResources: ResourcesProps[] = [
     id: 1,
     title: 'What is Test Data in Software Testing?',
     content:
-      'Test Data in Software Testing is the input given to a software program during test execution. It represents data that affects or affected by software execution while testing. Test data is used for both positive testing to verify that functions produce expected results for given inputs and for negative testing to test software ability to handle unusual, exceptional or unexpected inputs.',
+      'Test Data in Software Testing is the input given to a software program during test execution. It represents data that affects or affected by software execution while testing. Test data is used for both positive testing to verify that functions produce expected results for given inputs and for negative testing to test software ability to handle unusual, exceptional or unexpected inputs.Test Data in Software Testing is the input given to a software program during test execution. It represents data that affects or affected by software execution while testing. Test data is used for both positive testing to verify that functions produce expected results for given inputs and for negative testing to test software ability to handle unusual, exceptional or unexpected inputsTest Data in Software Testing is the input given to a software program during test execution. It represents data that affects or affected by software execution while testing. Test data is used for both positive testing to verify that functions produce expected results for given inputs and for negative testing to test software ability to handle unusual, exceptional or unexpected inputs',
     cover: require('@/assets/catagory.png'),
     createdAt: '2020-06-03 10:34:22',
     categoryId: 1,
@@ -96,7 +96,7 @@ export const testResources: ResourcesProps[] = [
     title: 'Automated Test Data Generation Tools',
     content:
       'n order to generate various sets of data, you can use a gamut of automated test data generation tools. Below are some examples of such tools:',
-    cover: require('@/assets/catagory.png'),
+    cover: require('@/assets/BTS20_CatHero_LearningMaterials_Desktop.jpg'),
     createdAt: '2020-06-03 10:34:22',
     categoryId: 3,
   },
