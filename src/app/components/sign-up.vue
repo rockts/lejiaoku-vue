@@ -3,33 +3,41 @@
     <form>
       <div class="form-group sign-input-prepend">
         <input
-          type="email"
+          type="username"
           class="form-control"
           id="exampleInputEmail1"
-          aria-describedby="emailHelp"
-          placeholder="手机号或邮箱"
+          placeholder="输入昵称"
         /><i class="bi bi-person-fill"></i>
+      </div>
+      <div class="form-group sign-input-prepend">
+        <input
+          type="number"
+          class="form-control"
+          id="exampleInputEmail1"
+          placeholder="输入手机号"
+        /><i class="bi bi-phone-fill"></i>
       </div>
       <div class="form-group sign-input-prepend">
         <input
           type="password"
           class="form-control"
           id="exampleInputPassword1"
-          placeholder="密码"
+          placeholder="设置密码"
         /><i class="bi bi-bag-fill"></i>
-      </div>
-      <div class="sign-forget-btn"><a href="#">忘记密码？</a></div>
-      <div class="sign-sign-up">
-        <a href="/sign_up">注册</a>
       </div>
 
       <div class="form-check my-2">
         <button type="submit" class="btn btn-outline-primary  btn-block">
-          登录
+          注册
         </button>
+        <small
+          >点击 “注册” 即表示您同意并愿意遵守乐教库
+          <router-link to="/">用户协议</router-link> 和
+          <router-link to="/">隐私政策</router-link>。</small
+        >
       </div>
       <div class="sign-more">
-        <h6>社交账号登录</h6>
+        <h6>社交账号直接注册</h6>
         <ul>
           <li>
             <img
@@ -50,63 +58,11 @@
     </form>
   </div>
 </template>
+
 <script lang="ts">
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: 'SignIn',
+  name: 'SignUp',
 });
 </script>
-<style scoped>
-.main {
-  width: 400px;
-  margin: 10px auto;
-  padding: 50px 50px 30px;
-  background-color: #fff;
-  border-radius: 4px;
-  box-shadow: 0 0 8px rgb(0 0 0 / 10%);
-  vertical-align: middle;
-  display: inline-block;
-}
-.sign-input-prepend i {
-  color: #999;
-  position: absolute;
-  left: 30px;
-  top: 10px;
-  font: 30px;
-}
-
-.sign-input-prepend input {
-  padding: 0 40px;
-  height: 50px;
-}
-
-.sign-forget-btn {
-  float: left;
-  margin: 15px 0;
-}
-
-.sign-sign-up {
-  float: right;
-  position: relative;
-  margin: 15px 0;
-}
-
-.sign-more {
-  position: relative;
-  margin: 0 0 10px;
-  font-size: 12px;
-  color: #b5b5b5;
-  padding-top: 40px;
-}
-
-.sign-more h6 {
-  font-size: 18px;
-}
-
-.sign-more li {
-  list-style: none;
-  display: inline;
-  padding-right: 10px;
-}
-</style>

@@ -8,8 +8,8 @@ import ResourcesDetail from '@/resources/ResourcesDetail.vue';
 import About from '@/views/About.vue';
 import Test from '@/views/Test.vue';
 import store from '@/app/app-store';
-import signIn from '@/app/components/sign_in.vue';
-import signUp from '@/app/components/sign_up.vue';
+import signIn from '@/app/components/sign-in.vue';
+import signUp from '@/app/components/sign-up.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -49,12 +49,12 @@ const routes: Array<RouteRecordRaw> = [
     component: Test,
   },
   {
-    path: '/sign_in',
+    path: '/sign-in',
     name: 'signIn',
     component: signIn,
   },
   {
-    path: '/sign_up',
+    path: '/sign-up',
     name: 'signUp',
     component: signUp,
   },

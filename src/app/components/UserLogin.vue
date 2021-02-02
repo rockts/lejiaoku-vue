@@ -1,7 +1,5 @@
 <template>
-  <!-- Extra large modal -->
-  <div class="container my-5"></div>
-  <div class="container">
+  <div class="container mt-5">
     <nav>
       <div class="nav nav-tabs" id="nav-tab" role="tablist">
         <a
@@ -37,19 +35,11 @@
       </div>
       <div
         class="tab-pane fade"
-        id="nav-profile"
+        id="sign-up"
         role="tabpanel"
-        aria-labelledby="nav-profile-tab"
+        aria-labelledby="sign-up-tab"
       >
-        ...
-      </div>
-      <div
-        class="tab-pane fade"
-        id="nav-contact"
-        role="tabpanel"
-        aria-labelledby="nav-contact-tab"
-      >
-        ...
+        <sign-up></sign-up>
       </div>
     </div>
   </div>
@@ -59,11 +49,12 @@
 import { defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
-import SignIn from './sign_in.vue';
+import SignIn from './sign-in.vue';
+import SignUp from './sign-up.vue';
 
 export default defineComponent({
   name: 'UserLogin',
-  components: { SignIn },
+  components: { SignIn, SignUp },
 
   setup() {
     const emailVal = ref('');
