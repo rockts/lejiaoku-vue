@@ -6,8 +6,41 @@
       <p>
         我们需要你的帮助！
       </p>
+
+      <div
+        class="modal fade"
+        id="SignUpModal"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="SignUpModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <SignUp></SignUp>
+            </div>
+          </div>
+        </div>
+      </div>
       <p class="lead">
-        <router-link class="btn btn-primary" to="/login" role="button"
+        <router-link
+          type="button"
+          data-toggle="modal"
+          data-target="#SignUpModal"
+          to="#"
+          class="btn btn-primary"
+          role="button"
           >现在加入
         </router-link>
       </p>

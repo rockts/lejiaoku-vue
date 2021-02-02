@@ -83,7 +83,7 @@
         >
           <div class="modal-dialog" role="document">
             <div class="modal-content">
-              <div class="modal-header">
+              <div class="modal-body">
                 <h5 class="modal-title" id="SignInModalLabel">欢迎回来</h5>
                 <button
                   type="button"
@@ -93,8 +93,6 @@
                 >
                   <span aria-hidden="true">&times;</span>
                 </button>
-              </div>
-              <div class="modal-body">
                 <sign-in></sign-in>
               </div>
             </div>
