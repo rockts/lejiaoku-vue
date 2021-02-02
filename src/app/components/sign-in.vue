@@ -18,13 +18,13 @@
           placeholder="密码"
         /><i class="bi bi-bag-fill"></i>
       </div>
-      <div class="sign-forget-btn"><a href="#">忘记密码？</a></div>
-      <div class="sign-sign-up">
-        <a href="/sign_up">注册</a>
+
+      <div class="sign-btn">
+        <a href="#">忘记密码？</a> <a href="/sign-up">注册</a>
       </div>
 
-      <div class="form-check my-2">
-        <button type="submit" class="btn btn-outline-primary  btn-block">
+      <div class="my-2">
+        <button type="submit" class="btn btn-outline-primary btn-block">
           登录
         </button>
       </div>
@@ -68,6 +68,10 @@ export default defineComponent({
   vertical-align: middle;
   display: inline-block;
 }
+.sign-input-prepend {
+  height: 60px;
+  margin: 5px 0;
+}
 .sign-input-prepend i {
   color: #999;
   position: relative;
@@ -81,15 +85,13 @@ export default defineComponent({
   height: 50px;
 }
 
-.sign-forget-btn {
-  float: left;
-  margin: 15px 0;
-}
-
-.sign-sign-up {
-  float: right;
+.sign-btn {
   position: relative;
   margin: 15px 0;
+}
+.sign-btn a {
+  padding: auto 40px;
+  text-decoration: none;
 }
 
 .sign-more {

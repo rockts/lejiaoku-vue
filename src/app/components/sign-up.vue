@@ -26,8 +26,8 @@
         /><i class="bi bi-bag-fill"></i>
       </div>
 
-      <div class="form-check my-2">
-        <button type="submit" class="btn btn-outline-primary  btn-block">
+      <div class="my-2">
+        <button type="submit" class="btn btn-outline-primary btn-block">
           注册
         </button>
         <small

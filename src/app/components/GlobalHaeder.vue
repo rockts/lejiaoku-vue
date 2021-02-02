@@ -72,14 +72,77 @@
           </button>
         </form>
 
+        <!-- Modal -->
+        <div
+          class="modal fade"
+          id="SignInModal"
+          tabindex="-1"
+          role="dialog"
+          aria-labelledby="SignInModalLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-body">
+                <button
+                  type="button"
+                  class="close"
+                  data-dismiss="modal"
+                  aria-label="Close"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+                <sign-in></sign-in>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="modal fade"
+          id="SignUpModal"
+          tabindex="-1"
+          role="dialog"
+          aria-labelledby="SignUpModalLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-body">
+                <button
+                  type="button"
+                  class="close"
+                  data-dismiss="modal"
+                  aria-label="Close"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+                <SignUp></SignUp>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Button trigger modal -->
+
         <ul v-if="!user.isLogin" class="navbar-nav">
-          <li class="nav-item px-3">
-            <router-link to="/sign-in" class="btn  btn-outline-primary"
+          <li class="nav-item px-1 py-1">
+            <router-link
+              type="button"
+              to="/sign-in"
+              data-toggle="modal"
+              data-target="#SignInModal"
+              class="btn  btn-outline-primary"
               >登录</router-link
             >
           </li>
-          <li class="nav-item">
-            <router-link to="/sign-up" class="btn btn-primary"
+          <li class="nav-item px-1 py-1">
+            <router-link
+              type="button"
+              data-toggle="modal"
+              data-target="#SignUpModal"
+              to="/sign-up"
+              class="btn btn-primary"
               >注册</router-link
             >
           </li>
@@ -122,6 +185,8 @@ import { computed, defineComponent, PropType } from 'vue';
 import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
 import { GlobalDataOProps } from '@/app/app-store';
+import SignIn from './sign-in.vue';
+import SignUp from './sign-up.vue';
 
 export interface UserProps {
   isLogin: boolean;
@@ -136,6 +201,8 @@ export interface CategoryProps {
 
 export default defineComponent({
   name: 'GlobalHaeder',
+
+  components: { SignIn, SignUp },
 
   props: {
     user: {
