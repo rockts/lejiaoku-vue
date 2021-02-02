@@ -34,26 +34,17 @@ import { defineComponent, ref } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { GlobalDataOProps, ResourcesProps } from '@/app/app-store';
-import validateInput, { RulesProp } from '@/components/ValidateInput.vue';
-import ValidateForm from '@/components/ValidateForm.vue';
 
 export default defineComponent({
   name: 'CreateResources',
-  components: {
-    validateInput,
-    ValidateForm,
-  },
+  components: {},
   setup() {
     const titleVal = ref();
     const router = useRouter();
     const store = useStore<GlobalDataOProps>();
-    const titleRules: RulesProp = [
-      { type: 'required', message: '资源标题不能为空' },
-    ];
+
     const contentVal = ref('');
-    const contentRules: RulesProp = [
-      { type: 'required', message: '资源介绍不能为空' },
-    ];
+
     const onFormSubmit = (result: boolean) => {
       if (result) {
         const { categoryId } = store.state.user;
@@ -72,10 +63,9 @@ export default defineComponent({
     };
 
     return {
-      titleRules,
       titleVal,
       contentVal,
-      contentRules,
+
       onFormSubmit,
     };
   },

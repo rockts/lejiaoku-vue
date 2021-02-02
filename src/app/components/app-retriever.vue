@@ -9,7 +9,7 @@
         action="/search"
         method="GET"
         name="advanced-search"
-        class="search-form visible-md-block visible-lg-block js-search-form"
+        class="search-form 	d-none d-md-block 	 d-lg-block  js-search-form"
       >
         <div class="search-field">
           <input
@@ -61,7 +61,7 @@
         </select>
         <button class="btn btn-big-link btn-search">搜索</button>
       </form>
-      <div class="advanced-search-call-out">
+      <div class="advanced-search-call-out d-none d-md-block 	d-lg-block">
         可以按学科、年级、版本搜索
       </div>
     </div>
@@ -88,4 +88,13 @@ export default defineComponent({
 
 <style scoped>
 @import './styles/app-retriever.css';
+@import '/app/styles/aa.css';
+
+.form-control {
+  width: 200px;
+}
+
+.search-input {
+  width: 300px;
+}
 </style>

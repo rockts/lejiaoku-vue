@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from '@/home/Home.vue';
-import UserLogin from '@/components/UserLogin.vue';
+import UserLogin from '@/app/components/UserLogin.vue';
 import Categorys from '@/views/Categorys.vue';
 import CategoryDetail from '@/views/CategoryDetail.vue';
 import CreateResources from '@/views/CreateResources.vue';
@@ -8,6 +8,8 @@ import ResourcesDetail from '@/resources/ResourcesDetail.vue';
 import About from '@/views/About.vue';
 import Test from '@/views/Test.vue';
 import store from '@/app/app-store';
+import signIn from '@/app/components/sign_in.vue';
+import signUp from '@/app/components/sign_up.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -45,6 +47,16 @@ const routes: Array<RouteRecordRaw> = [
     path: '/test/:id',
     name: 'TestID',
     component: Test,
+  },
+  {
+    path: '/sign_in',
+    name: 'signIn',
+    component: signIn,
+  },
+  {
+    path: '/sign_up',
+    name: 'signUp',
+    component: signUp,
   },
   {
     path: '/login',

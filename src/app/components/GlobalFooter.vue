@@ -1,6 +1,6 @@
 <template>
-  <div class="text-cneter py-4 text-secondary bg-light">
-    <small>
+  <navbar>
+    <div class="text-cneter py-4 text-secondary bg-light">
       <ul class="list-inline mb-0">
         <li class="list-inline-item">
           <router-link to="/">首页</router-link>
@@ -12,8 +12,8 @@
           <router-link to="/about">关于我们</router-link>
         </li>
       </ul>
-    </small>
-  </div>
+    </div>
+  </navbar>
 </template>
 
 <script lang="ts">
