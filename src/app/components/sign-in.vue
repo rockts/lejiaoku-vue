@@ -1,33 +1,29 @@
 <template>
-  <div class="main my-5  py-4">
+  <div class="main my-2">
     <form>
-      <div class="form-group sign-input-prepend">
-        <input
-          type="email"
-          class="form-control"
-          id="exampleInputEmail1"
-          aria-describedby="emailHelp"
-          placeholder="手机号或邮箱"
-        /><i class="bi bi-person-fill"></i>
-      </div>
-      <div class="form-group sign-input-prepend">
-        <input
-          type="password"
-          class="form-control"
-          id="exampleInputPassword1"
-          placeholder="密码"
-        /><i class="bi bi-bag-fill"></i>
-      </div>
+      <input
+        type="email"
+        class="form-control"
+        id="exampleInputEmail1"
+        aria-describedby="emailHelp"
+        placeholder="手机号或邮箱"
+      /><i class="bi bi-person-fill"></i>
+
+      <input
+        type="password"
+        class="form-control"
+        id="exampleInputPassword1"
+        placeholder="密码"
+      /><i class="bi bi-bag-fill"></i>
 
       <div class="sign-btn">
         <a href="#">忘记密码？</a> <a href="/sign-up">注册</a>
       </div>
 
-      <div class="my-2">
-        <button type="submit" class="btn btn-outline-primary btn-block">
-          登录
-        </button>
-      </div>
+      <button type="submit" class="w-100 btn btn-lg btn-primary">
+        登录
+      </button>
+
       <div class="sign-more">
         <h6>社交账号登录</h6>
         <ul>
@@ -59,30 +55,36 @@ export default defineComponent({
 </script>
 <style>
 .main {
-  width: 400px;
-  margin: 10px auto;
-  padding: 50px 50px 30px;
-  background-color: #fff;
+  width: 100%;
+  max-width: 330px;
+  padding: 15px;
+  margin: auto;
   border-radius: 4px;
   box-shadow: 0 0 8px rgb(0 0 0 / 10%);
   vertical-align: middle;
   display: inline-block;
 }
-.sign-input-prepend {
-  height: 60px;
-  margin: 5px 0;
-}
-.sign-input-prepend i {
-  color: #999;
-  position: relative;
-  left: -130px;
-  top: -52px;
-  line-height: 50px;
+
+.main input {
+  margin-bottom: -1px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }
 
-.sign-input-prepend input {
-  padding: 0 40px;
-  height: 50px;
+.main .form-control {
+  position: relative;
+  box-sizing: border-box;
+  height: auto;
+  padding: 10px;
+  font-size: 16px;
+  padding-left: 30px;
+}
+
+.main i {
+  color: #999;
+  position: relative;
+  left: -135px;
+  top: -37px;
 }
 
 .sign-btn {

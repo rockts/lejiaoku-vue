@@ -83,7 +83,8 @@
         >
           <div class="modal-dialog" role="document">
             <div class="modal-content">
-              <div class="modal-body">
+              <div class="modal-header">
+                <h5 class="modal-title" id="SignInModalLabel">欢迎回来</h5>
                 <button
                   type="button"
                   class="close"
@@ -92,6 +93,8 @@
                 >
                   <span aria-hidden="true">&times;</span>
                 </button>
+              </div>
+              <div class="modal-body">
                 <sign-in></sign-in>
               </div>
             </div>
@@ -108,7 +111,7 @@
         >
           <div class="modal-dialog" role="document">
             <div class="modal-content">
-              <div class="modal-body">
+              <div class="modal-header">
                 <button
                   type="button"
                   class="close"
@@ -117,6 +120,8 @@
                 >
                   <span aria-hidden="true">&times;</span>
                 </button>
+              </div>
+              <div class="modal-body">
                 <SignUp></SignUp>
               </div>
             </div>
@@ -129,7 +134,7 @@
           <li class="nav-item px-1 py-1">
             <router-link
               type="button"
-              to="/sign-in"
+              to="#"
               data-toggle="modal"
               data-target="#SignInModal"
               class="btn  btn-outline-primary"
@@ -141,7 +146,7 @@
               type="button"
               data-toggle="modal"
               data-target="#SignUpModal"
-              to="/sign-up"
+              to="#"
               class="btn btn-primary"
               >注册</router-link
             >

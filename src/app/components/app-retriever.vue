@@ -88,7 +88,6 @@ export default defineComponent({
 
 <style scoped>
 @import './styles/app-retriever.css';
-@import '/app/styles/aa.css';
 
 .form-control {
   width: 200px;

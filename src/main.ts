@@ -8,6 +8,7 @@ import 'popper.js';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import 'normalize.css/normalize.css';
 
 axios.get('http://localhost:3000').then((resp) => {
   console.log(resp.data);
