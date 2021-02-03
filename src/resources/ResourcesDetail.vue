@@ -100,10 +100,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.card-header {
-  background: #fff;
-}
-
 .card-title,
 .card-text,
 .card-footer,

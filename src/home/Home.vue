@@ -1,5 +1,5 @@
 <template>
-  <div class="home  py-3">
+  <div class="home  pt-3">
     <CategoryList :list="list"></CategoryList>
     <HomeJoin></HomeJoin>
   </div>

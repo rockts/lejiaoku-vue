@@ -1,6 +1,6 @@
 <template>
   <div class="home__join mt-3 mb-0">
-    <div class="jumbotron">
+    <div class="jumbotron" style="margin-bottom: 0px;">
       <h1 class="display-3">欢迎成为贡献者</h1>
       <hr class="my-4" />
       <p>
@@ -58,5 +58,8 @@ export default defineComponent({
 <style>
 .home__join {
   background: #076e95;
+}
+.jumbotron-bottom {
+  margin: 0;
 }
 </style>

@@ -3,10 +3,7 @@
     <div class="text-cneter py-4 text-secondary bg-light">
       <ul class="list-inline mb-0">
         <li class="list-inline-item">
-          <router-link to="#">© 乐教库 2021</router-link>
-        </li>
-        <li class="list-inline-item">
-          <router-link to="/">首页</router-link>
+          © 乐教库 2021
         </li>
         <li class="list-inline-item">
           <router-link to="/">用户协议</router-link>
@@ -15,7 +12,7 @@
           <router-link to="/">隐私政策</router-link>
         </li>
         <li class="list-inline-item">
-          <router-link to="/categorys">资源</router-link>
+          <router-link :to="{ name: 'resourcesIndex' }">资源</router-link>
         </li>
         <li class="list-inline-item">
           <router-link to="/about">关于我们</router-link>

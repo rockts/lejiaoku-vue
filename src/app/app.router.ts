@@ -1,16 +1,28 @@
+/**
+ * @FileDescription: app router
+ * @Author: gaopeng(gaopeng@lekee.cc)
+ * @Date: 2021-2-2 20:47
+ * @LastEditors: gaopeng(gaopeng@lekee.cc)
+ * @LastEditTime: 2021-2-3
+ */
+
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from '@/home/Home.vue';
+import About from '@/views/About.vue';
+import resourcesRoutes from '@/resources/resources.routes';
 import UserLogin from '@/app/components/UserLogin.vue';
 import Categorys from '@/views/Categorys.vue';
 import CategoryDetail from '@/views/CategoryDetail.vue';
 import CreateResources from '@/views/CreateResources.vue';
 import ResourcesDetail from '@/resources/ResourcesDetail.vue';
-import About from '@/views/About.vue';
 import Test from '@/views/Test.vue';
 import store from '@/app/app-store';
 import signIn from '@/app/components/sign-in.vue';
 import signUp from '@/app/components/sign-up.vue';
 
+/**
+ * 定义路由
+ */
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
@@ -69,7 +81,12 @@ const routes: Array<RouteRecordRaw> = [
     name: 'About',
     component: About,
   },
+  ...resourcesRoutes,
 ];
+
+/**
+ * 创建路由器
+ */
 
 const router = createRouter({
   history: createWebHistory(),
