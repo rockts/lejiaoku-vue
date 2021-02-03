@@ -1,3 +1,11 @@
+/**
+ * @FileDescription: app store
+ * @Author: gaopeng(gaopeng@lekee.cc)
+ * @Date: 2021-2-1 11:52
+ * @LastEditors: gaopeng(gaopeng@lekee.cc)
+ * @LastEditTime: 2021-2-3 21:02
+ */
+
 import { createStore } from 'vuex';
 import axios from 'axios';
 import { testData, testResources } from '@/data/testData';
@@ -31,11 +39,14 @@ export interface GlobalDataOProps {
   user: UserProps;
 }
 
+/**
+ * 创建 Store
+ */
 export default createStore<GlobalDataOProps>({
   state: {
     categorys: testData,
     resources: testResources,
-    user: { isLogin: false, name: 'lekeopen', categoryId: 1 },
+    user: { isLogin: true, name: 'lekeopen', categoryId: 1 },
   },
   mutations: {
     login(state) {
