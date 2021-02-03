@@ -15,7 +15,7 @@ import Categorys from '@/views/Categorys.vue';
 import CategoryDetail from '@/views/CategoryDetail.vue';
 import CreateResources from '@/views/CreateResources.vue';
 import Test from '@/views/Test.vue';
-import store from '@/app/app-store';
+import store from '@/app/app.store';
 import signIn from '@/app/components/sign-in.vue';
 import signUp from '@/app/components/sign-up.vue';
 
@@ -58,6 +58,7 @@ const routes: Array<RouteRecordRaw> = [
     path: '/sign-in',
     name: 'signIn',
     component: signIn,
+    meta: { redirectAlreadyLogin: true },
   },
   {
     path: '/sign-up',
@@ -87,11 +88,16 @@ const router = createRouter({
   routes,
 });
 
+/**
+ * 导航守卫
+ */
+
 router.beforeEach((to, from, next) => {
+  console.log('👮‍♀️');
   console.log(to.meta);
 
   if (to.meta.requiredLogin && !store.state.user.isLogin) {
-    next({ name: 'login' });
+    next({ name: 'signIn' });
   } else if (to.meta.redirectAlreadyLogin && store.state.user.isLogin) {
     next('/');
   } else {

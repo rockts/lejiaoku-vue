@@ -9,7 +9,7 @@
 import { defineComponent, computed } from 'vue';
 import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
-import { GlobalDataOProps } from '@/app/app-store';
+import { GlobalDataOProps } from '@/app/app.store';
 import CategoryList from '@/app/components/CategoryList.vue';
 import BreadCrumbs from '@/app/components/BreadCrumbs.vue';
 

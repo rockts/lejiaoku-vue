@@ -1,7 +1,7 @@
 <template>
   <div class="create-resources-page">
     <h4>发布资源</h4>
-    <validate-form @form-submit="onFormSubmit">
+    <form @form-submit="onFormSubmit">
       <div class="mb-3">
         <label class="form-label">资源标题：</label>
         <validate-input
@@ -22,10 +22,9 @@
           v-model="contentVal"
         />
       </div>
-      <template #submit>
-        <button class="btn btn-primary btn-large">发布资源</button>
-      </template>
-    </validate-form>
+
+      <button class="btn btn-primary btn-large">发布资源</button>
+    </form>
   </div>
 </template>
 
@@ -33,7 +32,7 @@
 import { defineComponent, ref } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
-import { GlobalDataOProps, ResourcesProps } from '@/app/app-store';
+import { GlobalDataOProps, ResourcesProps } from '@/app/app.store';
 
 export default defineComponent({
   name: 'CreateResources',

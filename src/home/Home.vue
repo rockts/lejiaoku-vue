@@ -8,7 +8,7 @@
 <script lang="ts">
 import { defineComponent, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
-import { GlobalDataOProps } from '@/app/app-store';
+import { GlobalDataOProps } from '@/app/app.store';
 
 // @ is an alias to /src
 import CategoryList from '@/app/components/CategoryList.vue';

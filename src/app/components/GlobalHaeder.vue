@@ -109,7 +109,7 @@
         >
           <div class="modal-dialog" role="document">
             <div class="modal-content">
-              <div class="modal-header">
+              <div class="modal-body">
                 <button
                   type="button"
                   class="close"
@@ -118,8 +118,6 @@
                 >
                   <span aria-hidden="true">&times;</span>
                 </button>
-              </div>
-              <div class="modal-body">
                 <SignUp></SignUp>
               </div>
             </div>
@@ -187,7 +185,7 @@
 import { computed, defineComponent, PropType } from 'vue';
 import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
-import { GlobalDataOProps } from '@/app/app-store';
+import { GlobalDataOProps } from '@/app/app.store';
 import SignIn from './sign-in.vue';
 import SignUp from './sign-up.vue';
 

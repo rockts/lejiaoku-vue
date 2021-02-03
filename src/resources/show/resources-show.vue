@@ -77,7 +77,7 @@
 import { defineComponent } from 'vue';
 import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
-import { GlobalDataOProps } from '@/app/app-store';
+import { GlobalDataOProps } from '@/app/app.store';
 import BreadCrumbs from '@/app/components/BreadCrumbs.vue';
 
 export default defineComponent({

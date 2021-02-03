@@ -2,7 +2,7 @@ import { createApp } from 'vue';
 import axios from 'axios';
 import App from './app/App.vue';
 import router from './app/app.router';
-import store from './app/app-store';
+import store from './app/app.store';
 import 'jquery';
 import 'popper.js';
 import 'bootstrap';
