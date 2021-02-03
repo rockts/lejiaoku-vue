@@ -3,7 +3,7 @@
  * @Author: gaopeng(gaopeng@lekee.cc)
  * @Date: 2021-2-2 20:47
  * @LastEditors: gaopeng(gaopeng@lekee.cc)
- * @LastEditTime: 2021-2-3
+ * @LastEditTime: 2021-2-3 21:02
  */
 
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
@@ -14,7 +14,6 @@ import UserLogin from '@/app/components/UserLogin.vue';
 import Categorys from '@/views/Categorys.vue';
 import CategoryDetail from '@/views/CategoryDetail.vue';
 import CreateResources from '@/views/CreateResources.vue';
-import ResourcesDetail from '@/resources/ResourcesDetail.vue';
 import Test from '@/views/Test.vue';
 import store from '@/app/app-store';
 import signIn from '@/app/components/sign-in.vue';
@@ -38,11 +37,6 @@ const routes: Array<RouteRecordRaw> = [
     path: '/category/:id',
     name: 'CategoryDetail',
     component: CategoryDetail,
-  },
-  {
-    path: '/resources/:id',
-    name: 'ResourcesDetail',
-    component: ResourcesDetail,
   },
   {
     path: '/create',

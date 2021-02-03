@@ -61,7 +61,7 @@
               <li>年级：三年级上册</li>
               <li>版本：人教版</li>
               <li>文件类型：ppt</li>
-              <li><span>资源类型：</span>{{ category.name }}</li>
+              <li><span>资源类型：</span>课件</li>
               <li>大小：15KB</li>
               <li><router-link to="#">贡献者：高鹏</router-link></li>
               <li>发布时间：{{ resources.createdAt }}</li>
@@ -87,13 +87,11 @@ export default defineComponent({
   setup() {
     const route = useRoute();
     const store = useStore<GlobalDataOProps>();
-    const currnetId = +route.params.id;
+    const currnetId = +route.params.resourcesId;
     const resources = store.state.resources.find((c) => c.id == currnetId);
-    const category = store.state.categorys.find((c) => c.id == currnetId);
 
     return {
       resources,
-      category,
     };
   },
 });
