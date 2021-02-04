@@ -2,25 +2,28 @@
   <div class="main my-2">
     <form>
       <input
-        type="email"
+        type="text"
         class="form-control"
-        id="exampleInputEmail1"
-        aria-describedby="emailHelp"
-        placeholder="手机号或邮箱"
+        v-model="name"
+        placeholder="用户名"
       /><i class="bi bi-person-fill"></i>
 
       <input
         type="password"
         class="form-control"
-        id="exampleInputPassword1"
         placeholder="密码"
+        v-model="password"
       /><i class="bi bi-bag-fill"></i>
 
       <div class="sign-btn">
         <a href="#">忘记密码？</a> <a href="/sign-up">注册</a>
       </div>
 
-      <button type="submit" class="w-100 btn btn-lg btn-primary">
+      <button
+        type="submit"
+        @click="signIn"
+        class="w-100 btn btn-lg btn-primary"
+      >
         登录
       </button>
 
@@ -54,25 +57,28 @@ export default defineComponent({
   name: 'SignIn',
   data() {
     return {
-      errorMessage: '',
-      user: {
-        name: '高鹏',
-        password: '123123',
-      },
-      token: '',
+      name: '',
+      password: '',
     };
   },
 
-  async created() {
-    // 用户登录
-    try {
-      const response = await axios.post('/login', this.user);
-      this.token = response.data.token;
+  methods: {
+    async signIn() {
+      console.log(this.name, this.password);
 
-      console.log(response.data);
-    } catch (error) {
-      this.errorMessage = error.message;
-    }
+      try {
+        const response = await axios.post('/login', {
+          name: this.name,
+          password: this.password,
+        });
+
+        console.log(response.data);
+      } catch (error) {
+        console.log(error.response);
+
+        this.$emit('login-error', error.response);
+      }
+    },
   },
 });
 </script>

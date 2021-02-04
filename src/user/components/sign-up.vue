@@ -1,26 +1,17 @@
 <template>
   <div class="main my-2">
     <form>
-      <input
-        type="text"
-        class="form-control"
-        id="exampleInputEmail1"
-        placeholder="输入昵称"
-      /><i class="bi bi-person-fill"></i>
+      <input type="text" class="form-control" placeholder="输入昵称" /><i
+        class="bi bi-person-fill"
+      ></i>
 
-      <input
-        type="text"
-        class="form-control"
-        id="exampleInputEmail1"
-        placeholder="输入手机号"
-      /><i class="bi bi-phone-fill"></i>
+      <input type="text" class="form-control" placeholder="输入手机号" /><i
+        class="bi bi-phone-fill"
+      ></i>
 
-      <input
-        type="password"
-        class="form-control"
-        id="exampleInputPassword1"
-        placeholder="设置密码"
-      /><i class="bi bi-bag-fill"></i>
+      <input type="password" class="form-control" placeholder="设置密码" /><i
+        class="bi bi-bag-fill"
+      ></i>
 
       <button type="submit" class="w-100 btn btn-lg btn-primary">
         注册

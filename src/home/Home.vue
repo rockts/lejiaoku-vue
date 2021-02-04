@@ -7,8 +7,6 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-
-// @ is an alias to /src
 import CategoryList from '@/category/components/category-list.vue';
 import HomeJoin from './components/HomeJoin.vue';
 

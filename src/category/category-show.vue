@@ -3,8 +3,8 @@
   <div class="category-show-page">
     <div class="container">
       <div class="category-info  border-bottom py-5 align-items-center">
-        <h3>{{ category.name }}</h3>
-        <p class="text-muted">{{ category.alias }}</p>
+        <!-- <h3>{{ category.name }}</h3>
+        <p class="text-muted">{{ category.alias }}</p> -->
         <pre>{{ currnetId }}</pre>
       </div>
 
@@ -15,7 +15,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { axios } from '@/app/app.service';
-import { useRoute } from 'vue-router';
+// import { useRoute } from 'vue-router';
 
 import BreadCrumbs from '@/app/components/BreadCrumbs.vue';
 import ResourcesList from '@/resources/components/ResourcesList.vue';

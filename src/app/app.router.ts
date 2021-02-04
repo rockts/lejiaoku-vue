@@ -14,7 +14,6 @@ import categoryRoutes from '@/category/category.routes';
 import userRoutes from '@/user/user.routes';
 import CreateResources from '@/resources/CreateResources.vue';
 import Test from '@/app/Test.vue';
-import store from '@/app/app.store';
 
 /**
  * 定义路由
@@ -29,7 +28,6 @@ const routes: Array<RouteRecordRaw> = [
     path: '/create',
     name: 'Create',
     component: CreateResources,
-    meta: { requiredLogin: false },
   },
   {
     path: '/test',
@@ -66,15 +64,15 @@ export default router;
  * 导航守卫
  */
 
-router.beforeEach((to, from, next) => {
-  console.log('👮‍♀️');
-  console.log(to.meta);
+// router.beforeEach((to, from, next) => {
+//   console.log('👮‍♀️');
+//   console.log(to.meta);
 
-  if (to.meta.requiredLogin && !store.state.user.isLogin) {
-    next({ name: 'signIn' });
-  } else if (to.meta.redirectAlreadyLogin && store.state.user.isLogin) {
-    next('/');
-  } else {
-    next();
-  }
-});
+//   if (to.meta.requiredLogin && !store.state.user.isLogin) {
+//     next({ name: 'signIn' });
+//   } else if (to.meta.redirectAlreadyLogin && store.state.user.isLogin) {
+//     next('/');
+//   } else {
+//     next();
+//   }
+// });

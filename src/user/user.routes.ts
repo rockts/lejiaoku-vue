@@ -19,7 +19,6 @@ const routes: Array<RouteRecordRaw> = [
     path: '/sign-in',
     name: 'signIn',
     component: SignIn,
-    meta: { redirectAlreadyLogin: true },
   },
   {
     path: '/sign-up',
@@ -30,7 +29,6 @@ const routes: Array<RouteRecordRaw> = [
     path: '/login',
     name: 'UserLogin',
     component: UserLogin,
-    meta: { redirectAlreadyLogin: true },
   },
 ];
 

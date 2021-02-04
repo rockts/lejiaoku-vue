@@ -75,24 +75,11 @@
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { useStore } from 'vuex';
-import { useRoute } from 'vue-router';
-import { GlobalDataOProps } from '@/app/app.store';
 import BreadCrumbs from '@/app/components/BreadCrumbs.vue';
 
 export default defineComponent({
   components: {
     BreadCrumbs,
-  },
-  setup() {
-    const route = useRoute();
-    const store = useStore<GlobalDataOProps>();
-    const currnetId = +route.params.resourcesId;
-    const resources = store.state.resources.find((c) => c.id == currnetId);
-
-    return {
-      resources,
-    };
   },
 });
 </script>

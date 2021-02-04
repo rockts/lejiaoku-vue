@@ -28,7 +28,7 @@
               </button>
             </div>
             <div class="modal-body">
-              <SignUp></SignUp>
+              <SignUp />
             </div>
           </div>
         </div>
@@ -58,8 +58,5 @@ export default defineComponent({
 <style>
 .home__join {
   background: #076e95;
-}
-.jumbotron-bottom {
-  margin: 0;
 }
 </style>

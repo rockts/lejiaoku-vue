@@ -51,7 +51,6 @@
               </router-link>
             </div>
           </li>
-          <pre>{{ category.id }}</pre>
 
           <li class="nav-item">
             <router-link class="nav-link" to="/">贡献者</router-link>
@@ -93,7 +92,10 @@
                 >
                   <span aria-hidden="true">&times;</span>
                 </button>
-                <sign-in></sign-in>
+                <SignIn
+                  @login-success="onLoginSuccess"
+                  @login-error="onLoginError"
+                />
               </div>
             </div>
           </div>
@@ -118,7 +120,7 @@
                 >
                   <span aria-hidden="true">&times;</span>
                 </button>
-                <SignUp></SignUp>
+                <SignUp />
               </div>
             </div>
           </div>
@@ -126,7 +128,7 @@
 
         <!-- Button trigger modal -->
 
-        <ul v-if="!user.isLogin" class="navbar-nav">
+        <ul v-if="!isLoginIn" class="navbar-nav">
           <li class="nav-item px-1 py-1">
             <router-link
               type="button"
@@ -149,8 +151,8 @@
           </li>
         </ul>
 
-        <ul v-else class="list-inline mb-0 px-5">
-          <li class="nav-item dropdown" :title="`${user.name}`">
+        <ul v-if="isLoginIn" class="list-inline mb-0 px-5">
+          <li class="nav-item dropdown" title="`${currentUser.name}`">
             <router-link
               class="nav-link dropdown-toggle"
               to="#"
@@ -161,7 +163,7 @@
               aria-expanded="false"
             >
               <img class="img-circle avatar" src="@/assets/avatar.png" />
-              {{ user.name }} <span class="sr-only">(current)</span>
+              {{ currentUser.name }}
             </router-link>
             <div class="dropdown-menu" aria-labelledby="usersDropdown">
               <router-link to="/create" class="dropdown-item"
@@ -173,6 +175,9 @@
               <router-link to="/create" class="dropdown-item"
                 >设置账户</router-link
               >
+              <router-link to="#" @click="signOut" class="dropdown-item"
+                >退出账户</router-link
+              >
             </div>
           </li>
         </ul>
@@ -181,53 +186,75 @@
   </nav>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
-import { useStore } from 'vuex';
-import { useRoute } from 'vue-router';
-import { GlobalDataOProps } from '@/app/app.store';
+<script>
+import { defineComponent } from 'vue';
 import SignIn from '@/user/components/sign-in.vue';
 import SignUp from '@/user/components/sign-up.vue';
-
-export interface UserProps {
-  isLogin: boolean;
-  name?: string;
-  id?: number;
-}
-export interface CategoryProps {
-  id: number;
-  name: string;
-  alias: string;
-}
+import { axios } from '@/app/app.service';
 
 export default defineComponent({
   name: 'GlobalHaeder',
 
+  data() {
+    return {
+      errorMessage: '',
+      token: '',
+      title: '',
+      currentUser: null,
+    };
+  },
+
+  computed: {
+    isLoginIn() {
+      return this.token ? true : false;
+    },
+  },
+
+  async created() {
+    const tid = localStorage.getItem('tid');
+    const uid = localStorage.getItem('uid');
+
+    if (tid) {
+      this.token = tid;
+    }
+
+    if (uid) {
+      this.getCurrentUser(uid);
+    }
+  },
+
+  methods: {
+    signOut() {
+      this.token = '';
+      this.currentUser = null;
+
+      localStorage.removeItem('tid');
+      localStorage.removeItem('uid');
+    },
+
+    async getCurrentUser(userId) {
+      try {
+        const response = await axios.get(`/users/${userId}`);
+
+        this.currentUser = response.data;
+      } catch (error) {
+        this.errorMessage = error.message;
+      }
+    },
+    onLoginSuccess(data) {
+      this.token = data.token;
+      this.getCurrentUser(data.id);
+
+      localStorage.setItem('tid', data.token);
+      localStorage.setItem('uid', data.id);
+    },
+
+    onLoginError(error) {
+      this.errorMessage = error.data.message;
+    },
+  },
+
   components: { SignIn, SignUp },
-
-  props: {
-    user: {
-      type: Object as PropType<UserProps>,
-      required: true,
-    },
-    list: {
-      type: Array as PropType<CategoryProps[]>,
-      required: true,
-    },
-  },
-
-  setup(props) {
-    const route = useRoute();
-    const store = useStore<GlobalDataOProps>();
-
-    const category = computed(() => store.state.categorys);
-    const CategoryList = computed(() => {
-      return props.list.map((category) => {
-        return category;
-      });
-    });
-    return { CategoryList, category, route };
-  },
 });
 </script>
 

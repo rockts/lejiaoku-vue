@@ -1,6 +1,6 @@
 <template>
   <div class="container-fluid">
-    <global-haeder :user="currentUser" />
+    <global-haeder />
     <Retriever />
     <router-view :key="$route.fullPath" />
     <global-footer />
@@ -8,11 +8,10 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { defineComponent } from 'vue';
 import GlobalHaeder from './components/GlobalHaeder.vue';
 import Retriever from './components/app-retriever.vue';
 import GlobalFooter from '@/app/components/GlobalFooter.vue';
-import { useStore } from 'vuex';
 
 export default defineComponent({
   name: 'App',
@@ -20,14 +19,6 @@ export default defineComponent({
     GlobalHaeder,
     Retriever,
     GlobalFooter,
-  },
-
-  setup() {
-    const store = useStore();
-    const currentUser = computed(() => store.state.user);
-    return {
-      currentUser,
-    };
   },
 });
 </script>
@@ -40,12 +31,7 @@ export default defineComponent({
   text-align: center;
   color: #2c3e50;
 }
-/* .container-fluid {
-  padding-right: 0px;
-  padding-left: 0px;
-} */
 .avatar {
-  /* height: 5vh; */
   width: 32px;
   margin-right: 10px;
 }
