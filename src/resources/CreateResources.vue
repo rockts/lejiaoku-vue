@@ -52,9 +52,9 @@
       />
 
       <div
-        :class="['drag-zone', { ative: dragZoneActive }]"
+        :class="['drag-zone', { active: dragZoneActive }]"
         @dragover.prevent
-        @drag.prevent="onDropDragZone"
+        @drop.prevent="onDropDragZone"
         @dragenter="dragZoneActive = true"
         @dragleave="dragZoneActive = false"
       >
@@ -110,6 +110,7 @@ export default defineComponent({
       file: null,
       imagePreviewUrl: null,
       imageUploadProgress: null,
+      dragZoneActive: false,
     };
   },
 
