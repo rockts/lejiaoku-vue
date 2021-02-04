@@ -8,13 +8,12 @@
 
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from '@/home/Home.vue';
-import About from '@/views/About.vue';
+import About from '@/app/components/About.vue';
 import resourcesRoutes from '@/resources/resources.routes';
+import categorysRoutes from '@/categorys/categorys.routes';
 import UserLogin from '@/app/components/UserLogin.vue';
-import Categorys from '@/views/Categorys.vue';
-import CategoryDetail from '@/views/CategoryDetail.vue';
-import CreateResources from '@/views/CreateResources.vue';
-import Test from '@/views/Test.vue';
+import CreateResources from '@/resources/CreateResources.vue';
+import Test from '@/app/Test.vue';
 import store from '@/app/app.store';
 import signIn from '@/app/components/sign-in.vue';
 import signUp from '@/app/components/sign-up.vue';
@@ -27,16 +26,6 @@ const routes: Array<RouteRecordRaw> = [
     path: '/',
     name: 'Home',
     component: Home,
-  },
-  {
-    path: '/categorys',
-    name: 'Catagorys',
-    component: Categorys,
-  },
-  {
-    path: '/category/:id',
-    name: 'CategoryDetail',
-    component: CategoryDetail,
   },
   {
     path: '/create',
@@ -77,6 +66,7 @@ const routes: Array<RouteRecordRaw> = [
     component: About,
   },
   ...resourcesRoutes,
+  ...categorysRoutes,
 ];
 
 /**

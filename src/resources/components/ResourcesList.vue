@@ -26,8 +26,8 @@
                   <li>年级：{{resources.grade}}</li>
                   <li>学科：{{resources.subject}}</li>
                   <li>版本：{{resources.version}}</li>
-                  <li>贡献者：{{resources.user.name}}</li>
                   <li>资源类型：{{resources.category}}</li>
+                  <li>贡献者：{{resources.user.name}}</li>
                 </ul>
               </p>
             </div>
