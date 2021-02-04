@@ -3,11 +3,12 @@
  * @Author: gaopeng(gaopeng@lekee.cc)
  * @Date: 2021-2-1 11:52
  * @LastEditors: gaopeng(gaopeng@lekee.cc)
- * @LastEditTime: 2021-2-3 21:02
+ * @LastEditTime: 2021-2-4 11:23
  */
 
 import { createStore } from 'vuex';
 import axios from 'axios';
+import user from '@/user/user.store';
 import { testData, testResources } from '@/data/testData';
 
 interface UserProps {
@@ -65,11 +66,18 @@ export default createStore<GlobalDataOProps>({
   },
 
   actions: {
+    getName({ commit, rootState }) {
+      console.log(rootState);
+
+      commit('setLoading', true);
+    },
     fetchCategory(context) {
       axios.get('/categorys').then((resp) => {
         context.commit('fetchCategory', resp.data);
       });
     },
   },
-  modules: {},
+  modules: {
+    user,
+  },
 });

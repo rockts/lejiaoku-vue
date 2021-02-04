@@ -18,8 +18,17 @@
                 </router-link>
               </h5>
               <p class="card-text">
-                <small>资源介绍：</small>
-                {{ resources.content }}
+                资源介绍：
+                {{ resources.description }}
+              </p>
+              <p class="text-muted">
+                <ul class="attr">
+                  <li>年级：{{resources.grade}}</li>
+                  <li>学科：{{resources.subject}}</li>
+                  <li>版本：{{resources.version}}</li>
+                  <li>贡献者：{{resources.user.name}}</li>
+                  <li>资源类型：{{resources.category}}</li>
+                </ul>
               </p>
             </div>
             <div class="card-footer text-muted">
@@ -33,34 +42,63 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
-import { ResourcesProps } from '@/data/testData';
+import { apiHttpClient } from '@/app/app.service';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'ResourcesList',
-  props: {
-    list: {
-      type: Array as PropType<ResourcesProps[]>,
-      required: true,
+  data() {
+    return {
+      list: [],
+    };
+  },
+
+  created() {
+    // 获取内容列表数据
+    this.getResources();
+  },
+
+  methods: {
+    async getResources() {
+      try {
+        // 请求内容列表接口
+        const response = await apiHttpClient.get('/resources');
+
+        // 设置组件的数据
+        this.list = response.data;
+      } catch (error) {
+        console.log(error.response);
+      }
     },
   },
-  setup(props) {
-    const resourcesList = computed(() => {
-      return props.list.map((resources) => {
-        if (!resources.cover) {
-          resources.cover = require('@/assets/catagory.png');
-        }
-        return resources;
-      });
-    });
-    return { resourcesList };
-  },
+  // props: {
+  //   list: {
+  //     type: Array as PropType<ResourcesProps[]>,
+  //     required: true,
+  //   },
+  // },
+  // setup(props) {
+  //   const resourcesList = computed(() => {
+  //     return props.list.map((resources) => {
+  //       if (!resources.cover) {
+  //         resources.cover = require('@/assets/catagory.png');
+  //       }
+  //       return resources;
+  //     });
+  //   });
+  //   return { resourcesList };
+  // },
 });
 </script>
 
 <style scoped>
 .card .card-title,
 .card-text {
+  text-align: left;
+}
+
+.attr > li {
+  list-style: none;
   text-align: left;
 }
 </style>
