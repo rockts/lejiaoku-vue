@@ -186,8 +186,8 @@ import { computed, defineComponent, PropType } from 'vue';
 import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
 import { GlobalDataOProps } from '@/app/app.store';
-import SignIn from './sign-in.vue';
-import SignUp from './sign-up.vue';
+import SignIn from '@/user/components/sign-in.vue';
+import SignUp from '@/user/components/sign-up.vue';
 
 export interface UserProps {
   isLogin: boolean;
@@ -219,6 +219,7 @@ export default defineComponent({
   setup(props) {
     const route = useRoute();
     const store = useStore<GlobalDataOProps>();
+
     const category = computed(() => store.state.categorys);
     const CategoryList = computed(() => {
       return props.list.map((category) => {

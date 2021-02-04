@@ -1,18 +1,18 @@
 <template>
   <div class="container-fluid">
-    <global-haeder :user="currentUser"></global-haeder>
+    <global-haeder :user="currentUser" />
     <Retriever />
     <router-view :key="$route.fullPath" />
-    <global-footer></global-footer>
+    <global-footer />
   </div>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
-import { useStore } from 'vuex';
 import GlobalHaeder from './components/GlobalHaeder.vue';
 import Retriever from './components/app-retriever.vue';
 import GlobalFooter from '@/app/components/GlobalFooter.vue';
+import { useStore } from 'vuex';
 
 export default defineComponent({
   name: 'App',

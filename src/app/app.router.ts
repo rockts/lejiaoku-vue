@@ -11,12 +11,10 @@ import Home from '@/home/Home.vue';
 import About from '@/app/components/About.vue';
 import resourcesRoutes from '@/resources/resources.routes';
 import categoryRoutes from '@/category/category.routes';
-import UserLogin from '@/app/components/UserLogin.vue';
+import userRoutes from '@/user/user.routes';
 import CreateResources from '@/resources/CreateResources.vue';
 import Test from '@/app/Test.vue';
 import store from '@/app/app.store';
-import signIn from '@/app/components/sign-in.vue';
-import signUp from '@/app/components/sign-up.vue';
 
 /**
  * 定义路由
@@ -44,29 +42,13 @@ const routes: Array<RouteRecordRaw> = [
     component: Test,
   },
   {
-    path: '/sign-in',
-    name: 'signIn',
-    component: signIn,
-    meta: { redirectAlreadyLogin: true },
-  },
-  {
-    path: '/sign-up',
-    name: 'signUp',
-    component: signUp,
-  },
-  {
-    path: '/login',
-    name: 'login',
-    component: UserLogin,
-    meta: { redirectAlreadyLogin: true },
-  },
-  {
     path: '/about',
     name: 'About',
     component: About,
   },
   ...resourcesRoutes,
   ...categoryRoutes,
+  ...userRoutes,
 ];
 
 /**
@@ -77,6 +59,8 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
 });
+
+export default router;
 
 /**
  * 导航守卫
@@ -94,5 +78,3 @@ router.beforeEach((to, from, next) => {
     next();
   }
 });
-
-export default router;
