@@ -7,11 +7,11 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import CategoryList from './components/CategorysList.vue';
+import CategoryList from './components/category-list.vue';
 import BreadCrumbs from '@/app/components/BreadCrumbs.vue';
 
 export default defineComponent({
-  name: 'Categorys',
+  name: 'categorysIndex',
   components: {
     CategoryList,
     BreadCrumbs,

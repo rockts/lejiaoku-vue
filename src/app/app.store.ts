@@ -7,7 +7,6 @@
  */
 
 import { createStore } from 'vuex';
-import axios from 'axios';
 import user from '@/user/user.store';
 import { testData, testResources } from '@/data/testData';
 
@@ -70,11 +69,6 @@ export default createStore<GlobalDataOProps>({
       console.log(rootState);
 
       commit('setLoading', true);
-    },
-    fetchCategory(context) {
-      axios.get('/categorys').then((resp) => {
-        context.commit('fetchCategory', resp.data);
-      });
     },
   },
   modules: {

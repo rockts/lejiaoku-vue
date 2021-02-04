@@ -7,8 +7,8 @@
  */
 
 import { RouteRecordRaw } from 'vue-router';
-import CategorysIndex from './categorys-index.vue';
-import CategorysShow from './categorys-show.vue';
+import CategoryIndex from './category-index.vue';
+import CategoryShow from './category-show.vue';
 
 /**
  * 定义路由
@@ -16,13 +16,13 @@ import CategorysShow from './categorys-show.vue';
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/categorys',
-    name: 'categorysIndex',
-    component: CategorysIndex,
+    name: 'categoryIndex',
+    component: CategoryIndex,
   },
   {
     path: '/category/:categoryId',
-    name: 'categorysShow',
-    component: CategorysShow,
+    name: 'categoryShow',
+    component: CategoryShow,
   },
 ];
 

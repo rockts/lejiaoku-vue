@@ -42,7 +42,7 @@
 </template>
 
 <script lang="ts">
-import { apiHttpClient } from '@/app/app.service';
+import { axios } from '@/app/app.service';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -62,7 +62,7 @@ export default defineComponent({
     async getResources() {
       try {
         // 请求内容列表接口
-        const response = await apiHttpClient.get('/resources');
+        const response = await axios.get('/resources');
 
         // 设置组件的数据
         this.list = response.data;
