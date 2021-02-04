@@ -211,6 +211,15 @@ export default defineComponent({
   },
 
   async created() {
+    // 用户登录
+    try {
+      const response = await axios.post('/login', this.user);
+      this.token = response.data.token;
+
+      console.log(response.data);
+    } catch (error) {
+      this.errorMessage = error.message;
+    }
     const tid = localStorage.getItem('tid');
     const uid = localStorage.getItem('uid');
 

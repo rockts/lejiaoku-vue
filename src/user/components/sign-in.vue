@@ -49,7 +49,7 @@
     </form>
   </div>
 </template>
-<script lang="ts">
+<script>
 import { axios } from '@/app/app.service';
 import { defineComponent } from 'vue';
 
