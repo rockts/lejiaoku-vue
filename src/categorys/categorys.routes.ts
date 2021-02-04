@@ -20,7 +20,7 @@ const routes: Array<RouteRecordRaw> = [
     component: CategorysIndex,
   },
   {
-    path: '/categorys/:categorysId',
+    path: '/category/:categoryId',
     name: 'categorysShow',
     component: CategorysShow,
   },

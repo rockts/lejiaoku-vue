@@ -11,7 +11,7 @@ import { useStore } from 'vuex';
 import { GlobalDataOProps } from '@/app/app.store';
 
 // @ is an alias to /src
-import CategoryList from '@/app/components/CategoryList.vue';
+import CategoryList from '@/categorys/components/CategorysList.vue';
 import HomeJoin from './components/HomeJoin.vue';
 
 export default defineComponent({

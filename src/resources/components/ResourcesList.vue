@@ -71,6 +71,13 @@ export default defineComponent({
       }
     },
   },
+
+  //   computed: {
+  // postImageURL () {
+  //   return `${API_BASE_URL}/files/${this.item.file.id}/serve?size=large`
+  // },
+  // },
+
   // props: {
   //   list: {
   //     type: Array as PropType<ResourcesProps[]>,
