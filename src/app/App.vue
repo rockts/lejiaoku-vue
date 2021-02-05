@@ -7,7 +7,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import { defineComponent } from 'vue';
 import GlobalHaeder from './components/GlobalHaeder.vue';
 import Retriever from './components/app-retriever.vue';
@@ -15,6 +15,10 @@ import GlobalFooter from '@/app/components/GlobalFooter.vue';
 
 export default defineComponent({
   name: 'App',
+
+  created() {
+    console.log(this.$store.state);
+  },
   components: {
     GlobalHaeder,
     Retriever,

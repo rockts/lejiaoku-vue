@@ -7,19 +7,24 @@
  */
 
 import { createStore } from 'vuex';
-import user from '@/user/user.store';
+import { postStoreModule } from '../post/post.store';
+import { userStoreModule } from '../user/user.store';
 
 /**
  * 创建 Store
  */
-export default createStore({
+const store = createStore({
   state: {
     appName: '乐教库',
   },
-  mutations: {},
 
-  actions: {},
   modules: {
-    user,
+    post: postStoreModule,
+    user: userStoreModule,
   },
 });
+
+/**
+ * 默认导出
+ */
+export default store;

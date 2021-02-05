@@ -1,7 +1,7 @@
-const store = {
+export const userStoreModule = {
+  namespaced: true,
+
   state: {
     currentUser: '',
   },
 };
-
-export default store;

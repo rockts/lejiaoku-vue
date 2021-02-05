@@ -92,7 +92,7 @@ import { axios } from '@/app/app.service';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: 'CreatePost',
+  name: 'PostCreate',
   data() {
     return {
       errorMessage: '',

@@ -12,7 +12,6 @@ import About from '@/app/components/About.vue';
 import postRoutes from '@/post/post.routes';
 import categoryRoutes from '@/category/category.routes';
 import userRoutes from '@/user/user.routes';
-import CreatePost from '@/post/CreatePost.vue';
 import Test from '@/app/Test.vue';
 
 /**
@@ -23,11 +22,6 @@ const routes: Array<RouteRecordRaw> = [
     path: '/',
     name: 'Home',
     component: Home,
-  },
-  {
-    path: '/create',
-    name: 'Create',
-    component: CreatePost,
   },
   {
     path: '/test',
