@@ -7,8 +7,13 @@
  */
 
 import { createStore } from 'vuex';
-import { postStoreModule } from '../post/post.store';
+import { postStoreModule, PostStoreState } from '../post/post.store';
 import { userStoreModule } from '../user/user.store';
+
+export interface RootState {
+  appName: string;
+  post: PostStoreState;
+}
 
 /**
  * 创建 Store
@@ -16,7 +21,7 @@ import { userStoreModule } from '../user/user.store';
 const store = createStore({
   state: {
     appName: '乐教库',
-  },
+  } as RootState,
 
   modules: {
     post: postStoreModule,
