@@ -7,22 +7,22 @@
  */
 
 import { RouteRecordRaw } from 'vue-router';
-import ResourcesIndex from './index/resources-index.vue';
-import ResourcesShow from './show/resources-show.vue';
+import PostIndex from './index/post-index.vue';
+import PostShow from './show/post-show.vue';
 
 /**
  * 定义路由
  */
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/resources',
-    name: 'resourcesIndex',
-    component: ResourcesIndex,
+    path: '/posts',
+    name: 'postIndex',
+    component: PostIndex,
   },
   {
-    path: '/resources/:resourcesId',
-    name: 'resourcesShow',
-    component: ResourcesShow,
+    path: '/posts/:postId',
+    name: 'postShow',
+    component: PostShow,
   },
 ];
 

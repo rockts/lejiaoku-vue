@@ -1,36 +1,36 @@
 <template>
-  <div class="create-resources-page">
+  <div class="create-Post-page">
     <h4>发布资源</h4>
     <!-- <form> -->
     <div class="mb-3">
       <label class="form-label">资源标题：</label>
       <input
         v-model="title"
-        @keyup.enter="createResources"
+        @keyup.enter="createPost"
         placeholder="请输入资源标题"
         type="text"
       />
       <input
         v-model="categoryId"
-        @keyup.enter="createResources"
+        @keyup.enter="createPost"
         placeholder="输入类型 Id"
         type="text"
       />
       <input
         v-model="grade"
-        @keyup.enter="createResources"
+        @keyup.enter="createPost"
         placeholder="输入年级"
         type="text"
       />
       <input
         v-model="subject"
-        @keyup.enter="createResources"
+        @keyup.enter="createPost"
         placeholder="输入学科"
         type="text"
       />
       <input
         v-model="version"
-        @keyup.enter="createResources"
+        @keyup.enter="createPost"
         placeholder="输入版本"
         type="text"
       />
@@ -92,7 +92,7 @@ import { axios } from '@/app/app.service';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: 'CreateResources',
+  name: 'CreatePost',
   data() {
     return {
       errorMessage: '',
@@ -144,7 +144,7 @@ export default defineComponent({
         this.createImagePreview(file);
       }
     },
-    async createFile(file, resourcesId) {
+    async createFile(file, PostId) {
       // 创建表单
       const formData = new FormData();
 
@@ -153,23 +153,19 @@ export default defineComponent({
 
       // 上传文件
       try {
-        const response = await axios.post(
-          `/files?resources=${resourcesId}`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${this.token}`,
-            },
+        const response = await axios.post(`/files?Post=${PostId}`, formData, {
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+          },
 
-            onUploadProgress: (event) => {
-              console.log(event);
+          onUploadProgress: (event) => {
+            console.log(event);
 
-              const { loaded, total } = event;
+            const { loaded, total } = event;
 
-              this.imageUploadProgress = Math.round((loaded * 100) / total);
-            },
-          }
-        );
+            this.imageUploadProgress = Math.round((loaded * 100) / total);
+          },
+        });
 
         // 清理
         this.file = null;
@@ -209,10 +205,10 @@ export default defineComponent({
         this.createImagePreview(file);
       }
     },
-    async createResources() {
+    async createPost() {
       try {
         const response = await axios.post(
-          '/resources',
+          '/Post',
           {
             title: this.title,
             categoryId: this.categoryId,

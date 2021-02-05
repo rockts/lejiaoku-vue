@@ -11,7 +11,7 @@
         <router-link to="/">隐私政策</router-link>
       </li>
       <li class="list-inline-item">
-        <router-link :to="{ name: 'resourcesIndex' }">资源</router-link>
+        <router-link :to="{ name: 'postIndex' }">资源</router-link>
       </li>
       <li class="list-inline-item">
         <router-link to="/about">关于我们</router-link>

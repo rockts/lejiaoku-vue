@@ -1,6 +1,6 @@
 <template>
   <bread-crumbs></bread-crumbs>
-  <div class="resources-detail-page mb-3">
+  <div class="post-show-page mb-3">
     <div class="container">
       <div class="card">
         <div class="card-header ">
@@ -8,8 +8,8 @@
             <div class="col-md-4">
               <div class="cover">
                 <img
-                  :src="resources.cover"
-                  :alt="`${resources.title}`"
+                  :src="post.cover"
+                  :alt="`${post.title}`"
                   class="cover  img-fluid img-thumbnail"
                 />
               </div>
@@ -22,7 +22,7 @@
               </div>
             </div>
             <div class="col-md-8">
-              <h4 class="card-title pt-2">{{ resources.title }}</h4>
+              <h4 class="card-title pt-2">{{ post.title }}</h4>
               <div class="res__btn text-left my-5">
                 <router-link to="/" class="btn btn-primary "
                   >点击阅览</router-link
@@ -53,7 +53,7 @@
         <div class="card-body">
           <h5>资源介绍</h5>
           <p class="card-text">
-            {{ resources.content }}
+            {{ post.content }}
           </p>
           <div class="res__attr">
             <ul class="res__attr">
@@ -64,7 +64,7 @@
               <li><span>资源类型：</span>课件</li>
               <li>大小：15KB</li>
               <li><router-link to="#">贡献者：高鹏</router-link></li>
-              <li>发布时间：{{ resources.createdAt }}</li>
+              <li>发布时间：{{ post.createdAt }}</li>
             </ul>
           </div>
         </div>

@@ -13,7 +13,9 @@ import user from '@/user/user.store';
  * 创建 Store
  */
 export default createStore({
-  state: {},
+  state: {
+    appName: '乐教库',
+  },
   mutations: {},
 
   actions: {},

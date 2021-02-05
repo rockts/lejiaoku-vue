@@ -9,10 +9,10 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from '@/home/Home.vue';
 import About from '@/app/components/About.vue';
-import resourcesRoutes from '@/resources/resources.routes';
+import postRoutes from '@/post/post.routes';
 import categoryRoutes from '@/category/category.routes';
 import userRoutes from '@/user/user.routes';
-import CreateResources from '@/resources/CreateResources.vue';
+import CreatePost from '@/post/CreatePost.vue';
 import Test from '@/app/Test.vue';
 
 /**
@@ -27,7 +27,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/create',
     name: 'Create',
-    component: CreateResources,
+    component: CreatePost,
   },
   {
     path: '/test',
@@ -44,7 +44,7 @@ const routes: Array<RouteRecordRaw> = [
     name: 'About',
     component: About,
   },
-  ...resourcesRoutes,
+  ...postRoutes,
   ...categoryRoutes,
   ...userRoutes,
 ];

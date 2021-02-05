@@ -8,7 +8,7 @@
         <pre>{{ currnetId }}</pre>
       </div>
 
-      <resources-list />
+      <post-list />
     </div>
   </div>
 </template>
@@ -18,7 +18,7 @@ import { axios } from '@/app/app.service';
 // import { useRoute } from 'vue-router';
 
 import BreadCrumbs from '@/app/components/BreadCrumbs.vue';
-import ResourcesList from '@/resources/components/ResourcesList.vue';
+import PostList from '@/post/components/PostList.vue';
 
 export default defineComponent({
   data() {
@@ -45,7 +45,7 @@ export default defineComponent({
 
   components: {
     BreadCrumbs,
-    ResourcesList,
+    PostList,
   },
 });
 </script>
