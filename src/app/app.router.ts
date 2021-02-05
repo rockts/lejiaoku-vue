@@ -3,45 +3,13 @@
  * @Author: gaopeng(gaopeng@lekee.cc)
  * @Date: 2021-2-2 20:47
  * @LastEditors: gaopeng(gaopeng@lekee.cc)
- * @LastEditTime: 2021-2-3 21:02
+ * @LastEditTime: 2021-2-5 22:12
  */
-
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import Home from '@/home/Home.vue';
-import About from '@/app/components/About.vue';
+import { createRouter, createWebHistory } from 'vue-router';
+import appRoutes from './app.routes';
 import postRoutes from '@/post/post.routes';
 import categoryRoutes from '@/category/category.routes';
 import userRoutes from '@/user/user.routes';
-import Test from '@/app/Test.vue';
-
-/**
- * 定义路由
- */
-const routes: Array<RouteRecordRaw> = [
-  {
-    path: '/',
-    name: 'Home',
-    component: Home,
-  },
-  {
-    path: '/test',
-    name: 'Test',
-    component: Test,
-  },
-  {
-    path: '/test/:id',
-    name: 'TestID',
-    component: Test,
-  },
-  {
-    path: '/about',
-    name: 'About',
-    component: About,
-  },
-  ...postRoutes,
-  ...categoryRoutes,
-  ...userRoutes,
-];
 
 /**
  * 创建路由器
@@ -49,7 +17,7 @@ const routes: Array<RouteRecordRaw> = [
 
 const router = createRouter({
   history: createWebHistory(),
-  routes,
+  routes: [...appRoutes, ...postRoutes, ...categoryRoutes, ...userRoutes],
 });
 
 export default router;
