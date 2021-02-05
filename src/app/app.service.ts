@@ -1,9 +1,13 @@
 import axios from 'axios';
+import { API_BASE_URL } from './app.config';
 
 /**
  * axios 实例
  */
-axios.defaults.baseURL = 'http://localhost:3000';
+
+export const apiHttpClient = axios.create({
+  baseURL: API_BASE_URL,
+});
 
 /**
  * 请求拦截器
@@ -32,5 +36,3 @@ axios.defaults.baseURL = 'http://localhost:3000';
 //     return Promise.reject(error);
 //   }
 // );
-
-export { axios };

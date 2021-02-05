@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts">
-import { axios } from '@/app/app.service';
+import { apiHttpClient } from '@/app/app.service';
 import { defineComponent } from 'vue';
 import CategoryListItem from './category-list-item.vue';
 
@@ -36,7 +36,7 @@ export default defineComponent({
     async getCategorys() {
       try {
         // 请求类型列表接口
-        const response = await axios.get('/categorys');
+        const response = await apiHttpClient.get('/categorys');
 
         // 设置组件的数据
         this.CategoryList = response.data;

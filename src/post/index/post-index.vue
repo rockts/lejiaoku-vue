@@ -1,12 +1,12 @@
 <template>
   <bread-crumbs></bread-crumbs>
-  <div class="post-page">
+  <div class="post-index-page">
     <div class="container">
       <post-list />
     </div>
   </div>
 </template>
-<script lang="ts">
+<script>
 import { defineComponent } from 'vue';
 import BreadCrumbs from '@/app/components/BreadCrumbs.vue';
 import PostList from '@/post/components/PostList.vue';

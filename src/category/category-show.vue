@@ -14,7 +14,7 @@
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { axios } from '@/app/app.service';
+import { apiHttpClient } from '@/app/app.service';
 // import { useRoute } from 'vue-router';
 
 import BreadCrumbs from '@/app/components/BreadCrumbs.vue';
@@ -34,7 +34,7 @@ export default defineComponent({
     async getCategory() {
       try {
         // 请求类型列表接口
-        const response = await axios.get('/categorys');
+        const response = await apiHttpClient.get('/categorys');
 
         this.Category = response.data;
       } catch (error) {
