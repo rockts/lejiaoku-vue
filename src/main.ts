@@ -2,6 +2,7 @@ import { createApp } from 'vue';
 import App from './app/App.vue';
 import router from './app/app.router';
 import store from './app/app.store';
+import { titleMixin } from './app/app.mixin';
 import 'jquery';
 import 'popper.js';
 import 'bootstrap';
@@ -12,4 +13,5 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 createApp(App)
   .use(store)
   .use(router)
+  .mixin(titleMixin)
   .mount('#app');
