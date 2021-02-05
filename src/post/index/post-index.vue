@@ -9,7 +9,7 @@
 <script>
 import { defineComponent } from 'vue';
 import BreadCrumbs from '@/app/components/BreadCrumbs.vue';
-import PostList from '@/post/components/PostList.vue';
+import PostList from './components/post-list';
 
 export default defineComponent({
   components: {
