@@ -4,7 +4,7 @@
         
         <div class="col-md-4" v-if="item.cover">
         <img
-            :src="item.cover"
+            :src="postCoverURL"
             alt="item.title"
             class="cover img-fluid img-thumbnail my-4"
         />
@@ -12,7 +12,7 @@
         <div class="col-md-8">
         <div class="card-body">
             <h5 class="card-title">
-            <router-link :to="`/posts/${item.id}`">
+            <router-link :to="{name: 'postShow', params: {postId: item.id}}">
                 {{ item.title }}
             </router-link>
             </h5>

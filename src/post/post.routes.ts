@@ -24,6 +24,7 @@ const routes: Array<RouteRecordRaw> = [
     path: '/posts/:postId',
     name: 'postShow',
     component: PostShow,
+    props: true,
   },
   {
     path: '/posts/create',

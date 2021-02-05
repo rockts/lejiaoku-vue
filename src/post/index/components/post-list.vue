@@ -22,6 +22,10 @@ export default defineComponent({
       loading: 'post/index/loading',
       posts: 'post/index/posts',
     }),
+
+    // postCoverURL() {
+    //   return `${API_BASE_URL}/cover/${this.item.file.id}/serve?size=thumbnail`;
+    // },
   },
 
   methods: {
@@ -33,12 +37,6 @@ export default defineComponent({
   components: {
     PostListItem,
   },
-
-  //   computed: {
-  // postImageURL () {
-  //   return `${API_BASE_URL}/files/${this.item.file.id}/serve?size=large`
-  // },
-  // },
 
   // props: {
   //   list: {

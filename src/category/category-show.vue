@@ -8,17 +8,16 @@
         <pre>{{ currnetId }}</pre>
       </div>
 
-      <post-list />
+      <PostList />
     </div>
   </div>
 </template>
-<script lang="ts">
+<script>
 import { defineComponent } from 'vue';
 import { apiHttpClient } from '@/app/app.service';
-// import { useRoute } from 'vue-router';
 
 import BreadCrumbs from '@/app/components/BreadCrumbs.vue';
-import PostList from '@/post/components/PostList.vue';
+import PostList from '@/post/index/components/post-list';
 
 export default defineComponent({
   data() {

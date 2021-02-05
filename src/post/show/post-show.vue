@@ -2,7 +2,7 @@
   <bread-crumbs></bread-crumbs>
   <div class="post-show-page mb-3">
     <div class="container">
-      <div class="card">
+      <div class="card" v-if="showPost">
         <div class="card-header ">
           <div class="row">
             <div class="col-md-4">
@@ -53,17 +53,21 @@
         <div class="card-body">
           <h5>资源介绍</h5>
           <p class="card-text">
-            {{ post.content }}
+            {{ post.description }}
           </p>
           <div class="res__attr">
             <ul class="res__attr">
-              <li>学科：数学</li>
-              <li>年级：三年级上册</li>
-              <li>版本：人教版</li>
+              <li>学科：{{ post.subject }}</li>
+              <li>年级：{{ post.grade }}</li>
+              <li>版本：{{ post.version }}</li>
               <li>文件类型：ppt</li>
-              <li><span>资源类型：</span>课件</li>
+              <li><span>资源类型：</span>{{ post.category }}</li>
               <li>大小：15KB</li>
-              <li><router-link to="#">贡献者：高鹏</router-link></li>
+              <li>
+                <router-link to="/users/1"
+                  >贡献者：{{ post.user.name }}</router-link
+                >
+              </li>
               <li>发布时间：{{ post.createdAt }}</li>
             </ul>
           </div>
@@ -76,8 +80,33 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import BreadCrumbs from '@/app/components/BreadCrumbs.vue';
+import { mapGetters, mapActions } from 'vuex';
 
 export default defineComponent({
+  props: {
+    postId: String,
+  },
+
+  created() {
+    this.getPostById(this.postId);
+  },
+
+  computed: {
+    ...mapGetters({
+      loading: 'post/show/loading',
+      post: 'post/show/post',
+    }),
+
+    showPost() {
+      return !this.loading && this.post;
+    },
+  },
+
+  methods: {
+    ...mapActions({
+      getPostById: 'post/show/getPostById',
+    }),
+  },
   components: {
     BreadCrumbs,
   },
