@@ -9,24 +9,25 @@
 import { createStore } from 'vuex';
 import { postStoreModule, PostStoreState } from '../post/post.store';
 import { userStoreModule } from '../user/user.store';
+// import { coverStoreModule } from '../cover/cover.store';
 
 export interface RootState {
-  appName: string;
-  post: PostStoreState;
+ appName: string;
+ post: PostStoreState;
 }
 
 /**
  * 创建 Store
  */
 const store = createStore({
-  state: {
-    appName: '乐教库',
-  } as RootState,
+ state: {
+  appName: '乐教库',
+ } as RootState,
 
-  modules: {
-    post: postStoreModule,
-    user: userStoreModule,
-  },
+ modules: {
+  post: postStoreModule,
+  user: userStoreModule,
+ },
 });
 
 /**

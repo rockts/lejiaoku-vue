@@ -1,44 +1,46 @@
 <template>
-  <div class="create-Post-page">
-    <h4>发布资源</h4>
-    <!-- <form> -->
-    <div class="mb-3">
-      <label class="form-label">资源标题：</label>
-      <input
-        v-model="title"
-        @keyup.enter="createPost"
-        placeholder="请输入资源标题"
-        type="text"
-      />
-      <input
-        v-model="categoryId"
-        @keyup.enter="createPost"
-        placeholder="输入类型 Id"
-        type="text"
-      />
-      <input
-        v-model="grade"
-        @keyup.enter="createPost"
-        placeholder="输入年级"
-        type="text"
-      />
-      <input
-        v-model="subject"
-        @keyup.enter="createPost"
-        placeholder="输入学科"
-        type="text"
-      />
-      <input
-        v-model="version"
-        @keyup.enter="createPost"
-        placeholder="输入版本"
-        type="text"
-      />
-      <input
-        type="file"
-        ref="file"
-        @change="onChangeFile"
-        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
+ <BreadCrumbs />
+ <div class="post-create-page">
+  <div class="container">
+   <h4>发布资源</h4>
+   <!-- <form> -->
+   <div class="mb-3">
+    <label class="form-label">资源标题：</label>
+    <input
+     v-model="title"
+     @keyup.enter="createPost"
+     placeholder="请输入资源标题"
+     type="text"
+    />
+    <input
+     v-model="categoryId"
+     @keyup.enter="createPost"
+     placeholder="输入类型 Id"
+     type="text"
+    />
+    <input
+     v-model="grade"
+     @keyup.enter="createPost"
+     placeholder="输入年级"
+     type="text"
+    />
+    <input
+     v-model="subject"
+     @keyup.enter="createPost"
+     placeholder="输入学科"
+     type="text"
+    />
+    <input
+     v-model="version"
+     @keyup.enter="createPost"
+     placeholder="输入版本"
+     type="text"
+    />
+    <input
+     type="file"
+     ref="file"
+     @change="onChangeFile"
+     accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
         application/vnd.ms-powerpoint,
         application/pdf,
         application/msword,
@@ -49,211 +51,223 @@
         application/vnd.apple.numbers,
         application/vnd.apple.page,
         image/png"
-      />
+    />
 
-      <div
-        :class="['drag-zone', { active: dragZoneActive }]"
-        @dragover.prevent
-        @drop.prevent="onDropDragZone"
-        @dragenter="dragZoneActive = true"
-        @dragleave="dragZoneActive = false"
-      >
-        <div>把文件拖放到这里</div>
-      </div>
-
-      <div v-if="imageUploadProgress">
-        <span class="image-upload-progress">
-          {{ imageUploadProgress + '%' }}
-        </span>
-      </div>
-
-      <div v-if="imagePreviewUrl">
-        <img class="image-preview" :src="imagePreviewUrl" alt="" />
-      </div>
-    </div>
-    <div class="mb-3">
-      <label for="" class="form-label">资源介绍：</label>
-      <input
-        v-model="description"
-        rows="10"
-        type="text"
-        tag="textarea"
-        placeholder="请输入资源说明"
-      />
+    <div
+     :class="['drag-zone', { active: dragZoneActive }]"
+     @dragover.prevent
+     @drop.prevent="onDropDragZone"
+     @dragenter="dragZoneActive = true"
+     @dragleave="dragZoneActive = false"
+    >
+     <div>把文件拖放到这里</div>
     </div>
 
-    <!-- <button class="btn btn-primary btn-large">发布资源</button> -->
-    <!-- </form> -->
+    <div v-if="imageUploadProgress">
+     <span class="image-upload-progress">
+      {{ imageUploadProgress + '%' }}
+     </span>
+    </div>
+
+    <div v-if="imagePreviewUrl">
+     <img class="image-preview" :src="imagePreviewUrl" alt="" />
+    </div>
+   </div>
+   <div class="mb-3">
+    <label for="" class="form-label">资源介绍：</label>
+    <input
+     v-model="description"
+     rows="10"
+     type="text"
+     tag="textarea"
+     placeholder="请输入资源说明"
+    />
+   </div>
+
+   <!-- <button class="btn btn-primary btn-large">发布资源</button> -->
+   <!-- </form> -->
   </div>
+ </div>
 </template>
 
 <script>
-import { axios } from '@/app/app.service';
-import { defineComponent } from 'vue';
+ import { apiHttpClient } from '@/app/app.service';
+ import { defineComponent } from 'vue';
+ import BreadCrumbs from '@/app/components/BreadCrumbs.vue';
 
-export default defineComponent({
+ export default defineComponent({
+  title() {
+   return '发布资源';
+  },
+  components: {
+   BreadCrumbs,
+  },
   name: 'PostCreate',
   data() {
-    return {
-      errorMessage: '',
-      user: {
-        name: '高鹏',
-        password: '123123',
-      },
-      token: '',
-      title: '',
-      categoryId: '',
-      grade: '',
-      subject: '',
-      version: '',
-      description: '',
-      file: null,
-      imagePreviewUrl: null,
-      imageUploadProgress: null,
-      dragZoneActive: false,
-    };
+   return {
+    errorMessage: '',
+    user: {
+     name: '高鹏',
+     password: '123123',
+    },
+    token: '',
+    title: '',
+    categoryId: '',
+    grade: '',
+    subject: '',
+    version: '',
+    description: '',
+    file: null,
+    imagePreviewUrl: null,
+    imageUploadProgress: null,
+    dragZoneActive: false,
+   };
   },
 
   async created() {
-    // 用户登录
-    try {
-      const response = await axios.post('/login', this.user);
-      this.token = response.data.token;
+   // 用户登录
+   try {
+    const response = await apiHttpClient.post('/login', this.user);
+    this.token = response.data.token;
 
-      console.log(response.data);
-    } catch (error) {
-      this.errorMessage = error.message;
-    }
+    console.log(response.data);
+   } catch (error) {
+    this.errorMessage = error.message;
+   }
   },
 
   methods: {
-    onDropDragZone(event) {
-      console.log(event.dataTransfer.files);
+   onDropDragZone(event) {
+    console.log(event.dataTransfer.files);
 
-      this.dragZoneActive = false;
+    this.dragZoneActive = false;
 
-      const file = event.dataTransfer.files[0];
+    const file = event.dataTransfer.files[0];
 
-      if (file) {
-        this.file = file;
+    if (file) {
+     this.file = file;
 
-        // 设置资源标题
-        this.title = file.name.split('.')[0];
+     // 设置资源标题
+     this.title = file.name.split('.')[0];
 
-        // 生成预览图像
-        this.createImagePreview(file);
+     // 生成预览图像
+     this.createImagePreview(file);
+    }
+   },
+   async createFile(file, PostId) {
+    // 创建表单
+    const formData = new FormData();
+
+    // 添加字段
+    formData.append('file', file);
+
+    // 上传文件
+    try {
+     const response = await apiHttpClient.post(
+      `/files?Post=${PostId}`,
+      formData,
+      {
+       headers: {
+        Authorization: `Bearer ${this.token}`,
+       },
+
+       onUploadProgress: (event) => {
+        console.log(event);
+
+        const { loaded, total } = event;
+
+        this.imageUploadProgress = Math.round((loaded * 100) / total);
+       },
       }
-    },
-    async createFile(file, PostId) {
-      // 创建表单
-      const formData = new FormData();
+     );
 
-      // 添加字段
-      formData.append('file', file);
+     // 清理
+     this.file = null;
+     this.imagePreviewUrl = null;
+     this.$refs.file.value = '';
+     this.imageUploadProgress = null;
 
-      // 上传文件
-      try {
-        const response = await axios.post(`/files?Post=${PostId}`, formData, {
-          headers: {
-            Authorization: `Bearer ${this.token}`,
-          },
+     console.log(response.data);
+    } catch (error) {
+     this.errorMessage = error.message;
+    }
+   },
 
-          onUploadProgress: (event) => {
-            console.log(event);
+   // 上传文件预览
+   createImagePreview(file) {
+    const reader = new FileReader();
 
-            const { loaded, total } = event;
+    reader.readAsDataURL(file);
 
-            this.imageUploadProgress = Math.round((loaded * 100) / total);
-          },
-        });
+    reader.onload = (event) => {
+     this.imagePreviewUrl = event.target.result;
+    };
+   },
 
-        // 清理
-        this.file = null;
-        this.imagePreviewUrl = null;
-        this.$refs.file.value = '';
-        this.imageUploadProgress = null;
+   onChangeFile(event) {
+    console.log(event.target.files);
 
-        console.log(response.data);
-      } catch (error) {
-        this.errorMessage = error.message;
+    const file = event.target.files[0];
+
+    if (file) {
+     this.file = file;
+
+     // 用图像名作为资源标题
+     this.title = file.name.split('.')[0];
+
+     // 生成预览图像
+     this.createImagePreview(file);
+    }
+   },
+   async createPost() {
+    try {
+     const response = await apiHttpClient.post(
+      '/posts',
+      {
+       title: this.title,
+       categoryId: this.categoryId,
+       grade: this.grade,
+       subject: this.subject,
+       version: this.version,
+       description: this.description,
+      },
+      {
+       headers: {
+        Authorization: `Bearer ${this.token}`,
+       },
       }
-    },
+     );
 
-    // 上传文件预览
-    createImagePreview(file) {
-      const reader = new FileReader();
+     console.log(response.data);
 
-      reader.readAsDataURL(file);
+     if (this.file) {
+      this.createFile(this.file, response.data.insertId);
+     }
 
-      reader.onload = (event) => {
-        this.imagePreviewUrl = event.target.result;
-      };
-    },
-
-    onChangeFile(event) {
-      console.log(event.target.files);
-
-      const file = event.target.files[0];
-
-      if (file) {
-        this.file = file;
-
-        // 用图像名作为资源标题
-        this.title = file.name.split('.')[0];
-
-        // 生成预览图像
-        this.createImagePreview(file);
-      }
-    },
-    async createPost() {
-      try {
-        const response = await axios.post(
-          '/Post',
-          {
-            title: this.title,
-            categoryId: this.categoryId,
-            grade: this.grade,
-            subject: this.subject,
-            version: this.version,
-            description: this.description,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${this.token}`,
-            },
-          }
-        );
-
-        console.log(response.data);
-
-        if (this.file) {
-          this.createFile(this.file, response.data.insertId);
-        }
-
-        this.title = '';
-        this.categoryId = '';
-        this.grade = '';
-        this.subject = '';
-        this.version = '';
-        this.description = '';
-      } catch (error) {
-        this.errorMessage = error.message;
-      }
-    },
+     this.title = '';
+     this.categoryId = '';
+     this.grade = '';
+     this.subject = '';
+     this.version = '';
+     this.description = '';
+    } catch (error) {
+     this.errorMessage = error.message;
+    }
+   },
   },
-});
+ });
 </script>
 
 <style>
-.image-preview {
+ .image-preview {
   max-width: 360px;
-}
-.image-upload-progress {
+ }
+ .image-upload-progress {
   font-size: 32px;
   font-weight: 300;
-}
+ }
 
-.drag-zone {
+ .drag-zone {
   width: 360px;
   height: 250px;
   background: #f8f8f8;
@@ -262,10 +276,10 @@ export default defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
-}
+ }
 
-.drag-zone.active {
+ .drag-zone.active {
   background: #83c7f7;
   color: #1790e9;
-}
+ }
 </style>

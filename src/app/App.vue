@@ -1,47 +1,47 @@
 <template>
-  <div class="container-fluid">
-    <global-haeder />
-    <Retriever />
-    <router-view />
-    <global-footer />
-  </div>
+ <div class="container-fluid">
+  <global-haeder />
+  <Retriever />
+  <router-view />
+  <global-footer />
+ </div>
 </template>
 
 <script>
-import { defineComponent } from 'vue';
-import GlobalHaeder from './components/GlobalHaeder.vue';
-import Retriever from './components/app-retriever.vue';
-import GlobalFooter from '@/app/components/GlobalFooter.vue';
+ import { defineComponent } from 'vue'
+ import GlobalHaeder from './components/GlobalHaeder.vue'
+ import Retriever from './components/app-retriever.vue'
+ import GlobalFooter from '@/app/components/GlobalFooter.vue'
 
-export default defineComponent({
+ export default defineComponent({
   name: 'App',
 
   created() {
-    console.log(this.$store.state);
+   console.log(this.$store.state)
   },
   components: {
-    GlobalHaeder,
-    Retriever,
-    GlobalFooter,
+   GlobalHaeder,
+   Retriever,
+   GlobalFooter,
   },
-});
+ })
 </script>
 
 <style>
-#app {
+ #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-}
-.avatar {
+ }
+ .avatar {
   width: 32px;
   margin-right: 10px;
-}
+ }
 
-.content {
+ .content {
   text-align: center;
   margin: 20px 0;
-}
+ }
 </style>

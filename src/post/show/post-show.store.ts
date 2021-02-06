@@ -3,65 +3,67 @@ import { apiHttpClient } from '../../app/app.service';
 import { RootState } from '../../app/app.store';
 
 export interface Post {
-  id: number;
-  title: string;
-  description: string;
-  grade: string;
-  subject: string;
-  version: string;
-  category: string;
-  minetype: string;
-  updatedAt: Date;
+ id: number;
+ title: string;
+ description: string;
+ grade: string;
+ subject: string;
+ version: string;
+ category: string;
+ minetype: string;
+ updatedAt: Date;
+ cover: string;
+ file: string;
 }
 
 export interface PostShowStoreState {
-  loading: boolean;
-  post: Post;
+ loading: boolean;
+ post: Post;
 }
 
 export const postShowStoreModule: Module<PostShowStoreState, RootState> = {
-  namespaced: true,
+ namespaced: true,
 
-  state: {
-    loading: false,
-    post: {},
-  } as PostShowStoreState,
+ state: {
+  loading: false,
+  post: {},
+ } as PostShowStoreState,
 
-  getters: {
-    loading(state) {
-      return state.loading;
-    },
-
-    post(state) {
-      return Object.keys(state.post).length ? state.post : null;
-    },
+ getters: {
+  loading(state) {
+   return state.loading;
   },
 
-  mutations: {
-    setLoading(state, data) {
-      state.post = data;
-    },
+  post(state) {
+   return Object.keys(state.post).length ? state.post : null;
+  },
+ },
 
-    setPost(state, data) {
-      state.post = data;
-    },
+ mutations: {
+  setLoading(state, data) {
+   state.post = data;
   },
 
-  actions: {
-    async getPostById({ commit }, postId) {
-      commit('setLoading', true);
-
-      try {
-        const response = await apiHttpClient.get(`/posts/${postId}`);
-        commit('setLoading', false);
-        commit('setPost', response.data);
-
-        return response;
-      } catch (error) {
-        commit('setLoading', false);
-
-        throw error.response;
-      }
-    },
+  setPost(state, data) {
+   state.post = data;
   },
+ },
+
+ actions: {
+  async getPostById({ commit }, postId) {
+   commit('setLoading', true);
+
+   try {
+    const response = await apiHttpClient.get(`/posts/${postId}`);
+    commit('setLoading', false);
+    commit('setPost', response.data);
+
+    return response;
+   } catch (error) {
+    commit('setLoading', false);
+
+    throw error.response;
+   }
+  },
+ },
 };
