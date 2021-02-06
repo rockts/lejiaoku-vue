@@ -7,3 +7,10 @@
     </p>
   </div>
 </template>
+<script>
+export default {
+  title() {
+    return '关于我们';
+  },
+};
+</script>

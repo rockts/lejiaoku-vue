@@ -2,7 +2,7 @@
   <div class="container-fluid">
     <global-haeder />
     <Retriever />
-    <router-view :key="$route.fullPath" />
+    <router-view />
     <global-footer />
   </div>
 </template>
