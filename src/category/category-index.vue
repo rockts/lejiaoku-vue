@@ -11,6 +11,9 @@ import CategoryList from './components/category-list.vue';
 import BreadCrumbs from '@/app/components/BreadCrumbs.vue';
 
 export default defineComponent({
+  title() {
+    return '资源类型';
+  },
   name: 'categorysIndex',
   components: {
     CategoryList,

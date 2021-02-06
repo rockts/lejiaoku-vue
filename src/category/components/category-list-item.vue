@@ -1,7 +1,7 @@
 <template>
   <div class="category-list-item">
     <div>
-      <router-link :to="`/category/${category.id}`">
+      <router-link :to="`/categorys/${category.id}`">
         <div class="card  shadow rounded">
           <div class="card-body text-center">
             <h5 class="card-title  mt-4">{{ category.name }}</h5>

@@ -30,23 +30,23 @@
               >资源<span class="sr-only">(current)</span>
             </router-link>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <router-link class="dropdown-item" to="/category/1"
+              <router-link class="dropdown-item" to="/categorys/1"
                 >教材</router-link
               >
-              <router-link class="dropdown-item" to="/category/2"
+              <router-link class="dropdown-item" to="/categorys/2"
                 >课件</router-link
               >
-              <router-link class="dropdown-item" to="/category/3"
+              <router-link class="dropdown-item" to="/categorys/3"
                 >教案</router-link
               >
-              <router-link class="dropdown-item" to="/category/4"
+              <router-link class="dropdown-item" to="/categorys/4"
                 >练习题</router-link
               >
-              <router-link class="dropdown-item" to="/category/5"
+              <router-link class="dropdown-item" to="/categorys/5"
                 >其他</router-link
               >
 
-              <router-link class="dropdown-item" to="/category/6"
+              <router-link class="dropdown-item" to="/categorys/6"
                 >视频
               </router-link>
             </div>
