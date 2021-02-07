@@ -16,15 +16,15 @@
 </template>
 
 <script lang="ts">
- import { defineComponent } from 'vue'
+ import { defineComponent } from 'vue';
 
  export default defineComponent({
   name: 'BreadCrumb',
- })
+ });
 </script>
 
 <style>
- .breadcrumb {
-  background-color: #fff;
+ .breadcrumbs .breadcrumb {
+  background: #fff;
  }
 </style>

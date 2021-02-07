@@ -1,0 +1,80 @@
+.post-create-page-body {
+ background: #f8f8f8;
+ padding: 30px 30px;
+ margin-bottom: 20px;
+}
+
+.post-create-page-btn > button {
+ width: 100%;
+ margin: 20px auto;
+}
+
+.create-post-title input {
+ margin-bottom: 20px;
+ background: #f8f8f8;
+ border: none;
+ box-shadow: none;
+ width: 100%;
+ text-align: center;
+ font-size: 24px;
+ height: 50px;
+ border-bottom: 1px solid #4a4a4a;
+}
+
+.create-post-attr select {
+ margin: 10px auto;
+}
+
+.upload-cover {
+ text-align: center;
+}
+
+.upload-cover-icons {
+ margin: 10px auto;
+}
+
+.upload-cover .bi {
+ font-size: 30px;
+}
+
+.upload-cover input {
+ cursor: pointer;
+ opacity: 0;
+ overflow: hidden;
+ position: absolute;
+ right: 0;
+ top: 0;
+}
+
+.cover-preview {
+ max-width: 400px;
+}
+.cover-upload-progress {
+ font-size: 32px;
+ font-weight: 300;
+ text-align: center;
+}
+
+.drag-zone {
+ height: 250px;
+ background: #ffffff;
+ color: #ababab;
+ font-size: 14px;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+}
+
+.drag-zone.active {
+ background: #83c7f7;
+ color: #1790e9;
+}
+
+.input-description,
+.uplopadFile {
+ text-align: left;
+}
+
+.input-description textarea {
+ width: 100%;
+}

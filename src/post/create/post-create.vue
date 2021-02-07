@@ -1,18 +1,80 @@
 <template>
  <BreadCrumbs />
  <div class="post-create-page">
-  <div class="container">
-   <h4>发布资源</h4>
-   <!-- <form> -->
-   <div class="mb-3">
-    <label class="form-label">资源标题：</label>
-    <input
-     v-model="title"
-     @keyup.enter="createPost"
-     placeholder="请输入资源标题"
-     type="text"
-    />
-    <input
+  <div class="container post-create-page-body">
+   <form>
+    <div class="create-post-title mb-3">
+     <label class="sr-only" for="id_name">资源标题</label>
+     <input v-model="title" placeholder="请输入资源标题" type="text" class="" />
+
+     <div class="upload-cover">
+      <div
+       :class="['drag-zone', { active: dragZoneActive }]"
+       @dragover.prevent
+       @drop.prevent="onDropDragZone"
+       @dragenter="dragZoneActive = true"
+       @dragleave="dragZoneActive = false"
+      >
+       <div v-if="coverUploadProgress">
+        <span class="cover-upload-progress">
+         {{ coverUploadProgress + '%' }}
+        </span>
+       </div>
+       <div v-if="coverPreviewUrl">
+        <img class="cover-preview" :src="coverPreviewUrl" alt="" />
+       </div>
+       <div>
+        <label>
+         <div class="upload-cover-icons">
+          <i class="bi bi-card-image"></i>
+         </div>
+         <p>封面拖放到这里</p>
+         <P>大小限制: 5 MB</P>
+        </label>
+       </div>
+      </div>
+
+      <!-- 上传封面 input -->
+      <div>
+       <input
+        type="file"
+        ref="file"
+        @change="onChangeCover"
+        id="id_cover"
+        accept="image/png, image/jpg, image/gif, image/jpge"
+       />
+      </div>
+     </div>
+
+     <div class="row create-post-attr  mt-2">
+      <div class="col-md-3">
+       <select class="form-control">
+        <option selected>年级</option>
+        <option>一年级上册</option>
+       </select>
+      </div>
+      <div class="col-md-3">
+       <select class="form-control">
+        <option selected>学科</option>
+        <option>语文</option>
+       </select>
+      </div>
+      <div class="col-md-3">
+       <select class="form-control">
+        <option selected>版本</option>
+        <option>人教版</option>
+       </select>
+      </div>
+      <div class="col-md-3">
+       <select class="form-control">
+        <option selected>类型</option>
+        <option>课件</option>
+       </select>
+      </div>
+     </div>
+    </div>
+
+    <!-- <input
      v-model="categoryId"
      @keyup.enter="createPost"
      placeholder="输入类型 Id"
@@ -35,12 +97,26 @@
      @keyup.enter="createPost"
      placeholder="输入版本"
      type="text"
-    />
-    <input
-     type="file"
-     ref="file"
-     @change="onChangeFile"
-     accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
+    /> -->
+
+    <div class="mb-3 input-description">
+     <p><label>资源介绍：</label></p>
+     <textarea
+      v-model="description"
+      rows="5"
+      type="text"
+      tag="textarea"
+      placeholder="请输入资源说明"
+     />
+    </div>
+
+    <div class="uplopadFile">
+     <p><label for="id_name">资源文件</label></p>
+     <input
+      type="file"
+      ref="file"
+      @change="onChangeFile"
+      accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
         application/vnd.ms-powerpoint,
         application/pdf,
         application/msword,
@@ -49,43 +125,14 @@
         application/vnd.openxmlformats-officedocument.presentationml.presentation,
         application/octet-stream,
         application/vnd.apple.numbers,
-        application/vnd.apple.page,
-        image/png"
-    />
-
-    <div
-     :class="['drag-zone', { active: dragZoneActive }]"
-     @dragover.prevent
-     @drop.prevent="onDropDragZone"
-     @dragenter="dragZoneActive = true"
-     @dragleave="dragZoneActive = false"
-    >
-     <div>把文件拖放到这里</div>
+        application/vnd.apple.page"
+     />
     </div>
 
-    <div v-if="imageUploadProgress">
-     <span class="image-upload-progress">
-      {{ imageUploadProgress + '%' }}
-     </span>
+    <div class="post-create-page-btn">
+     <button class="btn btn-primary btn-large">发布资源</button>
     </div>
-
-    <div v-if="imagePreviewUrl">
-     <img class="image-preview" :src="imagePreviewUrl" alt="" />
-    </div>
-   </div>
-   <div class="mb-3">
-    <label for="" class="form-label">资源介绍：</label>
-    <input
-     v-model="description"
-     rows="10"
-     type="text"
-     tag="textarea"
-     placeholder="请输入资源说明"
-    />
-   </div>
-
-   <!-- <button class="btn btn-primary btn-large">发布资源</button> -->
-   <!-- </form> -->
+   </form>
   </div>
  </div>
 </template>
@@ -259,27 +306,5 @@
 </script>
 
 <style>
- .image-preview {
-  max-width: 360px;
- }
- .image-upload-progress {
-  font-size: 32px;
-  font-weight: 300;
- }
-
- .drag-zone {
-  width: 360px;
-  height: 250px;
-  background: #f8f8f8;
-  color: #ababab;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
- }
-
- .drag-zone.active {
-  background: #83c7f7;
-  color: #1790e9;
- }
+ @import './styles/style.css';
 </style>
