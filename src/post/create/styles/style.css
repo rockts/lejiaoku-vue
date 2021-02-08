@@ -29,6 +29,11 @@
  text-align: center;
 }
 
+.coverUploadBox {
+ cursor: pointer;
+ position: relative;
+}
+
 .upload-cover-icons {
  margin: 10px auto;
 }
@@ -47,7 +52,7 @@
 }
 
 .cover-preview {
- max-width: 400px;
+ max-height: 300px;
 }
 .cover-upload-progress {
  font-size: 32px;
@@ -56,7 +61,7 @@
 }
 
 .drag-zone {
- height: 250px;
+ height: 350px;
  background: #ffffff;
  color: #ababab;
  font-size: 14px;

@@ -5,7 +5,12 @@
    <form>
     <div class="create-post-title mb-3">
      <label class="sr-only" for="id_name">资源标题</label>
-     <input v-model="title" placeholder="请输入资源标题" type="text" class="" />
+     <input
+      v-model="title"
+      placeholder="请输入资源标题..."
+      type="text"
+      class=""
+     />
 
      <div class="upload-cover">
       <div
@@ -21,14 +26,14 @@
         </span>
        </div>
        <div v-if="coverPreviewUrl">
-        <img class="cover-preview" :src="coverPreviewUrl" alt="" />
+        <img class="cover-preview img-fluid" :src="coverPreviewUrl" alt="" />
        </div>
-       <div>
-        <label>
+       <div v-else>
+        <label for="id_cover" class="coverUploadBox">
          <div class="upload-cover-icons">
+          <p>封面拖放到这里</p>
           <i class="bi bi-card-image"></i>
          </div>
-         <p>封面拖放到这里</p>
          <P>大小限制: 5 MB</P>
         </label>
        </div>
@@ -106,7 +111,7 @@
       rows="5"
       type="text"
       tag="textarea"
-      placeholder="请输入资源说明"
+      placeholder="请输入资源说明..."
      />
     </div>
 
@@ -165,8 +170,8 @@
     version: '',
     description: '',
     file: null,
-    imagePreviewUrl: null,
-    imageUploadProgress: null,
+    coverPreviewUrl: null,
+    coverUploadProgress: null,
     dragZoneActive: false,
    };
   },
@@ -189,29 +194,29 @@
 
     this.dragZoneActive = false;
 
-    const file = event.dataTransfer.files[0];
+    const cover = event.dataTransfer.files[0];
 
-    if (file) {
-     this.file = file;
+    if (cover) {
+     this.cover = cover;
 
      // 设置资源标题
-     this.title = file.name.split('.')[0];
+     this.title = cover.name.split('.')[0];
 
      // 生成预览图像
-     this.createImagePreview(file);
+     this.createCoverPreview(cover);
     }
    },
-   async createFile(file, PostId) {
+   async createCover(cover, PostId) {
     // 创建表单
     const formData = new FormData();
 
     // 添加字段
-    formData.append('file', file);
+    formData.append('cover', cover);
 
-    // 上传文件
+    // 上传封面
     try {
      const response = await apiHttpClient.post(
-      `/files?Post=${PostId}`,
+      `/cover?Post=${PostId}`,
       formData,
       {
        headers: {
@@ -223,16 +228,16 @@
 
         const { loaded, total } = event;
 
-        this.imageUploadProgress = Math.round((loaded * 100) / total);
+        this.coverUploadProgress = Math.round((loaded * 100) / total);
        },
       }
      );
 
      // 清理
-     this.file = null;
-     this.imagePreviewUrl = null;
-     this.$refs.file.value = '';
-     this.imageUploadProgress = null;
+     this.cover = null;
+     this.coverPreviewUrl = null;
+     this.$refs.cover.value = '';
+     this.coverUploadProgress = null;
 
      console.log(response.data);
     } catch (error) {
@@ -240,32 +245,33 @@
     }
    },
 
-   // 上传文件预览
-   createImagePreview(file) {
+   // 上传封面预览
+   createCoverPreview(cover) {
     const reader = new FileReader();
 
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(cover);
 
     reader.onload = (event) => {
-     this.imagePreviewUrl = event.target.result;
+     this.coverPreviewUrl = event.target.result;
     };
    },
 
-   onChangeFile(event) {
+   onChangeCover(event) {
     console.log(event.target.files);
 
-    const file = event.target.files[0];
+    const cover = event.target.files[0];
 
-    if (file) {
-     this.file = file;
+    if (cover) {
+     this.cover = cover;
 
-     // 用图像名作为资源标题
-     this.title = file.name.split('.')[0];
+     // 用封面名作为资源标题
+     this.title = cover.name.split('.')[0];
 
-     // 生成预览图像
-     this.createImagePreview(file);
+     // 生成预览封面
+     this.createCoverPreview(cover);
     }
    },
+
    async createPost() {
     try {
      const response = await apiHttpClient.post(
@@ -287,8 +293,8 @@
 
      console.log(response.data);
 
-     if (this.file) {
-      this.createFile(this.file, response.data.insertId);
+     if (this.cover) {
+      this.createFile(this.cover, response.data.insertId);
      }
 
      this.title = '';

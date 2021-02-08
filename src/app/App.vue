@@ -8,23 +8,23 @@
 </template>
 
 <script>
- import { defineComponent } from 'vue'
- import GlobalHaeder from './components/GlobalHaeder.vue'
- import Retriever from './components/app-retriever.vue'
- import GlobalFooter from '@/app/components/GlobalFooter.vue'
+ import { defineComponent } from 'vue';
+ import GlobalHaeder from './components/GlobalHaeder.vue';
+ import Retriever from './components/app-retriever.vue';
+ import GlobalFooter from '@/app/components/GlobalFooter.vue';
 
  export default defineComponent({
   name: 'App',
 
   created() {
-   console.log(this.$store.state)
+   console.log(this.$store.state);
   },
   components: {
    GlobalHaeder,
    Retriever,
    GlobalFooter,
   },
- })
+ });
 </script>
 
 <style>
