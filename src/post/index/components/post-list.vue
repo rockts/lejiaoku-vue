@@ -1,7 +1,9 @@
 <template>
  <div class="post-list my-3">
-  <div v-if="loading">加载中...</div>
-  <PostListItem v-for="post in posts" :item="post" :key="post.id" />
+  <div class="container">
+   <div v-if="loading">加载中...</div>
+   <PostListItem v-for="post in posts" :item="post" :key="post.id" />
+  </div>
  </div>
 </template>
 

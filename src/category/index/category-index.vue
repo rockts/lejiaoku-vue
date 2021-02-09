@@ -1,22 +1,22 @@
 <template>
  <BreadCrumbs />
- <div class="post-index-page">
-  <PostList />
+ <div class="category-index-page">
+  <CategoryList />
  </div>
 </template>
 
 <script>
  import { defineComponent } from 'vue';
  import BreadCrumbs from '@/app/components/BreadCrumbs.vue';
- import PostList from './components/post-list';
+ import CategoryList from './components/category-list.vue';
 
  export default defineComponent({
   title() {
-   return '资源列表';
+   return '资源类型';
   },
   components: {
    BreadCrumbs,
-   PostList,
+   CategoryList,
   },
  });
 </script>

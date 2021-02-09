@@ -43,7 +43,7 @@
       <div>
        <input
         type="file"
-        ref="file"
+        ref="cover"
         @change="onChangeCover"
         id="id_cover"
         accept="image/png, image/jpg, image/gif, image/jpge"
@@ -105,18 +105,17 @@
     /> -->
 
     <div class="mb-3 input-description">
-     <p><label>资源介绍：</label></p>
+     <label>资源介绍：</label>
      <textarea
       v-model="description"
       rows="5"
-      type="text"
       tag="textarea"
       placeholder="请输入资源说明..."
      />
     </div>
 
     <div class="uplopadFile">
-     <p><label for="id_name">资源文件</label></p>
+     <label>资源文件：</label>
      <input
       type="file"
       ref="file"
