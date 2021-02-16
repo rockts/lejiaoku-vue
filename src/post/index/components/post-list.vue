@@ -35,23 +35,5 @@
   components: {
    PostListItem,
   },
-
-  // props: {
-  //   list: {
-  //     type: Array as PropType<PostProps[]>,
-  //     required: true,
-  //   },
-  // },
-  // setup(props) {
-  //   const postList = computed(() => {
-  //     return props.list.map((post) => {
-  //       if (!post.cover) {
-  //         post.cover = require('@/assets/catagory.png');
-  //       }
-  //       return post;
-  //     });
-  //   });
-  //   return { postList };
-  // },
  });
 </script>
