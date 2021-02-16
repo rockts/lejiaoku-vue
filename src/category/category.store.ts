@@ -4,6 +4,7 @@ import {
  categoryIndexStoreModule,
  CategoryIndexStoreState,
 } from './index/category-index.store';
+import { categoryShowStoreModule } from './show/category-show.store';
 
 export interface CategoryItem {
  id: number;
@@ -19,5 +20,6 @@ export const categoryStoreModule: Module<CategoryStoreState, RootState> = {
 
  modules: {
   index: categoryIndexStoreModule,
+  show: categoryShowStoreModule,
  },
 };

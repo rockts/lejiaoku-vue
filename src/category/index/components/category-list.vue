@@ -9,7 +9,6 @@
      :item="category"
      class="col-md-4 py-3 px-5"
     />
-    <pre>{{ category.name }}</pre>
    </div>
   </div>
  </div>

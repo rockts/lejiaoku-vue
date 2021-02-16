@@ -23,6 +23,7 @@ const routes: Array<RouteRecordRaw> = [
   path: '/categorys/:categoryId',
   name: 'categoryShow',
   component: CategoryShow,
+  props: true,
  },
 ];
 

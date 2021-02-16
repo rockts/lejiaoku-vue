@@ -3,14 +3,13 @@
  * @Author: gaopeng(gaopeng@lekee.cc)
  * @Date: 2021-2-1 11:52
  * @LastEditors: gaopeng(gaopeng@lekee.cc)
- * @LastEditTime: 2021-2-10 00:06
+ * @LastEditTime: 2021-2-10 02:26
  */
 
 import { createStore } from 'vuex';
 import { postStoreModule, PostStoreState } from '../post/post.store';
 import { userStoreModule } from '../user/user.store';
 import { categoryStoreModule } from '../category/category.store';
-// import { coverStoreModule } from '../cover/cover.store';
 
 export interface RootState {
  appName: string;

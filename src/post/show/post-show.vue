@@ -1,24 +1,30 @@
 <template>
  <bread-crumbs />
- <div class="post-show-page mb-3">
+ <div class="post-show-page mb-3" v-if="showPost">
   <div class="container">
    <div class="res__header">
     <div class="row">
      <div class="col-md-4">
-      <div class="cover">
+      <div v-if="post.cover" class="cover">
        <img
-        :src="post.cover"
+        :src="getCoverUrl"
         :alt="`${post.title}`"
         class="cover  img-fluid img-thumbnail"
        />
-
-       <pre>{{ post.cover }}</pre>
+       {{ post.cover.id }}
+      </div>
+      <div v-else class="cover">
+       <img
+        src="@/assets/catagory.png"
+        :alt="`${post.title}`"
+        class="cover  img-fluid img-thumbnail"
+       />
       </div>
       <div class="statistics">
        <ul>
         <li><i class="bi bi-eye-fill"></i>100</li>
         <li><i class="bi bi-file-arrow-down-fill"></i>200</li>
-        <li><i class="bi bi-star-fill"></i>50</li>
+        <li><i class="bi bi-star-fill"></i>{{ post.totalLikes }}</li>
        </ul>
       </div>
      </div>
@@ -47,33 +53,45 @@
      </div>
     </div>
    </div>
-   <div class="card" v-if="showPost">
+   <div class="card">
     <div class="card-body">
      <h5>资源介绍</h5>
      <p class="card-text">
       {{ post.description }}
      </p>
-     <div class="res__attr">
+     <div>
       <ul class="res__attr">
-       <li>学科：{{ post.subject }}</li>
-       <li>年级：{{ post.grade }}</li>
-       <li>版本：{{ post.version }}</li>
-       <li>文件类型：ppt</li>
-       <li><span>资源类型：</span>{{ post.category }}</li>
-       <li>大小：15KB</li>
+       <li><span style="font-weight: bold">学科：</span>{{ post.subject }}</li>
+       <li><span style="font-weight: bold">年级：</span>{{ post.grade }}</li>
+       <li><span style="font-weight: bold">版本：</span>{{ post.version }}</li>
        <li>
-        <router-link to="#">贡献者：{{ post.user.name }}</router-link>
+        <span style="font-weight: bold">文件类型：</span
+        >{{ post.file.mimetype }}
        </li>
-       <li>发布时间：{{ post.createdAt }}</li>
+       <li>
+        <span style="font-weight: bold">资源类型：</span>{{ post.category }}
+       </li>
+       <li>
+        <span style="font-weight: bold">大小：</span>{{ post.file.size }}
+       </li>
+       <li>
+        <span style="font-weight: bold">贡献者：</span>{{ post.user.name }}
+       </li>
+       <li>
+        <span style="font-weight: bold">更新时间：</span>{{ post.createdAt }}
+       </li>
       </ul>
      </div>
     </div>
-    <div class="card-footer"><i class="bi bi-tags-fill"></i> Tags:</div>
+    <div class="card-footer">
+     <i class="bi bi-tags-fill"></i> Tags:
+     <span>{{ post.tags }}</span>
+    </div>
    </div>
   </div>
  </div>
 </template>
-<script lang="ts">
+<script>
  import { defineComponent } from 'vue';
  import BreadCrumbs from '@/app/components/BreadCrumbs.vue';
  import { mapGetters, mapActions } from 'vuex';
@@ -87,26 +105,33 @@
 
   props: {
    postId: String,
+   coverId: String,
   },
 
   created() {
    this.getPostById(this.postId);
+   this.getCoverUrl(this.getCoverUrl);
   },
 
   computed: {
    ...mapGetters({
     loading: 'post/show/loading',
     post: 'post/show/post',
+    cover: 'post/cover/cover',
    }),
 
    showPost() {
     return !this.loading && this.post;
+   },
+   showCover() {
+    return !this.loading && this.cover;
    },
   },
 
   methods: {
    ...mapActions({
     getPostById: 'post/show/getPostById',
+    getCoverUrl: 'post/cover/getCoverUrl',
    }),
   },
   components: {
@@ -140,6 +165,9 @@
   list-style: none;
   display: inline;
   padding-right: 20px;
+ }
+ .res__attr li {
+  text-indent: 2em;
  }
 
  .res__operating li {
