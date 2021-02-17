@@ -1,19 +1,19 @@
 <template>
  <div class="home  pt-3">
-  <CategoryList />
+  <PostList />
   <HomeJoin />
  </div>
 </template>
 
 <script lang="ts">
  import { defineComponent } from 'vue';
- import CategoryList from '@/category/index/components/category-list.vue';
+ import PostList from '@/post/index/components/post-list.vue';
  import HomeJoin from './components/HomeJoin.vue';
 
  export default defineComponent({
   name: 'Home',
   components: {
-   CategoryList,
+   PostList,
    HomeJoin,
   },
  });
