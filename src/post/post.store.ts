@@ -1,10 +1,6 @@
 import { Module } from 'vuex';
 import { RootState } from '../app/app.store';
 import {
- postCoverStoreModule,
- PostCoverStoreState,
-} from './cover/post-cover.store';
-import {
  postCreateStoreModule,
  PostCreateStoreState,
 } from './create/post-create.store';
@@ -29,7 +25,6 @@ export interface PostItem {
 export interface PostStoreState {
  create: PostCreateStoreState;
  index: PostIndexStoreState;
- cover: PostCoverStoreState;
 }
 
 export const postStoreModule: Module<PostStoreState, RootState> = {
@@ -39,6 +34,5 @@ export const postStoreModule: Module<PostStoreState, RootState> = {
   create: postCreateStoreModule,
   index: postIndexStoreModule,
   show: postShowStoreModule,
-  cover: postCoverStoreModule,
  },
 };

@@ -6,9 +6,7 @@
     <h3>{{ category.name }}</h3>
     <p class="text-muted">{{ category.alias }}</p>
    </div>
-
    <PostList />
-   <pre>{{ categoryId }}</pre>
   </div>
  </div>
 </template>

@@ -4,7 +4,7 @@
             <div class="col-md-4" v-if="item.cover">
                 <img
                     :src="postCoverURL"
-                    :alt="item.title "
+                    :alt="item.title"
                     class="cover img-fluid img-thumbnail my-4"
                 />
             </div>
@@ -22,6 +22,15 @@
                             {{ item.title }}
                         </router-link>
                     </h5>
+                         <div class="statistics">
+                    <ul>
+                        <li><i class="bi bi-eye-fill"></i>100</li>
+                        <li><i class="bi bi-file-arrow-down-fill"></i>200</li>
+                        <li><i class="bi bi-hand-thumbs-up-fill"></i>{{ item.totalLikes }}</li>
+                        <li><i class="bi bi-heart-fill"></i>{{ 30 }}</li>
+                    </ul>
+                </div>
+                   
                     <p class="card-text">
                     资源介绍：
                     {{ item.description }}
@@ -33,13 +42,11 @@
                             <li>版本：{{item.version}}</li>
                             <li>资源类型：{{item.category}}</li>
                             <li>贡献者：{{item.user.name}}</li>
+                            <li>最后更新：{{ item.updatedate }} </li>
                         </ul>
                     </p>
                 </div>
           
-            <div class="card-footer text-muted">
-                <small class="text-muted">{{ item.createdAt }}</small>
-            </div>
          </div>
    
     </div>
@@ -72,4 +79,8 @@ export default defineComponent({
   list-style: none;
   text-align: left;
 }
+
+
+
+
 </style>

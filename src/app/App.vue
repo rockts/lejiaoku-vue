@@ -40,8 +40,34 @@
   margin-right: 10px;
  }
 
+ .card-footer {
+  background-color: #fff;
+  padding: 0 auto;
+ }
+
  .content {
   text-align: center;
   margin: 20px 0;
+ }
+ .img-thumbnail {
+  max-height: 250px;
+ }
+
+ .statistics {
+  margin-top: 10px;
+  text-align: left;
+ }
+
+ .statistics li {
+  list-style: none;
+  display: inline;
+  padding-right: 10px;
+ }
+
+ .statistics .bi {
+  position: relative;
+  left: 5px;
+  top: -5px;
+  padding-right: 10px;
  }
 </style>

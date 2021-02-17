@@ -19,6 +19,9 @@
         class="cover  img-fluid img-thumbnail"
        />
       </div>
+     </div>
+     <div class="col-md-8">
+      <h4 class="pt-2">{{ post.title }}</h4>
       <div class="statistics">
        <ul>
         <li><i class="bi bi-eye-fill"></i>100</li>
@@ -27,12 +30,19 @@
         <li><i class="bi bi-heart-fill"></i>{{ 30 }}</li>
        </ul>
       </div>
-     </div>
-     <div class="col-md-8">
-      <h4 class="pt-2">{{ post.title }}</h4>
-      <div class="res__btn text-left my-5">
-       <router-link to="/" class="btn btn-primary ">点击阅览</router-link>
-       <router-link to="/" class="btn btn-primary ">点击下载</router-link>
+      <div class="res__btn my-5">
+       <router-link
+        to="#"
+        class="btn btn-outline-success"
+        type="button"
+        data-toggle="collapse"
+        data-target="#demo"
+        >点击阅览</router-link
+       >
+
+       <button @click="onClick()" class="btn btn-outline-success">
+        点击下载
+       </button>
       </div>
       <div class="res__operating">
        <ul>
@@ -57,6 +67,14 @@
       </div>
      </div>
     </div>
+   </div>
+   <div id="demo" class="collapse">
+    <iframe
+     :src="postFileURL"
+     width="100%"
+     height="800px"
+     frameborder="0"
+    ></iframe>
    </div>
    <div class="card">
     <div class="card-body">
@@ -101,6 +119,7 @@
  import BreadCrumbs from '@/app/components/BreadCrumbs.vue';
  import { mapGetters, mapActions } from 'vuex';
  import { API_BASE_URL } from '@/app/app.config';
+ import axios from 'axios';
 
  export default defineComponent({
   title() {
@@ -111,7 +130,6 @@
 
   props: {
    postId: String,
-   coverId: String,
   },
 
   created() {
@@ -126,6 +144,9 @@
    postCoverURL() {
     return `${API_BASE_URL}/covers/${this.post.cover.id}?size=thumbnail`;
    },
+   postFileURL() {
+    return `${API_BASE_URL}/files/${this.post.file.id}`;
+   },
 
    showPost() {
     return !this.loading && this.post;
@@ -136,7 +157,25 @@
    ...mapActions({
     getPostById: 'post/show/getPostById',
    }),
+
+   onClick() {
+    axios({
+     url: `${API_BASE_URL}/files/${this.post.file.id}`,
+     method: 'GET',
+     responseType: 'blob',
+    }).then((response) => {
+     const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+     const fileLink = document.createElement('a');
+
+     fileLink.href = fileURL;
+     fileLink.setAttribute('download', `${this.post.file.filename}`);
+     document.body.appendChild(fileLink);
+
+     fileLink.click();
+    });
+   },
   },
+
   components: {
    BreadCrumbs,
   },
@@ -185,20 +224,7 @@
   margin: 5px 20px;
  }
 
- .statistics {
-  margin-top: 10px;
- }
-
- .statistics li {
-  list-style: none;
-  display: inline;
-  padding-right: 10px;
- }
-
- .statistics .bi {
-  position: relative;
-  left: 5px;
-  top: -5px;
-  padding-right: 10px;
+ .cover {
+  text-align: center;
  }
 </style>
