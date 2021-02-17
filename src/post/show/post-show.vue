@@ -7,11 +7,10 @@
      <div class="col-md-4">
       <div v-if="post.cover" class="cover">
        <img
-        :src="getCoverUrl"
+        :src="postCoverURL"
         :alt="`${post.title}`"
         class="cover  img-fluid img-thumbnail"
        />
-       {{ post.cover.id }}
       </div>
       <div v-else class="cover">
        <img
@@ -24,7 +23,8 @@
        <ul>
         <li><i class="bi bi-eye-fill"></i>100</li>
         <li><i class="bi bi-file-arrow-down-fill"></i>200</li>
-        <li><i class="bi bi-star-fill"></i>{{ post.totalLikes }}</li>
+        <li><i class="bi bi-hand-thumbs-up-fill"></i>{{ post.totalLikes }}</li>
+        <li><i class="bi bi-heart-fill"></i>{{ 30 }}</li>
        </ul>
       </div>
      </div>
@@ -44,6 +44,11 @@
         </li>
         <li>
          <a href=""><i class="bi bi-flag-fill"></i>报告</a>
+        </li>
+        <li>
+         <router-link to=""
+          ><i class="bi bi-hand-thumbs-up-fill"></i>点赞</router-link
+         >
         </li>
         <li>
          <a href=""><i class="bi bi-link"></i>复制网址</a>
@@ -95,6 +100,7 @@
  import { defineComponent } from 'vue';
  import BreadCrumbs from '@/app/components/BreadCrumbs.vue';
  import { mapGetters, mapActions } from 'vuex';
+ import { API_BASE_URL } from '@/app/app.config';
 
  export default defineComponent({
   title() {
@@ -110,28 +116,25 @@
 
   created() {
    this.getPostById(this.postId);
-   this.getCoverUrl(this.getCoverUrl);
   },
 
   computed: {
    ...mapGetters({
     loading: 'post/show/loading',
     post: 'post/show/post',
-    cover: 'post/cover/cover',
    }),
+   postCoverURL() {
+    return `${API_BASE_URL}/covers/${this.post.cover.id}?size=thumbnail`;
+   },
 
    showPost() {
     return !this.loading && this.post;
-   },
-   showCover() {
-    return !this.loading && this.cover;
    },
   },
 
   methods: {
    ...mapActions({
     getPostById: 'post/show/getPostById',
-    getCoverUrl: 'post/cover/getCoverUrl',
    }),
   },
   components: {
@@ -156,15 +159,15 @@
   text-align: left;
   border-bottom: 1px solid #ccc;
   box-shadow: rgb(0, 0, 0);
-  margin-bottom: 20px;
-  padding: 20px 10px;
+  margin-bottom: 10px;
+  padding: 10px;
  }
  .res__attr,
  .res__operating li {
   text-decoration: none; /*去掉前面的圆点*/
   list-style: none;
   display: inline;
-  padding-right: 20px;
+  padding-right: 14px;
  }
  .res__attr li {
   text-indent: 2em;
@@ -180,6 +183,10 @@
 
  .res__btn a {
   margin: 5px 20px;
+ }
+
+ .statistics {
+  margin-top: 10px;
  }
 
  .statistics li {

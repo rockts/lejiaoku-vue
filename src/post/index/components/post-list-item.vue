@@ -48,10 +48,16 @@
 
 <script>
 import { defineComponent } from 'vue';
+import { API_BASE_URL } from '@/app/app.config'
 
 export default defineComponent({
   props: {
     item: Object,
+  },
+  computed: {
+    postCoverURL() {
+      return `${API_BASE_URL}/covers/${this.item.cover.id}?size=thumbnail`;
+    },
   },
 });
 </script>
