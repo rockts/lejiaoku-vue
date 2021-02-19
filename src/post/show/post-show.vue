@@ -9,27 +9,19 @@
        <img
         :src="postCoverURL"
         :alt="`${post.title}`"
-        class="cover  img-fluid img-thumbnail"
+        class="img-fluid img-thumbnail"
        />
       </div>
       <div v-else class="cover">
        <img
         src="@/assets/catagory.png"
         :alt="`${post.title}`"
-        class="cover  img-fluid img-thumbnail"
+        class="img-fluid img-thumbnail"
        />
       </div>
      </div>
      <div class="col-md-8">
       <h4 class="pt-2">{{ post.title }}</h4>
-      <div class="statistics">
-       <ul>
-        <li><i class="bi bi-eye-fill"></i>100</li>
-        <li><i class="bi bi-file-arrow-down-fill"></i>200</li>
-        <li><i class="bi bi-hand-thumbs-up-fill"></i>{{ post.totalLikes }}</li>
-        <li><i class="bi bi-heart-fill"></i>{{ 30 }}</li>
-       </ul>
-      </div>
       <div class="res__btn my-5">
        <router-link
         to="#"
@@ -97,13 +89,27 @@
        <li>
         <span style="font-weight: bold">大小：</span>{{ post.file.size }}
        </li>
-       <li>
-        <span style="font-weight: bold">贡献者：</span>{{ post.user.name }}
-       </li>
-       <li>
-        <span style="font-weight: bold">更新时间：</span>{{ post.createdAt }}
-       </li>
       </ul>
+     </div>
+     <div class="container">
+      <div class="row">
+       <div class="col-md-6 author">
+        <img :src="userAvatarURL" :alt="post.user.name" class="avatar" />
+        <div class="author__text">
+         <p>贡献者：{{ post.user.name }}</p>
+         <small>更新于 14天以前</small>
+        </div>
+       </div>
+       <div class="col-md-6 statistics">
+        <ul>
+         <li><i class="bi bi-eye-fill"></i>100</li>
+         <li><i class="bi bi-file-arrow-down-fill"></i>200</li>
+         <li><i class="bi bi-hand-thumbs-up-fill"></i>{{ post.totalLikes }}</li>
+         <li><i class="bi bi-heart-fill"></i>30</li>
+         <li><i class="bi bi-chat-fill"></i>{{ post.totalComments }}</li>
+        </ul>
+       </div>
+      </div>
      </div>
     </div>
     <div class="card-footer">
@@ -146,6 +152,9 @@
    },
    postFileURL() {
     return `${API_BASE_URL}/files/${this.post.file.id}`;
+   },
+   userAvatarURL() {
+    return `${API_BASE_URL}/users/${this.post.user.id}/avatar`;
    },
 
    showPost() {
@@ -194,7 +203,7 @@
  }
 
  .res__header {
-  background: rgb(228, 228, 228);
+  background: #d7cfcf;
   text-align: left;
   border-bottom: 1px solid #ccc;
   box-shadow: rgb(0, 0, 0);

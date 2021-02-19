@@ -35,9 +35,26 @@
   text-align: center;
   color: #2c3e50;
  }
+
+ .author {
+  display: flex;
+ }
+
+ .author__text {
+  margin: 0 10px;
+ }
+
+ .author__text p {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  align-items: flex-start;
+ }
  .avatar {
-  width: 32px;
-  margin-right: 10px;
+  vertical-align: middle;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
  }
 
  .card-footer {
@@ -49,13 +66,20 @@
   text-align: center;
   margin: 20px 0;
  }
- .img-thumbnail {
-  max-height: 250px;
+ .cover {
+  background-color: #d7cfcf;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+ }
+ .cover img {
+  max-height: 300px;
  }
 
  .statistics {
-  margin-top: 10px;
-  text-align: left;
+  display: flex;
+  align-items: flex-end;
+  flex-direction: row;
  }
 
  .statistics li {

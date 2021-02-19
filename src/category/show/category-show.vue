@@ -4,7 +4,7 @@
   <div class="container">
    <div class="category-info  border-bottom py-5 align-items-center">
     <h3>{{ category.name }}</h3>
-    <p class="text-muted">{{ category.alias }}</p>
+    <p class="text-muted">{{ category }}</p>
    </div>
    <PostList />
   </div>
