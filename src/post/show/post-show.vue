@@ -87,7 +87,7 @@
         <span style="font-weight: bold">资源类型：</span>{{ post.category }}
        </li>
        <li>
-        <span style="font-weight: bold">大小：</span>{{ post.file.size }}
+        <span style="font-weight: bold">大小：</span>{{ fileSizeFormat() }}
        </li>
       </ul>
      </div>
@@ -127,6 +127,7 @@
  import { API_BASE_URL } from '@/app/app.config';
  import axios from 'axios';
  import moment from 'moment';
+ import { getReadableFileSizeString } from '@/hooks/utils';
 
  export default defineComponent({
   title() {
@@ -164,6 +165,9 @@
   },
 
   methods: {
+   fileSizeFormat() {
+    return getReadableFileSizeString(this.post.file.size);
+   },
    moment(...args) {
     return moment(...args);
    },
