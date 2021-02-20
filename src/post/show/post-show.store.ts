@@ -10,7 +10,8 @@ export interface Post {
  subject: string;
  version: string;
  category: string;
- updatedAt: Date;
+ created_at: Date;
+ updated_at: Date;
  file?: string;
 }
 

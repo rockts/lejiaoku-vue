@@ -97,7 +97,7 @@
         <img :src="userAvatarURL" :alt="post.user.name" class="avatar" />
         <div class="author__text">
          <p>贡献者：{{ post.user.name }}</p>
-         <small>更新于 14天以前</small>
+         <small>更新于 {{ moment(post.created_at).fromNow() }} </small>
         </div>
        </div>
        <div class="col-md-6 statistics">
@@ -126,6 +126,7 @@
  import { mapGetters, mapActions } from 'vuex';
  import { API_BASE_URL } from '@/app/app.config';
  import axios from 'axios';
+ import moment from 'moment';
 
  export default defineComponent({
   title() {
@@ -163,6 +164,9 @@
   },
 
   methods: {
+   moment(...args) {
+    return moment(...args);
+   },
    ...mapActions({
     getPostById: 'post/show/getPostById',
    }),
