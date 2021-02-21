@@ -52,9 +52,6 @@
           ><i class="bi bi-hand-thumbs-up-fill"></i>点赞</router-link
          >
         </li>
-        <li>
-         <a href=""><i class="bi bi-link"></i>复制网址</a>
-        </li>
        </ul>
       </div>
      </div>
@@ -80,14 +77,60 @@
        <li><span style="font-weight: bold">年级：</span>{{ post.grade }}</li>
        <li><span style="font-weight: bold">版本：</span>{{ post.version }}</li>
        <li>
-        <span style="font-weight: bold">文件类型：</span
-        >{{ post.file.mimetype }}
-       </li>
-       <li>
         <span style="font-weight: bold">资源类型：</span>{{ post.category }}
        </li>
+       <li v-if="post.file.mimetype.indexOf(`png`) > -1">
+        <span style="font-weight: bold">文件类型：</span>
+        <img src="@/assets/icon/filetype/png.png" class="filetypeicon" />
+       </li>
+       <li v-if="post.file.mimetype.indexOf(`bmp`) > -1">
+        <span style="font-weight: bold">文件类型：</span>
+        <img src="@/assets/icon/filetype/bmp.png" class="filetypeicon" />
+       </li>
+       <li v-if="post.file.mimetype.indexOf(`jpeg`) > -1">
+        <span style="font-weight: bold">文件类型：</span>
+        <img src="@/assets/icon/filetype/jpg.png" class="filetypeicon" />
+       </li>
+       <li v-if="post.file.mimetype.indexOf(`jpg`) > -1">
+        <span style="font-weight: bold">文件类型：</span>
+        <img src="@/assets/icon/filetype/jpg.png" class="filetypeicon" />
+       </li>
+       <li v-if="post.file.mimetype.indexOf(`gif`) > -1">
+        <span style="font-weight: bold">文件类型：</span>
+        <img src="@/assets/icon/filetype/gif.png" class="filetypeicon" />
+       </li>
+       <li v-if="post.file.mimetype.indexOf(`spreadsheetml.sheet`) > -1">
+        <span style="font-weight: bold">文件类型：</span>
+        <img src="@/assets/icon/filetype/xlsx.png" class="filetypeicon" />
+       </li>
+       <li v-if="post.file.mimetype.indexOf(`msword`) > -1">
+        <span style="font-weight: bold">文件类型：</span>
+        <img src="@/assets/icon/filetype/doc.png" class="filetypeicon" />
+       </li>
+       <li v-if="post.file.mimetype.indexOf(`wordprocessingml.document`) > -1">
+        <span style="font-weight: bold">文件类型：</span>
+        <img src="@/assets/icon/filetype/docx.png" class="filetypeicon" />
+       </li>
+       <li
+        v-if="post.file.mimetype.indexOf(`presentationml.presentation`) > -1"
+       >
+        <span style="font-weight: bold">文件类型：</span>
+        <img src="@/assets/icon/filetype/ppt.png" class="filetypeicon" />
+       </li>
+       <li v-if="post.file.mimetype.indexOf(`pdf`) > -1">
+        <span style="font-weight: bold">文件类型：</span>
+        <img src="@/assets/icon/filetype/pdf.png" class="filetypeicon" />
+       </li>
+       <li v-if="post.file.mimetype.indexOf(`ms-powerpoint`) > -1">
+        <span style="font-weight: bold">文件类型：</span>
+        <img src="@/assets/icon/filetype/ppt.png" class="filetypeicon" />
+       </li>
+       <li v-if="post.file.mimetype.indexOf(`ms-excel`) > -1">
+        <span style="font-weight: bold">文件类型：</span>
+        <img src="@/assets/icon/filetype/xls.png" class="filetypeicon" />
+       </li>
        <li>
-        <span style="font-weight: bold">大小：</span>{{ fileSizeFormat() }}
+        <span style="font-weight: bold">文件大小：</span>{{ fileSizeFormat() }}
        </li>
       </ul>
      </div>
@@ -120,6 +163,7 @@
   </div>
  </div>
 </template>
+
 <script>
  import { defineComponent } from 'vue';
  import BreadCrumbs from '@/app/components/BreadCrumbs.vue';
@@ -127,7 +171,7 @@
  import { API_BASE_URL } from '@/app/app.config';
  import axios from 'axios';
  import moment from 'moment';
- import { getReadableFileSizeString } from '@/hooks/utils';
+ import { getReadableFileSizeString } from '@/utils/utils';
 
  export default defineComponent({
   title() {
@@ -243,5 +287,10 @@
 
  .cover {
   text-align: center;
+ }
+
+ .filetypeicon {
+  width: 50px;
+  margin: 10px;
  }
 </style>

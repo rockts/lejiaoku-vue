@@ -9,3 +9,6 @@ export function getReadableFileSizeString(fileSizeInBytes: number) {
 
  return Math.max(fileSizeInBytes, 0.1).toFixed(1) + byteUnits[i];
 }
+
+// 资源类型 Icon 显示
+// export function getFileTypeIcon() {}
