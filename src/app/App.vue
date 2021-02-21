@@ -1,8 +1,9 @@
 <template>
- <div class="container-fluid">
+ <div id="app" class="container-fluid">
   <global-haeder />
   <Retriever />
   <router-view />
+  <!-- <backTop /> -->
   <global-footer />
  </div>
 </template>
@@ -12,17 +13,17 @@
  import GlobalHaeder from './components/GlobalHaeder.vue';
  import Retriever from './components/app-retriever.vue';
  import GlobalFooter from '@/app/components/GlobalFooter.vue';
+ //  import backTop from '@/app/components/BackTop';
 
  export default defineComponent({
   name: 'App',
 
-  created() {
-   console.log(this.$store.state);
-  },
+  //   created() {},
   components: {
    GlobalHaeder,
    Retriever,
    GlobalFooter,
+   //    backTop,
   },
  });
 </script>
@@ -85,20 +86,17 @@
 
  .statistics {
   display: flex;
-  align-items: flex-end;
+  align-content: space-between;
+  justify-content: space-evenly;
+  flex-wrap: nowrap;
   flex-direction: row;
  }
 
- .statistics li {
-  list-style: none;
-  display: inline;
-  padding-right: 10px;
+ .statistics-item {
+  text-align: center;
  }
 
- .statistics .bi {
-  position: relative;
-  left: 5px;
-  top: -5px;
-  padding-right: 10px;
+ .statistics-item__text {
+  margin-top: 5px;
  }
 </style>

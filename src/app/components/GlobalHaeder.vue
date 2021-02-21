@@ -2,7 +2,7 @@
  <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container">
    <router-link class="navbar-brand" to="/">
-    <img alt="LeJiaoKulogo" src="@/assets/logo.png" />
+    <img alt="LeJiaoKulogo" src="@/assets/img/logo.png" />
    </router-link>
    <button
     class="navbar-toggler"
@@ -35,16 +35,12 @@
        <router-link class="dropdown-item" to="/categorys/3">教案</router-link>
        <router-link class="dropdown-item" to="/categorys/4">练习题</router-link>
        <router-link class="dropdown-item" to="/categorys/5">其他</router-link>
-
        <router-link class="dropdown-item" to="/categorys/6">视频 </router-link>
       </div>
      </li>
 
      <li class="nav-item">
       <router-link class="nav-link" to="/">贡献者</router-link>
-     </li>
-     <li class="nav-item">
-      <router-link class="nav-link" to="/test">测试</router-link>
      </li>
     </ul>
     <form class="form-inline my-2 my-lg-0  d-sm-block d-md-none">
@@ -58,58 +54,6 @@
       搜索
      </button>
     </form>
-
-    <!-- Modal -->
-    <div
-     class="modal fade"
-     id="SignInModal"
-     tabindex="-1"
-     role="dialog"
-     aria-labelledby="SignInModalLabel"
-     aria-hidden="true"
-    >
-     <div class="modal-dialog" role="document">
-      <div class="modal-content">
-       <div class="modal-body">
-        <h5 class="modal-title" id="SignInModalLabel">欢迎回来</h5>
-        <button
-         type="button"
-         class="close"
-         data-dismiss="modal"
-         aria-label="Close"
-        >
-         <span aria-hidden="true">&times;</span>
-        </button>
-        <SignIn @login-success="onLoginSuccess" @login-error="onLoginError" />
-       </div>
-      </div>
-     </div>
-    </div>
-
-    <div
-     class="modal fade"
-     id="SignUpModal"
-     tabindex="-1"
-     role="dialog"
-     aria-labelledby="SignUpModalLabel"
-     aria-hidden="true"
-    >
-     <div class="modal-dialog" role="document">
-      <div class="modal-content">
-       <div class="modal-body">
-        <button
-         type="button"
-         class="close"
-         data-dismiss="modal"
-         aria-label="Close"
-        >
-         <span aria-hidden="true">&times;</span>
-        </button>
-        <SignUp />
-       </div>
-      </div>
-     </div>
-    </div>
 
     <!-- Button trigger modal -->
 
@@ -147,7 +91,7 @@
        aria-haspopup="true"
        aria-expanded="false"
       >
-       <img class="img-circle avatar" src="@/assets/avatar.png" />
+       <img class="img-circle avatar" src="@/assets/img/avatar.png" />
        {{ currentUser.name }}
       </router-link>
       <div class="dropdown-menu" aria-labelledby="usersDropdown">
@@ -167,8 +111,6 @@
 
 <script>
  import { defineComponent } from 'vue';
- import SignIn from '@/user/components/sign-in.vue';
- import SignUp from '@/user/components/sign-up.vue';
  import { axios } from '@/app/app.service';
 
  export default defineComponent({
@@ -241,7 +183,5 @@
     this.errorMessage = error.data.message;
    },
   },
-
-  components: { SignIn, SignUp },
  });
 </script>

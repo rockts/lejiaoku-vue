@@ -1,5 +1,5 @@
 import { Module } from 'vuex';
-import { apiHttpClient } from '../../app/app.service';
+
 import { RootState } from '../../app/app.store';
 
 export interface Post {

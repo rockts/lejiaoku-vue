@@ -126,10 +126,7 @@
         application/msword,
         application/vnd.ms-excel,
         application/vnd.openxmlformats-officedocument.wordprocessingml.document,
-        application/vnd.openxmlformats-officedocument.presentationml.presentation,
-        application/octet-stream,
-        application/vnd.apple.numbers,
-        application/vnd.apple.page"
+        application/vnd.openxmlformats-officedocument.presentationml.presentation"
      />
     </div>
 

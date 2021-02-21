@@ -14,7 +14,7 @@
       </div>
       <div v-else class="cover">
        <img
-        src="@/assets/catagory.png"
+        src="@/assets/img/catagory.png"
         :alt="`${post.title}`"
         class="img-fluid img-thumbnail"
        />

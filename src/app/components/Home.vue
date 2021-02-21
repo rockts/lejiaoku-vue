@@ -8,7 +8,7 @@
 <script lang="ts">
  import { defineComponent } from 'vue';
  import PostList from '@/post/index/components/post-list.vue';
- import HomeJoin from './components/HomeJoin.vue';
+ import HomeJoin from './HomeJoin.vue';
 
  export default defineComponent({
   name: 'Home',

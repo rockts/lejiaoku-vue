@@ -11,7 +11,7 @@
                 </div>
                 <div v-else class="col-md-4 cover">
                     <img
-                        src="@/assets/catagory.png"
+                        src="@/assets/img/catagory.png"
                         alt="默认封面"
                         class="img-fluid img-thumbnail"
                     />
@@ -42,24 +42,16 @@
                             </p>
                         </div>
                     
-                        <div class="row">
-                            <div class="col-md-6 author">  
+                       
+                            <div class="author">  
                                 <img :src="userAvatarURL" :alt="item.user.name" class="avatar">
                                 <div class="author__text">
                                     <p>贡献者：{{item.user.name}}</p>
                                     <small>更新于 14天以前</small>
                                 </div>
                             </div>
-                            <div class="col-md-6 statistics">
-                                <!-- <ul>
-                                    <li><i class="bi bi-eye-fill"></i>100</li>
-                                    <li><i class="bi bi-file-arrow-down-fill"></i>200</li>
-                                    <li><i class="bi bi-hand-thumbs-up-fill"></i>{{ item.totalLikes }}</li>
-                                    <li><i class="bi bi-heart-fill"></i>30</li>
-                                    <li><i class="bi bi-chat-fill"></i>{{ item.totalComments }}</li>
-                                </ul> -->
-                            </div>
-                        </div>
+                          
+                        
                     </div>
                 </div>
             </div>
