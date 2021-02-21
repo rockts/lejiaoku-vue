@@ -18,11 +18,16 @@
                 </div>
                 <div class="col-md-8">
                     <div class="card-body">
+                        <h3><span class="posttype  badge badge-success">
+                            {{item.category}}
+                        </span>
+                        </h3>
                         <h5 class="card-title">
                             <router-link :to="{name: 'postShow', params: {postId: item.id}}">
                                 {{ item.title }}
                             </router-link>
                         </h5>
+                     
                     
                         <div class="content">
                             <p class="card-text">
@@ -33,7 +38,6 @@
                                     <li><span  style="font-weight: bold">年级：</span>{{item.grade}}</li>
                                     <li><span  style="font-weight: bold">学科：</span>{{item.subject}}</li>
                                     <li><span  style="font-weight: bold">版本：</span>{{item.version}}</li>
-                                    <li><span  style="font-weight: bold">资源类型：</span>{{item.category}}</li>
                                 </ul>
                             </p>
                         </div>
@@ -47,13 +51,13 @@
                                 </div>
                             </div>
                             <div class="col-md-6 statistics">
-                                <ul>
+                                <!-- <ul>
                                     <li><i class="bi bi-eye-fill"></i>100</li>
                                     <li><i class="bi bi-file-arrow-down-fill"></i>200</li>
                                     <li><i class="bi bi-hand-thumbs-up-fill"></i>{{ item.totalLikes }}</li>
                                     <li><i class="bi bi-heart-fill"></i>30</li>
                                     <li><i class="bi bi-chat-fill"></i>{{ item.totalComments }}</li>
-                                </ul>
+                                </ul> -->
                             </div>
                         </div>
                     </div>
@@ -96,5 +100,10 @@ export default defineComponent({
 .attr > li {
   list-style: none;
   text-align: left;
+}
+
+.posttype {
+    float:right;
+
 }
 </style>
