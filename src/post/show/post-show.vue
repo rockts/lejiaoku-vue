@@ -21,38 +21,37 @@
       </div>
      </div>
      <div class="col-md-8">
-      <h4 class="pt-2">{{ post.title }}</h4>
-      <div class="res__btn my-5">
-       <router-link
-        to="#"
-        class="btn btn-outline-success"
-        type="button"
-        data-toggle="collapse"
-        data-target="#demo"
-        >点击阅览</router-link
-       >
-
-       <button @click="onClick()" class="btn btn-outline-success">
-        点击下载
-       </button>
-      </div>
-      <div class="res__operating">
+      <h4 class="pt-3">{{ post.title }}</h4>
+      <div class="res__btn my-4">
        <ul>
         <li>
-         <a href=""><i class="bi bi-share-fill"></i>分享</a>
+         <router-link
+          to="#"
+          class="btn btn-outline-success"
+          type="button"
+          data-toggle="collapse"
+          data-target="#demo"
+          >点击阅览
+         </router-link>
         </li>
         <li>
-         <a href=""><i class="bi bi-bookmark-heart-fill"></i>收藏</a>
-        </li>
-        <li>
-         <a href=""><i class="bi bi-flag-fill"></i>报告</a>
-        </li>
-        <li>
-         <router-link to=""
-          ><i class="bi bi-hand-thumbs-up-fill"></i>点赞</router-link
-         >
+         <button @click="onClick()" class="btn btn-outline-success" alt="100">
+          点击下载
+         </button>
         </li>
        </ul>
+      </div>
+      <div class="author">
+       <img :src="userAvatarURL" :alt="post.user.name" class="avatar" />
+       <div class="author__text">
+        <p>贡献者：{{ post.user.name }}</p>
+        <small>更新于 {{ moment(post.created_at).fromNow() }} </small>
+       </div>
+      </div>
+      <div class="res__operating">
+       <a href="mailto:rockts@sina.com" target="_blank"
+        ><i class="bi bi-flag-fill"></i>报告</a
+       >
       </div>
      </div>
     </div>
@@ -135,29 +134,48 @@
       </ul>
      </div>
      <div class="container">
-      <div class="row">
-       <div class="col-md-6 author">
-        <img :src="userAvatarURL" :alt="post.user.name" class="avatar" />
-        <div class="author__text">
-         <p>贡献者：{{ post.user.name }}</p>
-         <small>更新于 {{ moment(post.created_at).fromNow() }} </small>
+      <div class="statistics">
+       <div class="statistics-item">
+        <div class="statistics-item__btn">
+         <a href="#" class="btn btn-outline-info editBtn"
+          ><i class="bi bi-hand-thumbs-up-fill"></i
+         ></a>
+        </div>
+        <div class="statistics-item__text">{{ post.totalLikes }} 赞</div>
+       </div>
+       <div class="statistics-item">
+        <div class="statistics-item__btn">
+         <a href="#" class="btn btn-outline-info editBtn"
+          ><i class="bi bi-bookmark-heart-fill"></i
+         ></a>
+        </div>
+        <div class="statistics-item__text">30 收藏</div>
+       </div>
+       <div class="statistics-item">
+        <div class="statistics-item__btn">
+         <a href="" class="btn btn-outline-info editBtn"
+          ><i class="bi bi-cursor-fill"></i
+         ></a>
+        </div>
+        <div class="statistics-item__text">
+         分享
         </div>
        </div>
-       <div class="col-md-6 statistics">
-        <ul>
-         <li><i class="bi bi-eye-fill"></i>100</li>
-         <li><i class="bi bi-file-arrow-down-fill"></i>200</li>
-         <li><i class="bi bi-hand-thumbs-up-fill"></i>{{ post.totalLikes }}</li>
-         <li><i class="bi bi-heart-fill"></i>30</li>
-         <li><i class="bi bi-chat-fill"></i>{{ post.totalComments }}</li>
-        </ul>
+
+       <div class="statistics-item">
+        <div class="statistics-item__btn">
+         <a href="" class="btn btn-outline-info editBtn">
+          <i class="bi bi-chat-fill"></i
+         ></a>
+        </div>
+        <div class="statistics-item__text">{{ post.totalComments }} 评论</div>
        </div>
       </div>
      </div>
     </div>
     <div class="card-footer">
      <i class="bi bi-tags-fill"></i> Tags:
-     <span>{{ post.tags }}</span>
+     <span class="badge badge-pill badge-primary">{{ post.tags }}</span>
     </div>
    </div>
   </div>
@@ -262,27 +280,29 @@
   margin-bottom: 10px;
   padding: 10px;
  }
- .res__attr,
- .res__operating li {
+ .res__attr li {
   text-decoration: none; /*去掉前面的圆点*/
   list-style: none;
-  display: inline;
   padding-right: 14px;
  }
- .res__attr li {
-  text-indent: 2em;
- }
 
- .res__operating li {
-  float: right;
+ .res__btn li {
+  list-style: none;
+  display: inline-flex;
+  padding: 10px;
  }
-
+ .res__operating {
+  text-align: right;
+  margin-right: 20px;
+ }
  .res__operating i {
   padding-right: 5px;
  }
 
- .res__btn a {
-  margin: 5px 20px;
+ .editBtn {
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
  }
 
  .cover {

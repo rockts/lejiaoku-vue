@@ -56,6 +56,7 @@ export const postShowStoreModule: Module<PostShowStoreState, RootState> = {
     const response = await apiHttpClient.get(`/posts/${postId}`);
     commit('setLoading', false);
     commit('setPost', response.data);
+
     console.log('返回数据：', response);
 
     return response;
