@@ -175,7 +175,12 @@
     </div>
     <div class="card-footer">
      <i class="bi bi-tags-fill"></i> Tags:
-     <span class="badge badge-pill badge-primary">{{ post.tags }}</span>
+     <span
+      class="badge badge-pill badge-primary mx-2"
+      v-for="item in post.tags"
+      :key="item.id"
+      >{{ item.name }}</span
+     >
     </div>
    </div>
   </div>
@@ -227,6 +232,16 @@
   },
 
   methods: {
+   getTagsByName(items) {
+    console.log('item:' + items);
+    let result = '';
+    if (items) {
+     items.forEach((ele) => {
+      result += ' ' + ele.name;
+     });
+    }
+    return result;
+   },
    fileSizeFormat() {
     return getReadableFileSizeString(this.post.file.size);
    },
