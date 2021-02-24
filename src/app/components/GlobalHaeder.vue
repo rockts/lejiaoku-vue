@@ -111,7 +111,7 @@
 
 <script>
  import { defineComponent } from 'vue';
- import { axios } from '@/app/app.service';
+ import { apiHttpClient } from '@/app/app.service';
 
  export default defineComponent({
   name: 'GlobalHaeder',
@@ -134,7 +134,7 @@
   async created() {
    // 用户登录
    try {
-    const response = await axios.post('/login', this.user);
+    const response = await apiHttpClient.post('/login', this.user);
     this.token = response.data.token;
 
     console.log(response.data);
@@ -164,7 +164,7 @@
 
    async getCurrentUser(userId) {
     try {
-     const response = await axios.get(`/users/${userId}`);
+     const response = await apiHttpClient.get(`/users/${userId}`);
 
      this.currentUser = response.data;
     } catch (error) {

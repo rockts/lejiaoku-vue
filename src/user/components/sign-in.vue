@@ -42,7 +42,7 @@
  </div>
 </template>
 <script>
- import { axios } from '@/app/app.service';
+ import { apiHttpClient } from '@/app/app.service';
  import { defineComponent } from 'vue';
 
  export default defineComponent({
@@ -59,7 +59,7 @@
     console.log(this.name, this.password);
 
     try {
-     const response = await axios.post('/login', {
+     const response = await apiHttpClient.post('/login', {
       name: this.name,
       password: this.password,
      });

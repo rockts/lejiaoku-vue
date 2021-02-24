@@ -42,10 +42,21 @@
        </ul>
       </div>
       <div class="author">
-       <img :src="userAvatarURL" :alt="post.user.name" class="avatar" />
+       <img
+        v-if="post.user.avatar === null"
+        src="@/assets/img/avatar.png"
+        :alt="post.user.name"
+        class="avatar"
+       />
+       <img
+        v-if="post.user.avatar === 1"
+        :src="userAvatarURL"
+        :alt="post.user.name"
+        class="avatar"
+       />
        <div class="author__text">
         <p>贡献者：{{ post.user.name }}</p>
-        <small>更新于 {{ moment(post.created_at).fromNow() }} </small>
+        <small>更新于 14天以前</small>
        </div>
       </div>
       <div class="res__operating">
