@@ -42,6 +42,12 @@
        </ul>
       </div>
       <div class="author">
+       <img
+        v-if="post.user.avatar === 0"
+        src="@/assets/img/avatar.png"
+        :alt="post.user.name"
+        class="avatar"
+       />
        <img :src="userAvatarURL" :alt="post.user.name" class="avatar" />
        <div class="author__text">
         <p>贡献者：{{ post.user.name }}</p>
