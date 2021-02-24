@@ -1,8 +1,7 @@
 # lejiaoku-vue
 
-<<<<<<< HEAD
-乐教库的前端代码, 基于 vueJS. 正在完善中.
-=======
+乐教库的前端代码, 基于 vueJS.
+正在完善中.
 
 ## Project setup
 
