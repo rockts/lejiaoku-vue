@@ -29,14 +29,8 @@
        aria-expanded="false"
        >资源<span class="sr-only">(current)</span>
       </router-link>
-      <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-       <router-link class="dropdown-item" to="/categorys/1">教材</router-link>
-       <router-link class="dropdown-item" to="/categorys/2">课件</router-link>
-       <router-link class="dropdown-item" to="/categorys/3">教案</router-link>
-       <router-link class="dropdown-item" to="/categorys/4">练习题</router-link>
-       <router-link class="dropdown-item" to="/categorys/5">其他</router-link>
-       <router-link class="dropdown-item" to="/categorys/6">视频 </router-link>
-      </div>
+
+      <CategoryMenu />
      </li>
 
      <li class="nav-item">
@@ -61,7 +55,7 @@
      <li class="nav-item px-1 py-1">
       <router-link
        type="button"
-       to="#"
+       to="/sign-in"
        data-toggle="modal"
        data-target="#SignInModal"
        class="btn  btn-outline-primary"
@@ -73,7 +67,7 @@
        type="button"
        data-toggle="modal"
        data-target="#SignUpModal"
-       to="#"
+       to="/sign-up"
        class="btn btn-primary"
        >注册</router-link
       >
@@ -112,6 +106,7 @@
 <script>
  import { defineComponent } from 'vue';
  import { apiHttpClient } from '@/app/app.service';
+ import CategoryMenu from '@/category/index/components/category-menu.vue';
 
  export default defineComponent({
   name: 'GlobalHaeder',
@@ -183,5 +178,15 @@
     this.errorMessage = error.data.message;
    },
   },
+
+  components: {
+   CategoryMenu,
+  },
  });
 </script>
+
+<style>
+ .dropdown .dropdown-menu {
+  min-width: 6rem;
+ }
+</style>
