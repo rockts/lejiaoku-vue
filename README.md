@@ -1,6 +1,7 @@
 # lejiaoku-vue
 
-乐教库的前端代码
+乐教库的前端代码,基于 vueJS.
+开发正在进行中...
 
 ## Project setup
 
