@@ -44,7 +44,13 @@
                     
                        
                             <div class="author">  
-                                <img :src="userAvatarURL" :alt="item.user.name" class="avatar">
+                                <img
+                                    v-if="item.user.avatar === null"
+                                    src="@/assets/img/avatar.png"
+                                    :alt="item.user.name"
+                                    class="avatar"
+                                />
+                                <img v-if="item.user.avatar === 1" :src="userAvatarURL" :alt="item.user.name" class="avatar">
                                 <div class="author__text">
                                     <p>贡献者：{{item.user.name}}</p>
                                     <small>更新于 14天以前</small>
