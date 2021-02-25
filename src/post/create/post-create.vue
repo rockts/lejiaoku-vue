@@ -73,7 +73,7 @@
       <div class="col-md-3">
        <select class="form-control">
         <option selected>类型</option>
-        <option>课件</option>
+        <CategoryOption />
        </select>
       </div>
      </div>
@@ -121,10 +121,10 @@
       ref="file"
       @change="onChangeFile"
       accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
-        application/vnd.ms-powerpoint,
         application/pdf,
         application/msword,
         application/vnd.ms-excel,
+        application/vnd.ms-powerpoint,
         application/vnd.openxmlformats-officedocument.wordprocessingml.document,
         application/vnd.openxmlformats-officedocument.presentationml.presentation"
      />
@@ -142,6 +142,7 @@
  import { apiHttpClient } from '@/app/app.service';
  import { defineComponent } from 'vue';
  import BreadCrumbs from '@/app/components/BreadCrumbs.vue';
+ import CategoryOption from '@/category/index/components/category-option.vue';
 
  export default defineComponent({
   title() {
@@ -149,6 +150,7 @@
   },
   components: {
    BreadCrumbs,
+   CategoryOption,
   },
   name: 'PostCreate',
   data() {
