@@ -1,5 +1,5 @@
 <template>
- <div class="main my-2">
+ <div class="main my-5">
   <form>
    <input
     type="text"
@@ -52,6 +52,16 @@
     name: '',
     password: '',
    };
+  },
+
+  created() {
+   if (
+    JSON.parse(localStorage.getItem('user')) &&
+    JSON.parse(localStorage.getItem('user')).name
+   ) {
+    this.name = JSON.parse(localStorage.getItem('user')).name;
+    this.password = JSON.parse(localStorage.getItem('user')).password;
+   }
   },
 
   methods: {

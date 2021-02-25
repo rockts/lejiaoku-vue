@@ -53,11 +53,11 @@
                                 <img v-if="item.user.avatar === 1" :src="userAvatarURL" :alt="item.user.name" class="avatar">
                                 <div class="author__text">
                                     <p>贡献者：{{item.user.name}}</p>
-                                    <small>更新于 14天以前</small>
+                                    <small>更新于：{{ moment(item.updated_at).fromNow() }}</small>
                                 </div>
                             </div>
                           
-                        
+                
                     </div>
                 </div>
             </div>
@@ -67,25 +67,28 @@
 
 <script>
 import { defineComponent } from 'vue';
-import { API_BASE_URL } from '@/app/app.config'
+import { API_BASE_URL } from '@/app/app.config';
+import moment from 'moment';
 
 
 export default defineComponent({
   props: {
     item: Object,
   },
+  methods: {
+    moment(...args) {
+    return moment(...args);
+   },
+  },
   computed: {
     postCoverURL() {
-      return `${API_BASE_URL}/covers/${this.item.cover.id}?size=thumbnail`;
+        return `${API_BASE_URL}/covers/${this.item.cover.id}?size=thumbnail`;
     },
     userAvatarURL() {
-    return `${API_BASE_URL}/users/${this.item.user.id}/avatar`;
+        return `${API_BASE_URL}/users/${this.item.user.id}/avatar`;
     }
-
   },
-  components: {
 
-  }
 });
 </script>
 

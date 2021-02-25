@@ -56,7 +56,7 @@
        />
        <div class="author__text">
         <p>贡献者：{{ post.user.name }}</p>
-        <small>更新于 14天以前</small>
+        <small>更新于：{{ moment(post.updated_at).fromNow() }}</small>
        </div>
       </div>
       <div class="res__operating">

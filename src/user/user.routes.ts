@@ -9,27 +9,21 @@
 import { RouteRecordRaw } from 'vue-router';
 import SignIn from './components/sign-in.vue';
 import SignUp from './components/sign-up.vue';
-import UserLogin from './components/UserLogin.vue';
 
 /**
  * 定义路由
  */
 const routes: Array<RouteRecordRaw> = [
-  {
-    path: '/sign-in',
-    name: 'signIn',
-    component: SignIn,
-  },
-  {
-    path: '/sign-up',
-    name: 'signUp',
-    component: SignUp,
-  },
-  {
-    path: '/login',
-    name: 'UserLogin',
-    component: UserLogin,
-  },
+ {
+  path: '/sign-in',
+  name: 'signIn',
+  component: SignIn,
+ },
+ {
+  path: '/sign-up',
+  name: 'signUp',
+  component: SignUp,
+ },
 ];
 
 export default routes;

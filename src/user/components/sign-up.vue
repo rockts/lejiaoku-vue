@@ -1,5 +1,5 @@
 <template>
- <div class="main my-2">
+ <div class="main my-5">
   <form>
    <input type="text" class="form-control" placeholder="输入昵称" /><i
     class="bi bi-person-fill"

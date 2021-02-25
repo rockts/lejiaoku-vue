@@ -75,7 +75,7 @@
     </ul>
 
     <ul v-if="isLoginIn" class="list-inline mb-0 px-5">
-     <li class="nav-item dropdown" title="`${currentUser.name}`">
+     <li class="nav-item dropdown" title="高鹏">
       <router-link
        class="nav-link dropdown-toggle"
        to="#"
@@ -86,12 +86,14 @@
        aria-expanded="false"
       >
        <img class="img-circle avatar" src="@/assets/img/avatar.png" />
-       {{ currentUser.name }}
+       高鹏
       </router-link>
       <div class="dropdown-menu" aria-labelledby="usersDropdown">
-       <router-link to="/create" class="dropdown-item">发布文章</router-link>
-       <router-link to="/create" class="dropdown-item">个人中心</router-link>
-       <router-link to="/create" class="dropdown-item">设置账户</router-link>
+       <router-link to="/posts/create" class="dropdown-item"
+        >发布文章</router-link
+       >
+       <router-link to="#" class="dropdown-item">个人中心</router-link>
+       <router-link to="#" class="dropdown-item">设置账户</router-link>
        <router-link to="#" @click="signOut" class="dropdown-item"
         >退出账户</router-link
        >
@@ -105,78 +107,13 @@
 
 <script>
  import { defineComponent } from 'vue';
- import { apiHttpClient } from '@/app/app.service';
  import CategoryMenu from '@/category/index/components/category-menu.vue';
 
  export default defineComponent({
   name: 'GlobalHaeder',
 
   data() {
-   return {
-    errorMessage: '',
-    token: '',
-    title: '',
-    currentUser: null,
-   };
-  },
-
-  computed: {
-   isLoginIn() {
-    return this.token ? true : false;
-   },
-  },
-
-  async created() {
-   // 用户登录
-   try {
-    const response = await apiHttpClient.post('/login', this.user);
-    this.token = response.data.token;
-
-    console.log(response.data);
-   } catch (error) {
-    this.errorMessage = error.message;
-   }
-   const tid = localStorage.getItem('tid');
-   const uid = localStorage.getItem('uid');
-
-   if (tid) {
-    this.token = tid;
-   }
-
-   if (uid) {
-    this.getCurrentUser(uid);
-   }
-  },
-
-  methods: {
-   signOut() {
-    this.token = '';
-    this.currentUser = null;
-
-    localStorage.removeItem('tid');
-    localStorage.removeItem('uid');
-   },
-
-   async getCurrentUser(userId) {
-    try {
-     const response = await apiHttpClient.get(`/users/${userId}`);
-
-     this.currentUser = response.data;
-    } catch (error) {
-     this.errorMessage = error.message;
-    }
-   },
-   onLoginSuccess(data) {
-    this.token = data.token;
-    this.getCurrentUser(data.id);
-
-    localStorage.setItem('tid', data.token);
-    localStorage.setItem('uid', data.id);
-   },
-
-   onLoginError(error) {
-    this.errorMessage = error.data.message;
-   },
+   return {};
   },
 
   components: {
