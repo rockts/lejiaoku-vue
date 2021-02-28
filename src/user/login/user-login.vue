@@ -1,22 +1,22 @@
 <template>
  <div class="main my-5">
-  <form>
+  <form @submit.prevent="handleSubmit">
    <input
-    type="text"
+    type="email"
     class="form-control"
-    v-model="name"
-    placeholder="用户名"
-   /><i class="bi bi-person-fill"></i>
+    v-model="email"
+    placeholder="输入邮箱"
+   /><i class="bi bi-envelope-fill"></i>
 
    <input
     type="password"
     class="form-control"
-    placeholder="密码"
+    placeholder="输入密码"
     v-model="password"
    /><i class="bi bi-bag-fill"></i>
 
    <div class="sign-btn">
-    <a href="#">忘记密码？</a> <a href="/sign-up">注册</a>
+    <a href="#">忘记密码？</a> <a href="/user/register">注册</a>
    </div>
 
    <button type="submit" @click="signIn" class="w-100 btn btn-lg btn-primary">
@@ -44,46 +44,38 @@
 <script>
  import { apiHttpClient } from '@/app/app.service';
  import { defineComponent } from 'vue';
+ import { mapGetters } from 'vuex';
 
  export default defineComponent({
-  name: 'SignIn',
+  name: 'UserLogin',
   data() {
    return {
-    name: '',
+    email: '',
     password: '',
    };
   },
 
-  created() {
-   if (
-    JSON.parse(localStorage.getItem('user')) &&
-    JSON.parse(localStorage.getItem('user')).name
-   ) {
-    this.name = JSON.parse(localStorage.getItem('user')).name;
-    this.password = JSON.parse(localStorage.getItem('user')).password;
-   }
+  computed: {
+   ...mapGetters({
+    loading: 'user/login/loading',
+    posts: 'user/login/user',
+   }),
   },
 
   methods: {
-   async signIn() {
-    console.log(this.name, this.password);
+   async handleSubmit() {
+    const response = await apiHttpClient.post('/login', {
+     email: this.email,
+     password: this.password,
+    });
 
-    try {
-     const response = await apiHttpClient.post('/login', {
-      name: this.name,
-      password: this.password,
-     });
+    localStorage.setItem('token', response.data.token);
 
-     console.log(response.data);
-    } catch (error) {
-     console.log(error.response);
-
-     this.$emit('login-error', error.response);
-    }
+    this.$router.push('/');
    },
   },
  });
 </script>
 <style>
- @import './styles/sign.css';
+ @import '../styles/user.css';
 </style>

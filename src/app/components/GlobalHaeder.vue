@@ -1,5 +1,5 @@
 <template>
- <nav class="navbar navbar-expand-lg navbar-light bg-light">
+ <nav class="navbar navbar-expand-lg navbar-light bg-light ml-auto">
   <div class="container">
    <router-link class="navbar-brand" to="/">
     <img alt="LeJiaoKulogo" src="@/assets/img/logo.png" />
@@ -29,7 +29,6 @@
        aria-expanded="false"
        >资源<span class="sr-only">(current)</span>
       </router-link>
-
       <CategoryMenu />
      </li>
 
@@ -51,31 +50,24 @@
 
     <!-- Button trigger modal -->
 
-    <ul v-if="!isLoginIn" class="navbar-nav">
+    <ul v-if="!user" class="navbar-nav">
      <li class="nav-item px-1 py-1">
       <router-link
        type="button"
-       to="/sign-in"
-       data-toggle="modal"
-       data-target="#SignInModal"
+       to="/user/login"
        class="btn  btn-outline-primary"
        >登录</router-link
       >
      </li>
      <li class="nav-item px-1 py-1">
-      <router-link
-       type="button"
-       data-toggle="modal"
-       data-target="#SignUpModal"
-       to="/sign-up"
-       class="btn btn-primary"
+      <router-link type="button" to="/user/register" class="btn btn-primary"
        >注册</router-link
       >
      </li>
     </ul>
 
-    <ul v-if="isLoginIn" class="list-inline mb-0 px-5">
-     <li class="nav-item dropdown" title="高鹏">
+    <ul v-if="user" class="list-inline mb-0 px-5">
+     <li class="nav-item dropdown" :title="user.name">
       <router-link
        class="nav-link dropdown-toggle"
        to="#"
@@ -86,7 +78,7 @@
        aria-expanded="false"
       >
        <img class="img-circle avatar" src="@/assets/img/avatar.png" />
-       高鹏
+       {{ user.name }}
       </router-link>
       <div class="dropdown-menu" aria-labelledby="usersDropdown">
        <router-link to="/posts/create" class="dropdown-item"
@@ -94,8 +86,8 @@
        >
        <router-link to="#" class="dropdown-item">个人中心</router-link>
        <router-link to="#" class="dropdown-item">设置账户</router-link>
-       <router-link to="#" @click="signOut" class="dropdown-item"
-        >退出账户</router-link
+       <a href="javascript:void(0)" @click="handleClick" class="dropdown-item"
+        >退出账户</a
        >
       </div>
      </li>
@@ -111,9 +103,12 @@
 
  export default defineComponent({
   name: 'GlobalHaeder',
-
-  data() {
-   return {};
+  props: ['user'],
+  methods: {
+   handleClick() {
+    localStorage.removeItem('token');
+    this.$router.push('/');
+   },
   },
 
   components: {

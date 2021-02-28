@@ -1,8 +1,8 @@
 <template>
  <div id="app" class="container-fluid">
-  <global-haeder />
+  <global-haeder :user="user" />
   <Retriever />
-  <router-view />
+  <router-view :user="user" />
   <!-- <backTop /> -->
   <global-footer />
  </div>
@@ -13,12 +13,41 @@
  import GlobalHaeder from './components/GlobalHaeder.vue';
  import Retriever from './components/app-retriever.vue';
  import GlobalFooter from '@/app/components/GlobalFooter.vue';
+ import { apiHttpClient } from './app.service';
+ //  import { mapActions, mapGetters } from 'vuex';
  //  import backTop from '@/app/components/BackTop';
 
  export default defineComponent({
   name: 'App',
 
-  //   created() {},
+  data() {
+   return {
+    user: null,
+   };
+  },
+
+  async created() {
+   const response = await apiHttpClient.get('/user');
+
+   this.user = response.data;
+  },
+  //   async created() {
+  //    this.getUser();
+  //   },
+
+  //   computed: {
+  //    ...mapGetters({
+  //     loading: 'user/index/loading',
+  //     user: 'user/index/user',
+  //    }),
+  //   },
+
+  //   methods: {
+  //    ...mapActions({
+  //     getUser: 'user/index/getUser',
+  //    }),
+  //   },
+
   components: {
    GlobalHaeder,
    Retriever,

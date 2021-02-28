@@ -1,6 +1,5 @@
 <template>
  <div v-if="loading">加载中...</div>
-
  <CategoryOptionItem
   v-for="category in categorys"
   :key="category.id"

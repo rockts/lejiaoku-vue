@@ -1,5 +1,7 @@
 <template>
  <div class="home  pt-3">
+  <h3 v-if="user">hi, {{ user.name }}</h3>
+  <h3 v-if="!user">You are not logged in</h3>
   <PostList />
   <HomeJoin />
  </div>
@@ -12,6 +14,8 @@
 
  export default defineComponent({
   name: 'Home',
+  props: ['user'],
+
   components: {
    PostList,
    HomeJoin,

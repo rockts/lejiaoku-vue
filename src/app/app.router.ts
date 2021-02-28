@@ -20,22 +20,22 @@ const router = createRouter({
  routes: [...appRoutes, ...postRoutes, ...categoryRoutes, ...userRoutes],
 });
 
-// const HAS_LOGINED = true;
+// const HAS_LOGINED = false;
 
 /**
  * 导航守卫
  */
 
 // router.beforeEach((to, from, next) => {
-//   console.log('👮‍♀️');
+//  console.log('👮‍♀️');
 
-//   if (to.name !== 'signIn') {
-//     if (HAS_LOGINED) next();
-//     else next({ name: 'signIn' });
-//   } else {
-//     if (HAS_LOGINED) next({ name: 'Home' });
-//     else next();
-//   }
+//  if (to.name !== 'signIn') {
+//   if (HAS_LOGINED) next();
+//   else next({ name: 'signIn' });
+//  } else {
+//   if (HAS_LOGINED) next({ name: 'Home' });
+//   else next();
+//  }
 // });
 
 export default router;

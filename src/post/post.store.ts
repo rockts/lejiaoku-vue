@@ -18,7 +18,8 @@ export interface PostItem {
  subject: string;
  version: string;
  category: string;
- updatedAt: Date;
+ created_at: Date;
+ updated_at: Date;
  cover: string;
 }
 
