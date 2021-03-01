@@ -1,6 +1,7 @@
 <template>
- <div class="main my-5">
+ <div class="login">
   <form @submit.prevent="handleSubmit">
+   <h3>{{ msg }}</h3>
    <input
     type="email"
     class="form-control"
@@ -16,7 +17,7 @@
    /><i class="bi bi-bag-fill"></i>
 
    <div class="sign-btn">
-    <a href="#">忘记密码？</a> <a href="/user/register">注册</a>
+    <a href="#">忘记密码？</a> <a href="/register">注册</a>
    </div>
 
    <button type="submit" @click="signIn" class="w-100 btn btn-lg btn-primary">
@@ -50,6 +51,7 @@
   name: 'UserLogin',
   data() {
    return {
+    msg: '用户登录',
     email: '',
     password: '',
    };

@@ -1,10 +1,8 @@
 import { Module } from 'vuex';
 import { RootState } from '../../app/app.store';
-import { UserItem } from '../user.store';
 
 export interface UserLoginStoreState {
  loading: boolean;
- user: Array<UserItem>;
 }
 
 export const userLoginStoreModule: Module<UserLoginStoreState, RootState> = {

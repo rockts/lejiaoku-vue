@@ -1,6 +1,7 @@
 <template>
- <div class="main my-5">
+ <div class="login my-5">
   <form @submit.prevent="handleSubmit">
+   <h3>{{ msg }}</h3>
    <input
     type="text"
     class="form-control"
@@ -58,6 +59,7 @@
   name: 'SignUp',
   data() {
    return {
+    msg: '注册用户',
     name: '',
     email: '',
     password: '',
@@ -71,7 +73,7 @@
      password: this.password,
     });
 
-    this.$router.push('/user/login');
+    this.$router.push('/login');
    },
   },
  });

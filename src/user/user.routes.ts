@@ -15,12 +15,12 @@ import UserRegister from './register/user-register.vue';
  */
 const routes: Array<RouteRecordRaw> = [
  {
-  path: '/user/login',
+  path: '/login',
   name: 'UserLogin',
   component: UserLogin,
  },
  {
-  path: '/user/register',
+  path: '/register',
   name: 'UserRegister',
   component: UserRegister,
  },

@@ -1,59 +1,60 @@
-.main {
-  width: 100%;
-  max-width: 330px;
-  padding: 15px;
-  margin: auto;
-  border-radius: 4px;
-  box-shadow: 0 0 8px rgb(0 0 0 / 10%);
-  vertical-align: middle;
-  display: inline-block;
+.login {
+ width: 100%;
+ max-width: 330px;
+ padding: 15px;
+ margin: 20px auto;
+ border-radius: 4px;
+ box-shadow: 0 0 8px rgb(0 0 0 / 10%);
+ vertical-align: middle;
+ display: inline-block;
 }
 
-.main input {
-  margin-bottom: -1px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
+.login input {
+ margin-top: 15px;
+ margin-bottom: -1px;
+ border-top-left-radius: 0;
+ border-top-right-radius: 0;
 }
 
-.main .form-control {
-  position: relative;
-  box-sizing: border-box;
-  height: auto;
-  padding: 10px;
-  font-size: 16px;
-  padding-left: 30px;
+.login .form-control {
+ position: relative;
+ box-sizing: border-box;
+ height: auto;
+ padding: 10px;
+ font-size: 16px;
+ padding-left: 30px;
 }
 
-.main i {
-  color: #999;
-  position: relative;
-  left: -135px;
-  top: -37px;
+.login i {
+ color: #999;
+ position: relative;
+ left: -135px;
+ top: -37px;
 }
 
 .sign-btn {
-  position: relative;
-  margin: 15px 0;
+ position: relative;
+ margin: 15px 0;
 }
 .sign-btn a {
-  padding: auto 40px;
-  text-decoration: none;
+ padding: auto 40px;
+ text-decoration: none;
 }
 
 .sign-more {
-  position: relative;
-  margin: 0 0 10px;
-  font-size: 12px;
-  color: #b5b5b5;
-  padding-top: 40px;
+ position: relative;
+ margin: 0 0 10px;
+ font-size: 12px;
+ color: #b5b5b5;
+ padding-top: 40px;
 }
 
 .sign-more h6 {
-  font-size: 18px;
+ font-size: 18px;
 }
 
 .sign-more li {
-  list-style: none;
-  display: inline;
-  padding-right: 10px;
+ list-style: none;
+ display: inline;
+ padding-right: 10px;
 }

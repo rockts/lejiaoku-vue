@@ -52,15 +52,12 @@
 
     <ul v-if="!user" class="navbar-nav">
      <li class="nav-item px-1 py-1">
-      <router-link
-       type="button"
-       to="/user/login"
-       class="btn  btn-outline-primary"
+      <router-link type="button" to="/login" class="btn  btn-outline-primary"
        >登录</router-link
       >
      </li>
      <li class="nav-item px-1 py-1">
-      <router-link type="button" to="/user/register" class="btn btn-primary"
+      <router-link type="button" to="/register" class="btn btn-primary"
        >注册</router-link
       >
      </li>
