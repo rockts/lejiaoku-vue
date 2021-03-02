@@ -74,7 +74,12 @@
        aria-haspopup="true"
        aria-expanded="false"
       >
-       <img class="img-circle avatar" src="@/assets/img/avatar.png" />
+       <!-- <img
+        v-if="!img"
+        class="img-circle avatar"
+        src="@/assets/img/avatar.png"
+       /> -->
+       <img class="img-circle avatar" :src="userAvatarURL" />
        {{ user.name }}
       </router-link>
       <div class="dropdown-menu" aria-labelledby="usersDropdown">
@@ -96,6 +101,7 @@
 
 <script>
  import { defineComponent } from 'vue';
+ import { API_BASE_URL } from '@/app/app.config';
  import CategoryMenu from '@/category/index/components/category-menu.vue';
 
  export default defineComponent({
@@ -105,6 +111,11 @@
    handleClick() {
     localStorage.removeItem('token');
     this.$router.push('/');
+   },
+  },
+  computed: {
+   userAvatarURL() {
+    return `${API_BASE_URL}/users/${this.user.id}/avatar`;
    },
   },
 
