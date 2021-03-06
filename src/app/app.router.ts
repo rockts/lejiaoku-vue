@@ -29,9 +29,9 @@ const router = createRouter({
 // router.beforeEach((to, from, next) => {
 //  console.log('👮‍♀️');
 
-//  if (to.name !== 'signIn') {
+//  if (to.name !== 'UserLogin') {
 //   if (HAS_LOGINED) next();
-//   else next({ name: 'signIn' });
+//   else next({ name: 'UserLogin' });
 //  } else {
 //   if (HAS_LOGINED) next({ name: 'Home' });
 //   else next();

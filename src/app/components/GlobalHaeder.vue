@@ -75,7 +75,7 @@
        aria-expanded="false"
       >
        <!-- <img
-        v-if="!img"
+        v-if="(code = 404)"
         class="img-circle avatar"
         src="@/assets/img/avatar.png"
        /> -->
