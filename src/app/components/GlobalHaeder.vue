@@ -18,18 +18,8 @@
 
    <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
-     <li class="nav-item dropdown">
-      <router-link
-       class="nav-link dropdown-toggle"
-       to="#"
-       id="navbarDropdown"
-       role="button"
-       data-toggle="dropdown"
-       aria-haspopup="true"
-       aria-expanded="false"
-       >资源<span class="sr-only">(current)</span>
-      </router-link>
-      <CategoryMenu />
+     <li class="nav-item">
+      <router-link class="nav-link" to="/">分类 </router-link>
      </li>
 
      <li class="nav-item">
@@ -102,7 +92,6 @@
 <script>
  import { defineComponent } from 'vue';
  import { API_BASE_URL } from '@/app/app.config';
- import CategoryMenu from '@/category/index/components/category-menu.vue';
 
  export default defineComponent({
   name: 'GlobalHaeder',
@@ -119,9 +108,7 @@
    },
   },
 
-  components: {
-   CategoryMenu,
-  },
+  components: {},
  });
 </script>
 
