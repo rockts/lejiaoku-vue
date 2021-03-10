@@ -1,35 +1,35 @@
 <template>
- <div id="app" class="container-fluid">
-  <global-haeder :user="user" />
-  <Retriever />
-  <router-view :user="user" />
-  <!-- <backTop /> -->
-  <global-footer />
- </div>
+  <div id="app" class="container-fluid">
+    <global-haeder :user="user" />
+    <GlobalSearch />
+    <router-view :user="user" />
+    <!-- <backTop /> -->
+    <global-footer />
+  </div>
 </template>
 
 <script>
- import { defineComponent } from 'vue';
- import GlobalHaeder from './components/GlobalHaeder.vue';
- import Retriever from './components/app-retriever.vue';
- import GlobalFooter from '@/app/components/GlobalFooter.vue';
- import { apiHttpClient } from './app.service';
- //  import { mapActions, mapGetters } from 'vuex';
- //  import backTop from '@/app/components/BackTop';
+import { defineComponent } from "vue";
+import GlobalHaeder from "./components/form/GlobalHaeder.vue";
+import GlobalSearch from "./components/form/GlobalSearch.vue";
+import GlobalFooter from "./components/GlobalFooter.vue";
+import { apiHttpClient } from "./app.service";
+//  import { mapActions, mapGetters } from 'vuex';
+//  import backTop from '@/app/components/BackTop';
 
- export default defineComponent({
-  name: 'App',
+export default defineComponent({
+  name: "App",
 
   data() {
-   return {
-    user: null,
-   };
+    return {
+      user: null,
+    };
   },
 
   async created() {
-   const response = await apiHttpClient.get('/user');
+    const response = await apiHttpClient.get("/user");
 
-   this.user = response.data;
+    this.user = response.data;
   },
   //   async created() {
   //    this.getUser();
@@ -49,83 +49,83 @@
   //   },
 
   components: {
-   GlobalHaeder,
-   Retriever,
-   GlobalFooter,
-   //    backTop,
+    GlobalHaeder,
+    GlobalSearch,
+    GlobalFooter,
+    //    backTop,
   },
- });
+});
 </script>
 
 <style>
- #app {
+#app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
- }
- a {
+}
+a {
   text-decoration: none;
- }
+}
 
- a:hover {
+a:hover {
   color: #4499ee;
   text-decoration: none; /*CSS下划线效果：无下划线*/
- }
+}
 
- .author {
+.author {
   display: flex;
- }
+}
 
- .author__text {
+.author__text {
   margin: 0 10px;
- }
+}
 
- .author__text p {
+.author__text p {
   display: flex;
   margin: 0;
   padding: 0;
   align-items: flex-start;
- }
- .avatar {
+}
+.avatar {
   vertical-align: middle;
   width: 50px;
   height: 50px;
   border-radius: 50%;
- }
+}
 
- .card-footer {
+.card-footer {
   background-color: #fff;
   padding: 0 auto;
- }
+}
 
- .content {
+.content {
   text-align: center;
   margin: 20px 0;
- }
- .cover {
+}
+.cover {
   background-color: #d7cfcf;
   display: flex;
   align-items: center;
   justify-content: center;
- }
- .cover img {
+}
+.cover img {
   max-height: 300px;
- }
+}
 
- .statistics {
+.statistics {
   display: flex;
   align-content: space-between;
   justify-content: space-evenly;
   flex-wrap: nowrap;
   flex-direction: row;
- }
+}
 
- .statistics-item {
+.statistics-item {
   text-align: center;
- }
+}
 
- .statistics-item__text {
+.statistics-item__text {
   margin-top: 5px;
- }
+}
 </style>

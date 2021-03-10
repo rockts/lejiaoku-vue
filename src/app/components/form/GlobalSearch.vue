@@ -2,14 +2,12 @@
   <div class="retriever text-center">
     <div class="search-block">
       <h1 class="header-title">探索, 创造, 合作。</h1>
-      <div class="header-description">
-        乐教库是个开放式教育资源的分享平台。
-      </div>
+      <div class="header-description">乐教库是个开放式教育资源的分享平台。</div>
       <form
         action="/search"
         method="GET"
         name="advanced-search"
-        class="search-form 	d-none d-md-block 	 d-lg-block  js-search-form"
+        class="search-form d-none d-md-block d-lg-block js-search-form"
       >
         <div class="search-field">
           <input
@@ -61,7 +59,7 @@
         </select>
         <button class="btn btn-big-link btn-search">搜索</button>
       </form>
-      <div class="advanced-search-call-out d-none d-md-block 	d-lg-block">
+      <div class="advanced-search-call-out d-none d-md-block d-lg-block">
         可以按学科、年级、版本搜索
       </div>
     </div>
@@ -69,10 +67,10 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: 'Retriever',
+  name: "GlobalSearch",
   methods: {
     onInputContent(event) {
       console.log(event);
@@ -87,7 +85,7 @@ export default defineComponent({
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 
 <style scoped>
-@import './styles/app-retriever.css';
+@import "./styles/GlobalSearch.css";
 
 .form-control {
   width: 200px;
