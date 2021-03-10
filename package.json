@@ -1,6 +1,6 @@
 {
-    "name": "lejiaoku",
-    "version": "0.1.1",
+    "name": "lejiaoku-vue",
+    "version": "0.1.0",
     "private": true,
     "scripts": {
         "serve": "vue-cli-service serve",
