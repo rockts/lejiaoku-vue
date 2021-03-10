@@ -5,7 +5,7 @@
     "functionRoot": "./functions",
     "functions": [],
     "framework": {
-        "name": "lejiaoku-vue",
+        "name": "lejiaoku",
         "plugins": {
             "vue": {
                 "use": "@cloudbase/framework-plugin-website",
