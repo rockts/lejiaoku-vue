@@ -16,8 +16,8 @@ import userRoutes from '@/user/user.routes';
  */
 
 const router = createRouter({
-      history: createWebHistory(),
-      routes: [...appRoutes, ...postRoutes, ...classificationsRoutes, ...userRoutes],
+ history: createWebHistory(),
+ routes: [...appRoutes, ...postRoutes, ...classificationsRoutes, ...userRoutes],
 });
 
 // const HAS_LOGINED = false;

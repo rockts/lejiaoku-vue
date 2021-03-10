@@ -14,7 +14,7 @@
       type="text"
       v-model.trim="content"
       name="search"
-      class="search-input "
+      class="search-input form-control"
       title="Search keywords"
       placeholder="可以搜索课件、教案、试题"
       @input="onInputContent"
@@ -26,7 +26,7 @@
     <select
      name="subject"
      v-model="subject"
-     class="search-select "
+     class="search-select form-control"
      placeholder="科学"
     >
      <option value="">学科</option>
@@ -36,7 +36,7 @@
      <option value="物理">物理</option>
     </select>
 
-    <select name="grade" v-model="grade" class="search-select">
+    <select name="grade" v-model="grade" class="search-select form-control">
      <option>年级</option>
      <option value="一年级上册">一年级上册</option>
      <option value="一年级下册">一年级下册</option>
@@ -49,7 +49,7 @@
      name="version"
      id="id_textbook_version"
      v-model="version"
-     class="search-select  js-standards-select"
+     class="search-select  js-standards-select form-control"
     >
      <option>版本</option>
      <option value="人教版">人教版</option>
@@ -86,4 +86,11 @@
 
 <style scoped>
  @import './styles/GlobalSearch.css';
+ .form-control {
+  width: 200px;
+ }
+
+ .search-input {
+  width: 300px;
+ }
 </style>
