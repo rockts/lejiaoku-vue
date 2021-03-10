@@ -1,6 +1,6 @@
 <template>
  <BreadCrumbs />
- <div class="classifications-index-page">
+ <div class="classifications-index-page m-auto">
   <ClassificationsList />
  </div>
 </template>
