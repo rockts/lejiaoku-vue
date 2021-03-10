@@ -26,23 +26,12 @@
       <router-link class="nav-link" to="/">贡献者</router-link>
      </li>
     </ul>
-    <form class="form-inline my-2 my-lg-0  d-sm-block d-md-none">
-     <input
-      class="form-control mr-sm-2"
-      type="search"
-      placeholder="Search"
-      aria-label="Search"
-     />
-     <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
-      搜索
-     </button>
-    </form>
 
-    <!-- Button trigger modal -->
+    <HeaderSearch />
 
     <ul v-if="!user" class="navbar-nav">
      <li class="nav-item px-1 py-1">
-      <router-link type="button" to="/login" class="btn  btn-outline-primary"
+      <router-link type="button" to="/login" class="btn btn-outline-primary"
        >登录</router-link
       >
      </li>
@@ -92,9 +81,10 @@
 <script>
  import { defineComponent } from 'vue';
  import { API_BASE_URL } from '@/app/app.config';
+ import HeaderSearch from './form/HeaderSearch.vue';
 
  export default defineComponent({
-  name: 'GlobalHaeder',
+  name: 'GlobalHeader',
   props: ['user'],
   methods: {
    handleClick() {
@@ -108,7 +98,7 @@
    },
   },
 
-  components: {},
+  components: { HeaderSearch },
  });
 </script>
 

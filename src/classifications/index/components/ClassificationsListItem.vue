@@ -1,7 +1,12 @@
 <template>
- <div class="category-list-item">
+ <div class="classifications-list-item">
   <div>
-   <router-link :to="{ name: 'categoryShow', params: { categoryId: item.id } }">
+   <router-link
+    :to="{
+     name: 'classificationsShow',
+     params: { classifications: classifications },
+    }"
+   >
     <div class="card  shadow">
      <div class="card-body text-center">
       <h5 class="card-title  mt-4">{{ item.name }}</h5>

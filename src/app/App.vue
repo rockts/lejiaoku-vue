@@ -1,18 +1,18 @@
 <template>
  <div id="app" class="container-fluid">
-  <global-haeder :user="user" />
-  <Retriever />
+  <GlobalHeader :user="user" />
+  <GlobalSearch />
   <router-view :user="user" />
   <!-- <backTop /> -->
-  <global-footer />
+  <GlobalFooter />
  </div>
 </template>
 
 <script>
  import { defineComponent } from 'vue';
- import GlobalHaeder from './components/GlobalHaeder.vue';
- import Retriever from './components/app-retriever.vue';
- import GlobalFooter from '@/app/components/GlobalFooter.vue';
+ import GlobalHeader from './components/GlobalHeader.vue';
+ import GlobalSearch from './components/form/GlobalSearch.vue';
+ import GlobalFooter from './components/GlobalFooter.vue';
  import { apiHttpClient } from './app.service';
  //  import { mapActions, mapGetters } from 'vuex';
  //  import backTop from '@/app/components/BackTop';
@@ -49,8 +49,8 @@
   //   },
 
   components: {
-   GlobalHaeder,
-   Retriever,
+   GlobalHeader,
+   GlobalSearch,
    GlobalFooter,
    //    backTop,
   },

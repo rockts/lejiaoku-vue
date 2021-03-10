@@ -73,7 +73,7 @@
       <div class="col-md-3">
        <select class="form-control">
         <option selected>类型</option>
-        <CategoryOption />
+        <ClassificationsOption />
        </select>
       </div>
      </div>
@@ -142,7 +142,7 @@
  import { apiHttpClient } from '@/app/app.service';
  import { defineComponent } from 'vue';
  import BreadCrumbs from '@/app/components/BreadCrumbs.vue';
- import CategoryOption from '@/category/index/components/category-option.vue';
+ import ClassificationsOption from '@/classifications/index/components/ClassificationsOption.vue';
 
  export default defineComponent({
   title() {
@@ -150,7 +150,7 @@
   },
   components: {
    BreadCrumbs,
-   CategoryOption,
+   ClassificationsOption,
   },
   name: 'PostCreate',
   data() {
@@ -162,7 +162,7 @@
     },
     token: '',
     title: '',
-    categoryId: '',
+    category: '',
     grade: '',
     subject: '',
     version: '',

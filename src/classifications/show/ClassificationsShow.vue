@@ -33,12 +33,12 @@
 
   computed: {
    ...mapGetters({
-    loading: 'category/show/loading',
-    category: 'category/show/category',
+    loading: 'classifications/show/loading',
+    category: 'classifications/show/classifications',
    }),
 
-   showCategory() {
-    return !this.loading && this.category;
+   showClassifications() {
+    return !this.loading && this.classifications;
    },
   },
 

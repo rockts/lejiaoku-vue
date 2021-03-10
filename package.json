@@ -1,6 +1,6 @@
 {
-    "name": "lejiaoku-vue",
-    "version": "0.1.0",
+    "name": "lejiaoku",
+    "version": "0.1.1",
     "private": true,
     "scripts": {
         "serve": "vue-cli-service serve",
@@ -30,6 +30,7 @@
         "@vue/cli-service": "~4.5.0",
         "@vue/compiler-sfc": "^3.0.0",
         "@vue/eslint-config-typescript": "^5.0.2",
+        "css-loader": "^5.1.1",
         "eslint": "^6.7.2",
         "eslint-plugin-vue": "^7.0.0-0",
         "typescript": "~3.9.3"
