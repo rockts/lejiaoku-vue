@@ -160,7 +160,7 @@
           ><i class="bi bi-bookmark-heart-fill"></i
          ></a>
         </div>
-        <div class="statistics-item__text">30 收藏</div>
+        <div class="statistics-item__text">{{ post.totalSaves }} 收藏</div>
        </div>
        <div class="statistics-item">
         <div class="statistics-item__btn">
@@ -184,7 +184,7 @@
       </div>
      </div>
     </div>
-    <div v-if="item" class="card-footer">
+    <div class="card-footer">
      <i class="bi bi-tags-fill"></i> Tags:
      <span
       class="badge badge-pill badge-primary mx-2"
