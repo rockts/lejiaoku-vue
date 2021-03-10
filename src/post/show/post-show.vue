@@ -184,7 +184,7 @@
       </div>
      </div>
     </div>
-    <div class="card-footer">
+    <div v-if="item" class="card-footer">
      <i class="bi bi-tags-fill"></i> Tags:
      <span
       class="badge badge-pill badge-primary mx-2"

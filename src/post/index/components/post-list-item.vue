@@ -1,5 +1,5 @@
 <template>
-    <div class="card mb-3">
+    <div class="card">
         <div class="container">
             <div class="row">
                 <div class="col-md-4 cover" v-if="item.cover">
@@ -18,10 +18,10 @@
                 </div>
                 <div class="col-md-8">
                     <div class="card-body">
-                        <h3><span class="posttype  badge badge-success">
+                        <h4><span class="posttype  badge badge-success">
                             {{item.category}}
                         </span>
-                        </h3>
+                        </h4>
                         <h5 class="card-title">
                             <router-link :to="{name: 'postShow', params: {postId: item.id}}">
                                 {{ item.title }}

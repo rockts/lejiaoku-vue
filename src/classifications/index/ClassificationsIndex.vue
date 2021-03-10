@@ -12,7 +12,7 @@
 
  export default defineComponent({
   title() {
-   return '资源类型';
+   return '资源分类';
   },
   components: {
    BreadCrumbs,

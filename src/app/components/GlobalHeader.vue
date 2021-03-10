@@ -19,7 +19,7 @@
    <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
      <li class="nav-item">
-      <router-link class="nav-link" to="/">分类 </router-link>
+      <router-link class="nav-link" to="/classifications">分类 </router-link>
      </li>
 
      <li class="nav-item">

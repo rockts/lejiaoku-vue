@@ -1,21 +1,10 @@
 <template>
- <div class="classifications-list-item">
-  <div>
-   <router-link
-    :to="{
-     name: 'classificationsShow',
-     params: { classifications: classifications },
-    }"
-   >
-    <div class="card  shadow">
-     <div class="card-body text-center">
-      <h5 class="card-title  mt-4">{{ item.name }}</h5>
-      <p class="card-text">
-       {{ item.alias }}
-      </p>
-     </div>
-    </div>
-   </router-link>
+ <div class="card">
+  <div class="container">
+   <div class="card-body text-center">
+    <h3 class="card-title  mt-4">{{ name }}</h3>
+    <p class="card-text">{{ item }}</p>
+   </div>
   </div>
  </div>
 </template>
@@ -23,6 +12,11 @@
  import { defineComponent } from 'vue';
 
  export default defineComponent({
+  data() {
+   return {
+    name: '分类名字',
+   };
+  },
   props: {
    item: Object,
   },

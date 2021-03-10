@@ -4,11 +4,11 @@ import {
  classificationsIndexStoreModule,
  ClassificationsIndexStoreState,
 } from './index/ClassificationsIndex.store';
-import { classificationsShowStoreModule } from './show/ClassificationsShow.store';
 
 export interface ClassificationsItem {
  item: string;
 }
+
 export interface ClassificationsStoreState {
  index: ClassificationsIndexStoreState;
 }
@@ -21,6 +21,5 @@ export const classificationsStoreModule: Module<
 
  modules: {
   index: classificationsIndexStoreModule,
-  show: classificationsShowStoreModule,
  },
 };
