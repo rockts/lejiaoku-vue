@@ -1,14 +1,15 @@
 <template>
  <div class="post-list my-3">
-  <div class="container">
+  <div class="container m-auto">
    <div v-if="loading">加载中...</div>
-
-   <PostListItem
-    v-for="post in posts"
-    :item="post"
-    :key="post.id"
-    class="shadow p-3 mb-5 bg-white rounded"
-   />
+   <div class="row  row-cols-1 row-cols-sm-2 row-cols-md-4">
+    <PostListItem
+     v-for="post in posts"
+     :item="post"
+     :key="post.id"
+     class="shadow p-3 bg-white rounded  m-2 col"
+    />
+   </div>
   </div>
  </div>
 </template>

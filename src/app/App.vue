@@ -94,23 +94,15 @@
   border-radius: 50%;
  }
 
- .card-footer {
-  background-color: #fff;
-  padding: 0 auto;
- }
-
  .content {
   text-align: center;
-  margin: 20px 0;
+  margin: 10px;
  }
  .cover {
   background-color: #d7cfcf;
   display: flex;
   align-items: center;
   justify-content: center;
- }
- .cover img {
-  max-height: 300px;
  }
 
  .statistics {
