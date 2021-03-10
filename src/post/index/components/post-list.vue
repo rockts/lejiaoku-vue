@@ -2,7 +2,7 @@
  <div class="post-list my-3">
   <div class="container m-auto">
    <div v-if="loading">加载中...</div>
-   <div class="row  row-cols-1 row-cols-sm-2 row-cols-md-4">
+   <div class="row  row-cols-1 row-cols-xs-2 row-cols-md-4">
     <PostListItem
      v-for="post in posts"
      :item="post"
