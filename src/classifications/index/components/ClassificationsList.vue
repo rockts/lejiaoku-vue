@@ -1,9 +1,9 @@
 <template>
- <div class="classifications-list">
+ <div class="classifications-list mb-3">
   <div class="container">
    <div v-if="loading">加载中...</div>
    <div class="row">
-    <div class="list-group col-md-6 mb-3">
+    <div class="list-group col-md-6 mb-3 ">
      <div
       class="list-group-item list-group-item-action active"
       aria-current="true"
