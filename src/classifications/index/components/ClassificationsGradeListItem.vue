@@ -3,7 +3,7 @@
   <router-link
    to="/"
    class="list-group-item d-flex justify-content-between align-items-center"
-   >{{ item }} <span class="badge badge-primary badge-pill">14</span>
+   >{{ item.grade }} <span class="badge badge-primary badge-pill">14</span>
   </router-link>
  </div>
 </template>

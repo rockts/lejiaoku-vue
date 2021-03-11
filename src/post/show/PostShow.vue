@@ -21,7 +21,18 @@
       </div>
      </div>
      <div class="col-md-8">
-      <h4 class="pt-3">{{ post.title }}</h4>
+      <div class="post__title">
+       <h5 class="title_tags">
+        <span
+         class="badge badge-pill badge-primary mx-2"
+         v-for="item in post.tags"
+         :key="item.id"
+        >
+         {{ item.name }}
+        </span>
+       </h5>
+       <h4 class="pt-3">{{ post.title }}</h4>
+      </div>
       <div class="res__btn my-4">
        <ul>
         <li>
@@ -184,15 +195,6 @@
       </div>
      </div>
     </div>
-    <div class="card-footer">
-     <i class="bi bi-tags-fill"></i> Tags:
-     <span
-      class="badge badge-pill badge-primary mx-2"
-      v-for="item in post.tags"
-      :key="item.id"
-      >{{ item.name }}</span
-     >
-    </div>
    </div>
   </div>
  </div>
@@ -244,7 +246,6 @@
 
   methods: {
    getTagsByName(items) {
-    console.log('item:' + items);
     let result = '';
     if (items) {
      items.forEach((ele) => {
@@ -298,12 +299,17 @@
  }
 
  .res__header {
-  background: #d7cfcf;
+  background: #ccc;
   text-align: left;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid #fff;
   box-shadow: rgb(0, 0, 0);
   margin-bottom: 10px;
   padding: 10px;
+ }
+
+ .title_tags {
+  float: right;
+  margin: 10px;
  }
  .res__attr li {
   text-decoration: none; /*去掉前面的圆点*/
