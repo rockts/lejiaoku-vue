@@ -14,7 +14,7 @@
  import { defineComponent } from 'vue';
  import BreadCrumbs from '@/app/components/BreadCrumbs.vue';
  import { mapGetters, mapActions } from 'vuex';
- import PostList from '@/post/index/components/post-list';
+ import PostList from '@/post/index/components/PostList.vue';
 
  export default defineComponent({
   title() {

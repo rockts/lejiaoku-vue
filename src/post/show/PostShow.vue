@@ -292,7 +292,6 @@
  .card-text,
  .card-footer,
  .card-header,
- .card-text,
  .card-body {
   text-align: left;
   background: #fff;

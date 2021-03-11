@@ -5,9 +5,9 @@
  </div>
 </template>
 
-<script lang="ts">
+<script>
  import { defineComponent } from 'vue';
- import PostList from '@/post/index/components/post-list.vue';
+ import PostList from '@/post/index/components/PostList.vue';
  import HomeJoin from './HomeJoin.vue';
 
  export default defineComponent({

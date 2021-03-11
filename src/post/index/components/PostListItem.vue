@@ -1,6 +1,6 @@
 <template>
-<div class="card-group">
-  <div class="card cover">
+<div class="col sm-6 mb-4 lg-3">
+  <div class="card">
     <img v-if="item.cover" :src="postCoverURL" class="card-img-top img-fluid img-thumbnail" :alt="item.title">
     <img  v-else src="@/assets/img/catagory.png" alt="默认封面" class="img-fluid img-thumbnail" />
     <div class="card-body p-3">
@@ -10,23 +10,24 @@
                 {{item.category}}
             </span>
         </h5>
-        <h5 class="card-title p-3" >
+        <h5 class="card-title" >
             <router-link :to="{name: 'postShow', params: {postId: item.id}}">
                 {{ item.title }}
             </router-link>
         </h5>
-        <p class="card-text text-justify text-wrap" style="width: 16rem;">
-            <span class="d-inline-block p-3">
+        <p class="card-text text-justify">
+            <span class="d-inline-block">
             资源介绍：
             <br>{{ item.description }}</span>
         </p>
-        <p class="text-muted">
+        <p class="card-text">
             <ul class="attr">
                 <li><span  style="font-weight: bold">年级：</span>{{item.grade}}</li>
                 <li><span  style="font-weight: bold">学科：</span>{{item.subject}}</li>
                 <li><span  style="font-weight: bold">版本：</span>{{item.version}}</li>
             </ul>
         </p>
+         <router-link :to="{name: 'postShow', params: {postId: item.id}}" class="btn btn-outline-primary btn-sm">查看详情</router-link>
     </div>
     <div class="card-footer">
         <div class="author">  
@@ -40,11 +41,13 @@
             <div class="author__text">
                 <p>贡献者：{{item.user.name}}</p>
                 <small>更新于：{{ moment(item.updated_at).fromNow() }}</small>
+                 {{ item.totalcount }}
             </div>
         </div>   
     </div>
   </div>
 </div>
+
 </template>
 
 <script>
@@ -76,14 +79,6 @@ export default defineComponent({
 
 <style scoped>
 
- .card-footer {
-  background-color: #fff;
-  padding: 0 auto;
- }
-.card .card-title
- {
-  text-align: left;
-}
 
 
 .attr > li {

@@ -4,6 +4,7 @@
    <router-link class="navbar-brand" to="/">
     <img alt="LeJiaoKulogo" src="@/assets/img/logo.png" />
    </router-link>
+
    <button
     class="navbar-toggler"
     type="button"

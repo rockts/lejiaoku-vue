@@ -99,7 +99,6 @@
   margin: 10px;
  }
  .cover {
-  background-color: #d7cfcf;
   display: flex;
   align-items: center;
   justify-content: center;

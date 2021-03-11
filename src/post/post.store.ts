@@ -3,12 +3,12 @@ import { RootState } from '../app/app.store';
 import {
  postCreateStoreModule,
  PostCreateStoreState,
-} from './create/post-create.store';
+} from './create/PostCreate.store';
 import {
  postIndexStoreModule,
  PostIndexStoreState,
-} from './index/post-index.store';
-import { postShowStoreModule } from './show/post-show.store';
+} from './index/PostIndex.store';
+import { postShowStoreModule } from './show/PostShow.store';
 
 export interface PostItem {
  id: number;

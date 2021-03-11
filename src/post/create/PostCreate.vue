@@ -296,7 +296,7 @@
      }
 
      this.title = '';
-     this.categoryId = '';
+     this.categoryc = '';
      this.grade = '';
      this.subject = '';
      this.version = '';

@@ -5,7 +5,7 @@
     © 2021 乐教库
    </li>
    <li class="list-inline-item">
-    由<router-link to="https://lekee.cc">LeKeOpen</router-link>创建的项目
+    由 <a target="_blank" href="https://lekee.cc">LeKeOpen</a> 创建的项目
    </li>
    <li class="list-inline-item">
     <router-link to="/">用户协议</router-link>

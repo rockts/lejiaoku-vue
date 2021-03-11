@@ -8,7 +8,7 @@
 <script>
  import { defineComponent } from 'vue';
  import BreadCrumbs from '@/app/components/BreadCrumbs.vue';
- import PostList from './components/post-list';
+ import PostList from './components/PostList';
 
  export default defineComponent({
   title() {
