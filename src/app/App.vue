@@ -104,6 +104,10 @@
   justify-content: center;
  }
 
+ .cover img {
+  max-height: 300px;
+ }
+
  .statistics {
   display: flex;
   align-content: space-between;

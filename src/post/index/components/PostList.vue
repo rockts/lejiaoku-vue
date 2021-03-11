@@ -2,13 +2,15 @@
  <div class="PostList my-3">
   <div v-if="loading">加载中...</div>
   <div class="container">
-   <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4">
-    <PostListItem v-for="post in posts.data" :item="post" :key="post.id" />
-    <!-- {{ posts.headers['x-total-count'] }} -->
-
-    <h3>{{ getCount(posts) }}</h3>
-    <!-- {{ getCount() }} -->
-   </div>
+   <!-- <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4"> -->
+   <PostListItem
+    v-for="post in posts"
+    :item="post"
+    :key="post.id"
+    class="shadow p-3 mb-5 bg-body rounded"
+   />
+   <!-- </div> -->
+   <!-- <h1>{{ totalcount['x-total-count'] }}</h1> -->
   </div>
  </div>
 </template>
@@ -37,9 +39,6 @@
    ...mapActions({
     getPosts: 'post/index/getPosts',
    }),
-   getCount(posts) {
-    return posts.headers;
-   },
   },
 
   components: {

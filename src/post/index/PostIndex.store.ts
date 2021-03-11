@@ -26,6 +26,10 @@ export const postIndexStoreModule: Module<PostIndexStoreState, RootState> = {
   posts(state) {
    return state.posts;
   },
+
+  totalcount(state) {
+   return state.totalcount;
+  },
  },
 
  mutations: {
@@ -36,7 +40,7 @@ export const postIndexStoreModule: Module<PostIndexStoreState, RootState> = {
   setPosts(state, data) {
    state.posts = data;
   },
-  settotalcount(state, data) {
+  setTotalcount(state, data) {
    state.totalcount = data;
   },
  },
@@ -47,10 +51,9 @@ export const postIndexStoreModule: Module<PostIndexStoreState, RootState> = {
 
    try {
     const response = await apiHttpClient.get('/posts');
-    //     commit('setPosts', response.data);
-    commit('setPosts', response);
+    commit('setPosts', response.data);
+    commit('setTotalcount', response.headers);
     commit('setLoading', false);
-    console.log(response.headers);
 
     return response;
    } catch (error) {

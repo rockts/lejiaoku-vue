@@ -57,7 +57,6 @@
                                     <small>更新于：{{ moment(item.updated_at).fromNow() }}</small>
                                 </div>
                             </div>
-                          
                 
                     </div>
                 </div>
