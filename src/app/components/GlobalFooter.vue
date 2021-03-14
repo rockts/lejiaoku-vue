@@ -13,6 +13,9 @@
    <li class="list-inline-item">
     <router-link to="/">隐私政策</router-link>
    </li>
+   <li class="list-inline-item">
+    <a href="https://beian.miit.gov.cn" target="_blank">陇ICP备15002697号-4</a>
+   </li>
   </ul>
  </div>
 </template>
