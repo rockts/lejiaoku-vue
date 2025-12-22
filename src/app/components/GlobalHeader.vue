@@ -29,6 +29,12 @@
      <li class="nav-item">
       <router-link class="nav-link" to="/">贡献者</router-link>
      </li>
+     
+     <li class="nav-item">
+      <router-link class="nav-link" to="/test-api">
+       <i class="bi bi-wrench"></i> API测试
+      </router-link>
+     </li>
     </ul>
 
     <HeaderSearch />

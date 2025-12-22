@@ -10,6 +10,7 @@ import appRoutes from './app.routes';
 import postRoutes from '@/post/post.routes';
 import classificationsRoutes from '@/classifications/classifications.routes';
 import userRoutes from '@/user/user.routes';
+import testRoutes from '@/test/test.routes';
 
 /**
  * 创建路由器
@@ -17,7 +18,7 @@ import userRoutes from '@/user/user.routes';
 
 const router = createRouter({
     history: createWebHistory(),
-    routes: [...appRoutes, ...postRoutes, ...classificationsRoutes, ...userRoutes],
+    routes: [...appRoutes, ...postRoutes, ...classificationsRoutes, ...userRoutes, ...testRoutes],
 });
 
 // const HAS_LOGINED = false;
