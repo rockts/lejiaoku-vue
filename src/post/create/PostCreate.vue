@@ -324,11 +324,11 @@ export default defineComponent({
       try {
         // 使用 FormData 上传文件
         const formData = new FormData();
-        
+
         // 添加元数据字段
         formData.append("title", this.title || "未命名资源");
         formData.append("category", this.category || "课件");
-        
+
         // 添加文件（如果有）
         if (this.file) {
           formData.append("file", this.file);
@@ -340,21 +340,20 @@ export default defineComponent({
         } else {
           // 没有文件时使用占位 URL
           formData.append("file_format", "PDF");
-          formData.append("file_url", "https://placeholder.example.com/file.pdf");
+          formData.append(
+            "file_url",
+            "https://placeholder.example.com/file.pdf"
+          );
         }
 
         console.log("[PostCreate] 请求接口: POST /api/resources");
         console.log("[PostCreate] 使用 multipart/form-data 格式");
 
-        const response = await apiHttpClient.post(
-          "/api/resources",
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        const response = await apiHttpClient.post("/api/resources", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
 
         console.log("[PostCreate] 创建成功:", response.data);
 

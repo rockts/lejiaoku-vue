@@ -30,11 +30,11 @@ export default defineComponent({
     onDownload() {
       // 如果有文件URL，直接打开下载
       if (this.item.fileUrl) {
-        console.log('[ResourceCard] 下载文件:', this.item.fileUrl);
-        window.open(this.item.fileUrl, '_blank');
+        console.log("[ResourceCard] 下载文件:", this.item.fileUrl);
+        window.open(this.item.fileUrl, "_blank");
       } else {
         // 没有文件URL时跳转到详情页
-        console.log('[ResourceCard] 无文件URL，跳转详情页');
+        console.log("[ResourceCard] 无文件URL，跳转详情页");
         this.$router.push(`/posts/${this.item.id}`);
       }
     },
