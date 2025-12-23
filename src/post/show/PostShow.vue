@@ -142,41 +142,47 @@
           </div>
 
           <!-- 教材结构（MVP） -->
-          <div v-if="post.auto_meta_status === 'done' && post.auto_meta_result" class="mt-3">
+          <div
+            v-if="post.auto_meta_status === 'done' && post.auto_meta_result"
+            class="mt-3"
+          >
             <h5><i class="bi bi-book"></i> 教材结构</h5>
-            
+
             <!-- 教材基本信息 -->
             <p class="text-muted">
-              {{ post.auto_meta_result.textbook_info?.version || '-' }} · 
-              {{ post.auto_meta_result.textbook_info?.subject || '-' }} · 
-              {{ post.auto_meta_result.textbook_info?.grade || '-' }} · 
-              {{ post.auto_meta_result.textbook_info?.volume || '-' }}
+              {{ post.auto_meta_result.textbook_info?.version || "-" }} ·
+              {{ post.auto_meta_result.textbook_info?.subject || "-" }} ·
+              {{ post.auto_meta_result.textbook_info?.grade || "-" }} ·
+              {{ post.auto_meta_result.textbook_info?.volume || "-" }}
             </p>
-            
+
             <!-- 教材结构列表 -->
-            <div v-if="post.auto_meta_result.textbook_structure" class="textbook-structure">
-              <div 
-                v-for="unit in post.auto_meta_result.textbook_structure" 
+            <div
+              v-if="post.auto_meta_result.textbook_structure"
+              class="textbook-structure"
+            >
+              <div
+                v-for="unit in post.auto_meta_result.textbook_structure"
                 :key="unit.id || unit.name"
                 class="structure-item mb-2"
               >
                 <div class="unit-title fw-bold">
                   {{ unit.name }}
                 </div>
-                
+
                 <!-- 单元下的课/章节 -->
-                <div 
-                  v-for="lesson in unit.children || []" 
+                <div
+                  v-for="lesson in unit.children || []"
                   :key="lesson.id || lesson.name"
                   class="lesson-item ms-3 mt-1"
                 >
                   <div class="lesson-title">
                     {{ lesson.name }}
                   </div>
-                  
+
                   <!-- 课下的子目 -->
-                  <div 
-                    v-for="subtopic in lesson.children || []" 
+                  <div
+                    v-for="subtopic in lesson.children || []"
                     :key="subtopic.id || subtopic.name"
                     class="subtopic-item ms-3 mt-1"
                   >
@@ -187,19 +193,15 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- 无结构信息提示 -->
-            <div v-else class="text-muted small">
-              暂无教材结构信息
-            </div>
+            <div v-else class="text-muted small">暂无教材结构信息</div>
           </div>
-          
+
           <!-- 教材结构未生成提示 -->
           <div v-else-if="post.auto_meta_status !== 'done'" class="mt-3">
             <h5><i class="bi bi-book"></i> 教材结构</h5>
-            <p class="text-muted small">
-              教材结构尚未生成
-            </p>
+            <p class="text-muted small">教材结构尚未生成</p>
           </div>
 
           <div>
@@ -512,6 +514,8 @@ export default defineComponent({
   data() {
     return {
       showDownloadModal: false,
+      resource: null,  // 存储从 API 获取的资源数据
+      loading: false,  // 加载状态
     };
   },
 
@@ -520,31 +524,33 @@ export default defineComponent({
   },
 
   computed: {
-    ...mapGetters({
-      loading: "post/show/loading",
-      post: "post/show/post",
-    }),
+    // 由于不再使用 store，post 现在是本地数据
+    post() {
+      return this.resource;
+    },
+    
     postCoverURL() {
-      console.log("[PostShow] post 对象:", this.post);
-      console.log("[PostShow] description 值:", this.post?.description);
-      console.log("[PostShow] grade 值:", this.post?.grade);
+      console.log("[PostShow] resource 对象:", this.resource);
+      console.log("[PostShow] description 值:", this.resource?.description);
+      console.log("[PostShow] grade 值:", this.resource?.grade);
+      console.log("[PostShow] auto_meta_result 值:", this.resource?.auto_meta_result);
 
-      if (this.post?.cover_url) {
-        console.log("[PostShow] 封面URL:", this.post.cover_url);
-        return this.post.cover_url;
+      if (this.resource?.cover_url) {
+        console.log("[PostShow] 封面URL:", this.resource.cover_url);
+        return this.resource.cover_url;
       }
       console.log("[PostShow] 没有封面URL");
       return "";
     },
     postFileURL() {
-      if (this.post?.file?.id) {
-        return `${API_BASE_URL}/files/${this.post.file.id}`;
+      if (this.resource?.file?.id) {
+        return `${API_BASE_URL}/files/${this.resource.file.id}`;
       }
-      return this.post?.file_url || "";
+      return this.resource?.file_url || "";
     },
     userAvatarURL() {
-      if (this.post?.user?.id) {
-        return `${API_BASE_URL}/users/${this.post.user.id}/avatar`;
+      if (this.resource?.user?.id) {
+        return `${API_BASE_URL}/users/${this.resource.user.id}/avatar`;
       }
       return "";
     },
@@ -552,9 +558,9 @@ export default defineComponent({
     showPost() {
       console.log("[PostShow.vue] showPost 计算:", {
         loading: this.loading,
-        post: this.post,
+        resource: this.resource,
       });
-      return !this.loading && this.post;
+      return !this.loading && this.resource;
     },
   },
 
@@ -574,22 +580,41 @@ export default defineComponent({
     moment(...args) {
       return moment(...args);
     },
-    ...mapActions({
-      getPostById: "post/show/getPostById",
-    }),
+    
+    // 直接调用 API 获取资源详情
+    async getPostById(postId) {
+      this.loading = true;
+      try {
+        console.log(`[PostShow] 请求资源详情: /api/resources/${postId}`);
+        const response = await apiHttpClient.get(`/api/resources/${postId}`);
+        this.resource = response.data;
+        
+        // 暴露资源对象到 window 用于调试
+        window.__RESOURCE__ = response.data;
+        
+        console.log('[PostShow] 资源详情获取成功:', response.data);
+        console.log('[PostShow] auto_meta_result:', response.data.auto_meta_result);
+        console.log('[PostShow] chapter_info:', response.data.chapter_info);
+        
+      } catch (error) {
+        console.error('[PostShow] 获取资源详情失败:', error);
+      } finally {
+        this.loading = false;
+      }
+    },
 
     onClick() {
       // 确认下载
-      if (confirm(`确定要下载《${this.post.title}》吗？`)) {
+      if (confirm(`确定要下载《${this.resource.title}》吗？`)) {
         // 使用后端下载接口
-        const downloadUrl = `${API_BASE_URL}/api/resources/${this.post.id}/download`;
+        const downloadUrl = `${API_BASE_URL}/api/resources/${this.resource.id}/download`;
         console.log("[PostShow] 下载文件:", downloadUrl);
         window.open(downloadUrl, "_blank");
       }
     },
     confirmDownload() {
       // 使用后端下载接口
-      const downloadUrl = `${API_BASE_URL}/api/resources/${this.post.id}/download`;
+      const downloadUrl = `${API_BASE_URL}/api/resources/${this.resource.id}/download`;
       console.log("[PostShow] 下载文件:", downloadUrl);
       window.open(downloadUrl, "_blank");
       this.showDownloadModal = false;
