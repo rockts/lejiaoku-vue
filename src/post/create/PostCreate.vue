@@ -322,28 +322,44 @@ export default defineComponent({
       this.isSubmitting = true;
 
       try {
-        // 准备资源数据 - 只发送后端需要的字段
-        const resourceData = {
-          title: this.title || "未命名资源",
-          category: this.category || "课件",
-          file_format: this.file
-            ? this.file.name.split(".").pop().toUpperCase()
-            : "PDF",
-          file_url: "https://placeholder.example.com/file.pdf", // 开发期占位
-        };
+        // 使用 FormData 上传文件
+        const formData = new FormData();
+        
+        // 添加元数据字段
+        formData.append("title", this.title || "未命名资源");
+        formData.append("category", this.category || "课件");
+        
+        // 添加文件（如果有）
+        if (this.file) {
+          formData.append("file", this.file);
+          console.log("[PostCreate] 上传文件:", {
+            name: this.file.name,
+            size: this.file.size,
+            type: this.file.type,
+          });
+        } else {
+          // 没有文件时使用占位 URL
+          formData.append("file_format", "PDF");
+          formData.append("file_url", "https://placeholder.example.com/file.pdf");
+        }
 
-        console.log("[PostCreate] 提交数据:", resourceData);
         console.log("[PostCreate] 请求接口: POST /api/resources");
+        console.log("[PostCreate] 使用 multipart/form-data 格式");
 
         const response = await apiHttpClient.post(
           "/api/resources",
-          resourceData
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
         );
 
         console.log("[PostCreate] 创建成功:", response.data);
 
         // 显示成功消息
-        this.successMessage = `✓ 资源创建成功! ID: ${
+        this.successMessage = `✓ 资源上传成功! ID: ${
           response.data.id || response.data.insertId || "N/A"
         }`;
 
@@ -376,12 +392,12 @@ export default defineComponent({
           data: error.response?.data,
         });
 
-        this.errorMessage = `创建失败: ${
+        this.errorMessage = `上传失败: ${
           error.response?.data?.message || error.message
         }`;
       } finally {
         this.isSubmitting = false;
-        console.log("[PostCreate] 创建流程结束");
+        console.log("[PostCreate] 上传流程结束");
       }
     },
     async createFile(file, postId) {

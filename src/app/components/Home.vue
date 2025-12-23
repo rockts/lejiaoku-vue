@@ -70,13 +70,13 @@ export default defineComponent({
   },
   async created() {
     await this.fetchResources();
-    
+
     // 监听资源创建事件
-    window.addEventListener('resource-created', this.handleResourceCreated);
+    window.addEventListener("resource-created", this.handleResourceCreated);
   },
   beforeUnmount() {
     // 清理事件监听
-    window.removeEventListener('resource-created', this.handleResourceCreated);
+    window.removeEventListener("resource-created", this.handleResourceCreated);
   },
   computed: {
     filteredResources() {
@@ -169,6 +169,7 @@ export default defineComponent({
             downloads: item.totalDownloads || 0,
             createdAt: new Date(item.created_at).getTime(),
             recommended: false,
+            fileUrl: item.file?.url || item.file_url, // 文件下载URL
           };
         });
 
@@ -220,9 +221,9 @@ export default defineComponent({
       return formatMap[ext] || ext;
     },
     async handleResourceCreated() {
-      console.log('[Home] 收到资源创建事件,开始刷新列表...');
+      console.log("[Home] 收到资源创建事件,开始刷新列表...");
       await this.fetchResources();
-      console.log('[Home] 资源列表刷新完成');
+      console.log("[Home] 资源列表刷新完成");
     },
   },
 });
