@@ -53,14 +53,14 @@ export const postShowStoreModule: Module<PostShowStoreState, RootState> = {
    commit('setLoading', true);
 
    try {
-    const response = await apiHttpClient.get(`/posts/${postId}`);
+    const response = await apiHttpClient.get(`/api/resources/${postId}`);
     commit('setLoading', false);
     commit('setPost', response.data);
 
     console.log('返回数据：', response);
 
     return response;
-   } catch (error) {
+   } catch (error: any) {
     commit('setLoading', false);
 
     throw error.response;
