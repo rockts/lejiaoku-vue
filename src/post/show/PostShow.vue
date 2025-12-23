@@ -359,19 +359,19 @@ export default defineComponent({
       if (this.post?.cover?.id) {
         return `${API_BASE_URL}/covers/${this.post.cover.id}?size=thumbnail`;
       }
-      return '';
+      return "";
     },
     postFileURL() {
       if (this.post?.file?.id) {
         return `${API_BASE_URL}/files/${this.post.file.id}`;
       }
-      return this.post?.file_url || '';
+      return this.post?.file_url || "";
     },
     userAvatarURL() {
       if (this.post?.user?.id) {
         return `${API_BASE_URL}/users/${this.post.user.id}/avatar`;
       }
-      return '';
+      return "";
     },
 
     showPost() {
@@ -404,20 +404,30 @@ export default defineComponent({
     }),
 
     onClick() {
-      axios({
-        url: `${API_BASE_URL}/files/${this.post.file.id}`,
-        method: "GET",
-        responseType: "blob",
-      }).then((response) => {
-        const fileURL = window.URL.createObjectURL(new Blob([response.data]));
-        const fileLink = document.createElement("a");
+      // 检查是否有文件信息
+      if (this.post?.file?.id) {
+        // 有 file 对象,使用文件 ID 下载
+        axios({
+          url: `${API_BASE_URL}/files/${this.post.file.id}`,
+          method: "GET",
+          responseType: "blob",
+        }).then((response) => {
+          const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+          const fileLink = document.createElement("a");
 
-        fileLink.href = fileURL;
-        fileLink.setAttribute("download", `${this.post.file.filename}`);
-        document.body.appendChild(fileLink);
+          fileLink.href = fileURL;
+          fileLink.setAttribute("download", `${this.post.file.filename}`);
+          document.body.appendChild(fileLink);
 
-        fileLink.click();
-      });
+          fileLink.click();
+        });
+      } else if (this.post?.file_url) {
+        // 只有 file_url,直接打开
+        window.open(this.post.file_url, "_blank");
+      } else {
+        console.warn("[PostShow] 没有可下载的文件");
+        alert("该资源暂无可下载文件");
+      }
     },
   },
 

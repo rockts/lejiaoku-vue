@@ -364,14 +364,14 @@ export default defineComponent({
             type: this.file.type,
           });
         } else {
-          console.warn('[PostCreate] 没有选择文件，无法上传');
-          this.errorMessage = '请选择要上传的文件';
+          console.warn("[PostCreate] 没有选择文件，无法上传");
+          this.errorMessage = "请选择要上传的文件";
           this.isSubmitting = false;
           return;
         }
 
         // 打印 FormData 内容（调试用）
-        console.log('[PostCreate] FormData 内容:');
+        console.log("[PostCreate] FormData 内容:");
         for (let pair of formData.entries()) {
           console.log(`  ${pair[0]}:`, pair[1]);
         }
