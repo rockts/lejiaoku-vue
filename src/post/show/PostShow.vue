@@ -141,6 +141,67 @@
             </ul>
           </div>
 
+          <!-- 教材结构（MVP） -->
+          <div v-if="post.auto_meta_status === 'done' && post.auto_meta_result" class="mt-3">
+            <h5><i class="bi bi-book"></i> 教材结构</h5>
+            
+            <!-- 教材基本信息 -->
+            <p class="text-muted">
+              {{ post.auto_meta_result.textbook_info?.version || '-' }} · 
+              {{ post.auto_meta_result.textbook_info?.subject || '-' }} · 
+              {{ post.auto_meta_result.textbook_info?.grade || '-' }} · 
+              {{ post.auto_meta_result.textbook_info?.volume || '-' }}
+            </p>
+            
+            <!-- 教材结构列表 -->
+            <div v-if="post.auto_meta_result.textbook_structure" class="textbook-structure">
+              <div 
+                v-for="unit in post.auto_meta_result.textbook_structure" 
+                :key="unit.id || unit.name"
+                class="structure-item mb-2"
+              >
+                <div class="unit-title fw-bold">
+                  {{ unit.name }}
+                </div>
+                
+                <!-- 单元下的课/章节 -->
+                <div 
+                  v-for="lesson in unit.children || []" 
+                  :key="lesson.id || lesson.name"
+                  class="lesson-item ms-3 mt-1"
+                >
+                  <div class="lesson-title">
+                    {{ lesson.name }}
+                  </div>
+                  
+                  <!-- 课下的子目 -->
+                  <div 
+                    v-for="subtopic in lesson.children || []" 
+                    :key="subtopic.id || subtopic.name"
+                    class="subtopic-item ms-3 mt-1"
+                  >
+                    <div class="subtopic-title">
+                      {{ subtopic.name }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 无结构信息提示 -->
+            <div v-else class="text-muted small">
+              暂无教材结构信息
+            </div>
+          </div>
+          
+          <!-- 教材结构未生成提示 -->
+          <div v-else-if="post.auto_meta_status !== 'done'" class="mt-3">
+            <h5><i class="bi bi-book"></i> 教材结构</h5>
+            <p class="text-muted small">
+              教材结构尚未生成
+            </p>
+          </div>
+
           <div>
             <ul class="res__attr">
               <li v-if="post.subject">
@@ -684,5 +745,40 @@ export default defineComponent({
 }
 .modal-footer .btn .bi {
   margin-right: 4px;
+}
+
+/* 教材结构样式 */
+.textbook-structure {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 12px;
+  margin-top: 8px;
+}
+
+.structure-item {
+  border-left: 3px solid #007bff;
+  padding-left: 12px;
+  background-color: white;
+  border-radius: 4px;
+}
+
+.unit-title {
+  color: #007bff;
+  font-size: 14px;
+}
+
+.lesson-item {
+  color: #6c757d;
+  font-size: 13px;
+}
+
+.subtopic-item {
+  color: #868e96;
+  font-size: 12px;
+}
+
+.lesson-title,
+.subtopic-title {
+  padding: 2px 0;
 }
 </style>
