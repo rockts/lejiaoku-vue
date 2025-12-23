@@ -28,6 +28,7 @@ export default defineComponent({
         { value: "课件", label: "课件", icon: "🎞" },
         { value: "教案", label: "教案", icon: "✏️" },
         { value: "习题", label: "习题", icon: "❓" },
+        { value: "视频", label: "视频", icon: "🎬" },
         { value: "其他", label: "其他", icon: "🧩" },
       ],
     };

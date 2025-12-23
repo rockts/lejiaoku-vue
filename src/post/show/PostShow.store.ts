@@ -39,14 +39,12 @@ export const postShowStoreModule: Module<PostShowStoreState, RootState> = {
     },
 
     mutations: {
-        setLoading(state, data) {
-            state.loading = data;
+        setLoading(state, loading) {
+            state.loading = loading;
         },
 
         setPost(state, data) {
-            console.log('[PostShow.store] setPost 被调用，数据:', data);
             state.post = data;
-            console.log('[PostShow.store] state.post 已设置:', state.post);
         },
     },
 
@@ -55,7 +53,7 @@ export const postShowStoreModule: Module<PostShowStoreState, RootState> = {
             commit('setLoading', true);
 
             try {
-                const response = await apiHttpClient.get(`/api/resources/${postId}`);
+                const response = await apiHttpClient.get(`/posts/${postId}`);
                 commit('setLoading', false);
                 commit('setPost', response.data);
 
