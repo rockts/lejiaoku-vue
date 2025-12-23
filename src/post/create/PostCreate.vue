@@ -374,6 +374,34 @@
           </p>
         </div>
 
+        <!-- 教材结构显示区域（MVP） -->
+        <div class="textbook-structure-section mb-4" v-if="textbookStructure.length > 0 || aiRecognizing || aiRecognized">
+          <TextbookStructure :structure="textbookStructure" />
+          
+          <!-- 教材信息展示 -->
+          <div class="card shadow-sm mt-3" v-if="textbookInfo.title">
+            <div class="card-header bg-white">
+              <h6 class="mb-0">
+                <i class="bi bi-book"></i> 教材信息
+              </h6>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <p class="mb-1"><strong>书名：</strong>{{ textbookInfo.title }}</p>
+                  <p class="mb-1"><strong>学段：</strong>{{ textbookInfo.stage || '-' }}</p>
+                  <p class="mb-1"><strong>学科：</strong>{{ textbookInfo.subject || '-' }}</p>
+                </div>
+                <div class="col-md-6">
+                  <p class="mb-1"><strong>版本：</strong>{{ textbookInfo.version || '-' }}</p>
+                  <p class="mb-1"><strong>册次：</strong>{{ textbookInfo.volume || '-' }}</p>
+                  <p class="mb-1"><strong>简介：</strong>{{ textbookInfo.description || '-' }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="post-create-page-btn">
           <button
             type="button"
@@ -417,6 +445,7 @@ import { apiHttpClient } from "@/app/app.service";
 import { defineComponent } from "vue";
 import BreadCrumbs from "@/app/components/BreadCrumbs.vue";
 import ClassificationsOption from "@/classifications/index/components/ClassificationsOption.vue";
+import TextbookStructure from "./components/TextbookStructure.vue"; // 新增教材结构组件
 
 export default defineComponent({
   title() {
@@ -425,6 +454,7 @@ export default defineComponent({
   components: {
     BreadCrumbs,
     ClassificationsOption,
+    TextbookStructure, // 新增教材结构组件
   },
   name: "PostCreate",
   props: {
@@ -461,6 +491,19 @@ export default defineComponent({
       textbookVolume: "",
       textbookVersion: "",
       textbookCatalogId: null, // 最终的 catalog ID
+
+      // 教材结构化（MVP）
+      textbookStructure: [], // 解析后的教材结构
+      textbookInfo: {
+        // 自动识别的教材信息
+        title: "", // 书名
+        stage: "", // 学段
+        subject: "", // 学科
+        version: "", // 版本
+        volume: "", // 册次
+        description: "", // 简介
+        cover_url: "", // 封面
+      },
 
       // AI 自动识别
       aiRecognizing: false, // 正在识别
@@ -778,6 +821,27 @@ export default defineComponent({
       }
       if (data.version) {
         setTimeout(() => this.matchAndFillVersion(data.version), 400);
+      }
+
+      // 处理教材结构化信息（MVP）
+      if (data.textbook_info) {
+        // 更新教材基本信息
+        this.textbookInfo = {
+          title: data.textbook_info.title || this.textbookInfo.title,
+          stage: data.textbook_info.stage || this.textbookInfo.stage,
+          subject: data.textbook_info.subject || this.textbookInfo.subject,
+          version: data.textbook_info.version || this.textbookInfo.version,
+          volume: data.textbook_info.volume || this.textbookInfo.volume,
+          description: data.textbook_info.description || this.textbookInfo.description,
+          cover_url: data.textbook_info.cover_url || this.textbookInfo.cover_url,
+        };
+        console.log("[PostCreate] 教材基本信息更新:", this.textbookInfo);
+      }
+
+      // 处理教材目录结构
+      if (data.textbook_structure) {
+        this.textbookStructure = this.formatTextbookStructure(data.textbook_structure);
+        console.log("[PostCreate] 教材结构解析完成:", this.textbookStructure);
       }
 
       console.log("[PostCreate] 填充完成后的表单状态:", {
@@ -1200,6 +1264,42 @@ export default defineComponent({
         console.log("[PostCreate] 上传流程结束");
       }
     },
+
+    // 格式化教材结构数据
+    formatTextbookStructure(rawStructure) {
+      // 递归处理教材结构，添加展开状态等属性
+      const processNode = (node, level = 0) => {
+        const processed = {
+          id: node.id || `node_${Date.now()}_${Math.random()}`,
+          name: node.name || node.title || `未命名${level > 0 ? `-${level}` : ''}`,
+          type: node.type || this.getNodeType(level),
+          level: level,
+          expanded: level === 0, // 默认展开第一层
+          children: []
+        };
+
+        if (node.children && Array.isArray(node.children)) {
+          processed.children = node.children.map(child => processNode(child, level + 1));
+        }
+
+        return processed;
+      };
+
+      if (Array.isArray(rawStructure)) {
+        return rawStructure.map(item => processNode(item));
+      } else if (rawStructure && typeof rawStructure === 'object') {
+        return [processNode(rawStructure)];
+      }
+
+      return [];
+    },
+
+    // 根据层级获取节点类型
+    getNodeType(level) {
+      const types = ['Unit', 'Lesson', 'Subtopic'];
+      return types[level] || 'Section';
+    },
+
     async createFile(file, postId) {
       const formData = new FormData();
       formData.append("file", file);
