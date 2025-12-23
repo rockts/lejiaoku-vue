@@ -23,12 +23,6 @@
         :selected="filterState.grades"
         @update:selected="onGrades"
       />
-      <TagFilter
-        label="文件格式"
-        :options="formats"
-        :selected="filterState.formats"
-        @update:selected="onFormats"
-      />
     </div>
   </div>
 </template>
@@ -47,7 +41,6 @@ export default defineComponent({
       localKeyword: this.filterState.keyword || "",
       subjects: ["语文", "数学", "英语", "科学"],
       grades: ["一年级", "二年级", "三年级", "四年级", "五年级", "六年级"],
-      formats: ["PPT", "PDF", "DOC", "MP4"],
     };
   },
   methods: {
@@ -62,9 +55,6 @@ export default defineComponent({
     },
     onGrades(next) {
       this.$emit("update:filterState", { ...this.filterState, grades: next });
-    },
-    onFormats(next) {
-      this.$emit("update:filterState", { ...this.filterState, formats: next });
     },
   },
 });

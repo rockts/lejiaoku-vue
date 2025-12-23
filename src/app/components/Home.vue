@@ -51,7 +51,6 @@ export default defineComponent({
         category: null,
         subjects: [],
         grades: [],
-        formats: [],
       },
       resources: [
         {
@@ -165,14 +164,12 @@ export default defineComponent({
       const c = this.filterState.category;
       const s = this.filterState.subjects;
       const g = this.filterState.grades;
-      const f = this.filterState.formats;
       return this.resources.filter((r) => {
         const byK = !k || r.title.toLowerCase().includes(k);
         const byC = !c || r.category === c;
         const byS = !s.length || s.includes(r.subject);
         const byG = !g.length || g.includes(r.grade);
-        const byF = !f.length || f.includes(r.format);
-        return byK && byC && byS && byG && byF;
+        return byK && byC && byS && byG;
       });
     },
   },
@@ -200,7 +197,6 @@ export default defineComponent({
         category: null,
         subjects: [],
         grades: [],
-        formats: [],
       };
     },
   },

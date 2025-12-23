@@ -32,14 +32,6 @@
       >
         {{ g }} <span class="close">×</span>
       </button>
-      <button
-        v-for="f in filterState.formats"
-        :key="'f-' + f"
-        class="filter-tag"
-        @click="clear('formats', f)"
-      >
-        {{ f }} <span class="close">×</span>
-      </button>
       <button class="clear-all-btn" @click="$emit('clearAll')">清空全部</button>
     </div>
   </div>
@@ -59,8 +51,7 @@ export default defineComponent({
         this.filterState.keyword ||
         this.filterState.category ||
         this.filterState.subjects.length ||
-        this.filterState.grades.length ||
-        this.filterState.formats.length
+        this.filterState.grades.length
       );
     },
   },
