@@ -322,14 +322,10 @@ export default defineComponent({
       this.isSubmitting = true;
 
       try {
-        // 准备资源数据
+        // 准备资源数据 - 只发送后端需要的字段
         const resourceData = {
           title: this.title || "未命名资源",
-          category: this.category || "其他",
-          grade: this.grade || "未分级",
-          subject: this.subject || "未分类",
-          version: this.version || "通用版",
-          description: this.description || "",
+          category: this.category || "课件",
           file_format: this.file
             ? this.file.name.split(".").pop().toUpperCase()
             : "PDF",
