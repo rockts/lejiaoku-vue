@@ -38,7 +38,7 @@
                     <p>封面拖放到这里</p>
                     <i class="bi bi-card-image"></i>
                   </div>
-                  <P>大小限制: 5 MB</P>
+                  <p>大小限制: 5 MB</p>
                 </label>
               </div>
             </div>
