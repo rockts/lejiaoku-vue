@@ -14,7 +14,18 @@
         @clear="clearFilter"
         @clearAll="clearAllFilters"
       />
-      <ResourceList :resources="filteredResources" />
+      
+      <!-- 加载状态 -->
+      <div v-if="loading" class="text-center my-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">加载中...</span>
+        </div>
+        <p class="mt-2 text-muted">正在加载资源...</p>
+      </div>
+      
+      <!-- 资源列表 -->
+      <ResourceList v-else :resources="filteredResources" />
+      
       <div class="cta">
         <div class="cta-title">
           想上传自己的教学资源？加入我们，成为教师贡献者
@@ -38,6 +49,7 @@ import SearchBar from "./SearchBar.vue";
 import ResourceList from "./ResourceList.vue";
 import CategoryNav from "./CategoryNav.vue";
 import ActiveFilters from "./ActiveFilters.vue";
+import { apiHttpClient } from "@/app/app.service";
 
 export default defineComponent({
   name: "Home",
@@ -46,117 +58,18 @@ export default defineComponent({
   components: { SearchBar, ResourceList, CategoryNav, ActiveFilters },
   data() {
     return {
+      loading: false,
       filterState: {
         keyword: "",
         category: null,
         subjects: [],
         grades: [],
       },
-      resources: [
-        {
-          id: 1,
-          title: "三年级数学上册第一单元课件",
-          category: "课件",
-          format: "PPT",
-          subject: "数学",
-          grade: "三年级",
-          downloads: 230,
-          createdAt: Date.now() - 3600e3,
-          recommended: true,
-        },
-        {
-          id: 2,
-          title: "语文一年级识字教案",
-          category: "教案",
-          format: "DOC",
-          subject: "语文",
-          grade: "一年级",
-          downloads: 540,
-          createdAt: Date.now() - 7200e3,
-        },
-        {
-          id: 3,
-          title: "英语四年级口语练习试题",
-          category: "习题",
-          format: "PDF",
-          subject: "英语",
-          grade: "四年级",
-          downloads: 120,
-          createdAt: Date.now() - 1800e3,
-        },
-        {
-          id: 4,
-          title: "科学二年级观察视频",
-          category: "视频",
-          format: "MP4",
-          subject: "科学",
-          grade: "二年级",
-          downloads: 310,
-          createdAt: Date.now() - 5400e3,
-        },
-        {
-          id: 5,
-          title: "数学六年级毕业总复习教案",
-          category: "教案",
-          format: "PDF",
-          subject: "数学",
-          grade: "六年级",
-          downloads: 880,
-          createdAt: Date.now() - 2600e3,
-          recommended: true,
-        },
-        {
-          id: 6,
-          title: "语文二年级字词练习试题",
-          category: "习题",
-          format: "DOC",
-          subject: "语文",
-          grade: "二年级",
-          downloads: 95,
-          createdAt: Date.now() - 1600e3,
-        },
-        {
-          id: 7,
-          title: "英语三年级自然拼读课件",
-          category: "课件",
-          format: "PPT",
-          subject: "英语",
-          grade: "三年级",
-          downloads: 412,
-          createdAt: Date.now() - 8600e3,
-        },
-        {
-          id: 8,
-          title: "科学五年级项目式学习视频",
-          category: "视频",
-          format: "MP4",
-          subject: "科学",
-          grade: "五年级",
-          downloads: 267,
-          createdAt: Date.now() - 12600e3,
-        },
-        {
-          id: 9,
-          title: "语文六年级古诗文资料",
-          category: "教材",
-          format: "PDF",
-          subject: "语文",
-          grade: "六年级",
-          downloads: 699,
-          createdAt: Date.now() - 22600e3,
-        },
-        {
-          id: 10,
-          title: "数学一年级认识数字课件",
-          category: "课件",
-          format: "PPT",
-          subject: "数学",
-          grade: "一年级",
-          downloads: 332,
-          createdAt: Date.now() - 9600e3,
-        },
-      ],
+      resources: [],
     };
+  },
+  async created() {
+    await this.fetchResources();
   },
   computed: {
     filteredResources() {
@@ -198,6 +111,82 @@ export default defineComponent({
         subjects: [],
         grades: [],
       };
+    },
+    async fetchResources() {
+      this.loading = true;
+      try {
+        const response = await apiHttpClient.get("/posts");
+        // 转换后端数据格式为前端需要的格式
+        this.resources = response.data.map((item) => ({
+          id: item.id,
+          title: item.title,
+          category: item.category || "其他",
+          format: this.guessFormat(item.file?.filename),
+          subject: item.subject || "未分类",
+          grade: item.grade || "未分级",
+          downloads: item.totalDownloads || 0,
+          createdAt: new Date(item.created_at).getTime(),
+          recommended: false, // 后端暂无推荐字段
+        }));
+      } catch (error) {
+        console.error("获取资源列表失败:", error);
+        // 如果API失败,使用mock数据作为后备
+        this.resources = this.getMockData();
+      } finally {
+        this.loading = false;
+      }
+    },
+    guessFormat(filename) {
+      if (!filename) return "未知";
+      const ext = filename.split(".").pop().toUpperCase();
+      const formatMap = {
+        PPTX: "PPT",
+        PPT: "PPT",
+        DOCX: "DOC",
+        DOC: "DOC",
+        PDF: "PDF",
+        MP4: "MP4",
+        AVI: "MP4",
+        JPG: "图片",
+        PNG: "图片",
+        JPEG: "图片",
+      };
+      return formatMap[ext] || ext;
+    },
+    getMockData() {
+      return [
+        {
+          id: 1,
+          title: "三年级数学上册第一单元课件",
+          category: "课件",
+          format: "PPT",
+          subject: "数学",
+          grade: "三年级",
+          downloads: 230,
+          createdAt: Date.now() - 3600e3,
+          recommended: true,
+        },
+        {
+          id: 2,
+          title: "语文一年级识字教案",
+          category: "教案",
+          format: "DOC",
+          subject: "语文",
+          grade: "一年级",
+          downloads: 540,
+          createdAt: Date.now() - 7200e3,
+        },
+        {
+          id: 3,
+          title: "英语四年级口语练习试题",
+          category: "习题",
+          format: "PDF",
+          subject: "英语",
+          grade: "四年级",
+          downloads: 120,
+          createdAt: Date.now() - 1800e3,
+        },
+      ];
     },
   },
 });

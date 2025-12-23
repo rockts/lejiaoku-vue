@@ -1,6 +1,9 @@
 module.exports = {
   lintOnSave: false,
   transpileDependencies: ['vue-router'],
+  devServer: {
+    port: 8080,
+  },
   chainWebpack: (config) => {
     try {
       config.plugins.delete('fork-ts-checker');

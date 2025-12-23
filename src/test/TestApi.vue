@@ -1,7 +1,7 @@
 <template>
   <div class="test-api-page container mt-5">
     <h2 class="mb-4">后端 API 测试页面</h2>
-    
+
     <!-- 测试状态显示 -->
     <div class="alert" :class="statusClass" v-if="statusMessage">
       {{ statusMessage }}
@@ -11,13 +11,25 @@
     <div class="mb-4">
       <h4>API 测试</h4>
       <div class="btn-group" role="group">
-        <button @click="testUserApi" class="btn btn-primary" :disabled="loading">
+        <button
+          @click="testUserApi"
+          class="btn btn-primary"
+          :disabled="loading"
+        >
           测试 /user
         </button>
-        <button @click="testPostsApi" class="btn btn-primary" :disabled="loading">
+        <button
+          @click="testPostsApi"
+          class="btn btn-primary"
+          :disabled="loading"
+        >
           测试 /posts
         </button>
-        <button @click="testClassificationsApi" class="btn btn-primary" :disabled="loading">
+        <button
+          @click="testClassificationsApi"
+          class="btn btn-primary"
+          :disabled="loading"
+        >
           测试 /classifications
         </button>
       </div>
@@ -36,7 +48,9 @@
         <h5 class="mb-0">用户信息 (/user)</h5>
       </div>
       <div class="card-body">
-        <pre class="bg-light p-3 rounded">{{ JSON.stringify(userData, null, 2) }}</pre>
+        <pre class="bg-light p-3 rounded">{{
+          JSON.stringify(userData, null, 2)
+        }}</pre>
       </div>
     </div>
 
@@ -47,7 +61,11 @@
       </div>
       <div class="card-body">
         <p class="text-muted">共 {{ postsData.length }} 条数据</p>
-        <pre class="bg-light p-3 rounded" style="max-height: 400px; overflow-y: auto;">{{ JSON.stringify(postsData, null, 2) }}</pre>
+        <pre
+          class="bg-light p-3 rounded"
+          style="max-height: 400px; overflow-y: auto"
+          >{{ JSON.stringify(postsData, null, 2) }}</pre
+        >
       </div>
     </div>
 
@@ -57,7 +75,11 @@
         <h5 class="mb-0">分类信息 (/classifications)</h5>
       </div>
       <div class="card-body">
-        <pre class="bg-light p-3 rounded" style="max-height: 400px; overflow-y: auto;">{{ JSON.stringify(classificationsData, null, 2) }}</pre>
+        <pre
+          class="bg-light p-3 rounded"
+          style="max-height: 400px; overflow-y: auto"
+          >{{ JSON.stringify(classificationsData, null, 2) }}</pre
+        >
       </div>
     </div>
 
@@ -69,7 +91,9 @@
       <div class="card-body">
         <p><strong>状态码:</strong> {{ errorData.status }}</p>
         <p><strong>错误消息:</strong> {{ errorData.message }}</p>
-        <pre class="bg-light p-3 rounded">{{ JSON.stringify(errorData.data, null, 2) }}</pre>
+        <pre class="bg-light p-3 rounded">{{
+          JSON.stringify(errorData.data, null, 2)
+        }}</pre>
       </div>
     </div>
 
@@ -80,36 +104,36 @@
       </div>
       <div class="card-body">
         <p><strong>API Base URL:</strong> {{ apiBaseUrl }}</p>
-        <p><strong>Token:</strong> {{ token || '未登录' }}</p>
+        <p><strong>Token:</strong> {{ token || "未登录" }}</p>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
-import { apiHttpClient } from '@/app/app.service';
+import { defineComponent, ref, computed } from "vue";
+import { apiHttpClient } from "@/app/app.service";
 
 export default defineComponent({
-  name: 'TestApi',
+  name: "TestApi",
   setup() {
     const loading = ref(false);
-    const statusMessage = ref('');
-    const statusType = ref<'success' | 'error' | 'info'>('info');
-    
+    const statusMessage = ref("");
+    const statusType = ref<"success" | "error" | "info">("info");
+
     const userData = ref<any>(null);
     const postsData = ref<any>(null);
     const classificationsData = ref<any>(null);
     const errorData = ref<any>(null);
 
     const apiBaseUrl = process.env.VUE_APP_API_BASE_URL;
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
 
     const statusClass = computed(() => {
       return {
-        'alert-success': statusType.value === 'success',
-        'alert-danger': statusType.value === 'error',
-        'alert-info': statusType.value === 'info',
+        "alert-success": statusType.value === "success",
+        "alert-danger": statusType.value === "error",
+        "alert-info": statusType.value === "info",
       };
     });
 
@@ -123,22 +147,22 @@ export default defineComponent({
     const testUserApi = async () => {
       loading.value = true;
       clearResults();
-      statusMessage.value = '正在请求 /user...';
-      statusType.value = 'info';
+      statusMessage.value = "正在请求 /user...";
+      statusType.value = "info";
 
       try {
-        const response = await apiHttpClient.get('/user');
+        const response = await apiHttpClient.get("/user");
         userData.value = response.data;
-        statusMessage.value = '✓ 成功获取用户信息';
-        statusType.value = 'success';
+        statusMessage.value = "✓ 成功获取用户信息";
+        statusType.value = "success";
       } catch (error: any) {
         errorData.value = {
-          status: error.response?.status || 'Unknown',
+          status: error.response?.status || "Unknown",
           message: error.message,
           data: error.response?.data || error,
         };
         statusMessage.value = `✗ 请求失败: ${error.message}`;
-        statusType.value = 'error';
+        statusType.value = "error";
       } finally {
         loading.value = false;
       }
@@ -147,22 +171,22 @@ export default defineComponent({
     const testPostsApi = async () => {
       loading.value = true;
       clearResults();
-      statusMessage.value = '正在请求 /posts...';
-      statusType.value = 'info';
+      statusMessage.value = "正在请求 /posts...";
+      statusType.value = "info";
 
       try {
-        const response = await apiHttpClient.get('/posts');
+        const response = await apiHttpClient.get("/posts");
         postsData.value = response.data;
         statusMessage.value = `✓ 成功获取资源列表 (${response.data.length} 条)`;
-        statusType.value = 'success';
+        statusType.value = "success";
       } catch (error: any) {
         errorData.value = {
-          status: error.response?.status || 'Unknown',
+          status: error.response?.status || "Unknown",
           message: error.message,
           data: error.response?.data || error,
         };
         statusMessage.value = `✗ 请求失败: ${error.message}`;
-        statusType.value = 'error';
+        statusType.value = "error";
       } finally {
         loading.value = false;
       }
@@ -171,22 +195,22 @@ export default defineComponent({
     const testClassificationsApi = async () => {
       loading.value = true;
       clearResults();
-      statusMessage.value = '正在请求 /classifications...';
-      statusType.value = 'info';
+      statusMessage.value = "正在请求 /classifications...";
+      statusType.value = "info";
 
       try {
-        const response = await apiHttpClient.get('/classifications');
+        const response = await apiHttpClient.get("/classifications");
         classificationsData.value = response.data;
-        statusMessage.value = '✓ 成功获取分类信息';
-        statusType.value = 'success';
+        statusMessage.value = "✓ 成功获取分类信息";
+        statusType.value = "success";
       } catch (error: any) {
         errorData.value = {
-          status: error.response?.status || 'Unknown',
+          status: error.response?.status || "Unknown",
           message: error.message,
           data: error.response?.data || error,
         };
         statusMessage.value = `✗ 请求失败: ${error.message}`;
-        statusType.value = 'error';
+        statusType.value = "error";
       } finally {
         loading.value = false;
       }

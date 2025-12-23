@@ -25,10 +25,10 @@ export default defineComponent({
   props: { item: { type: Object, required: true } },
   methods: {
     onPreview() {
-      window.alert("预览: " + this.item.title);
+      this.$router.push(`/posts/${this.item.id}`);
     },
     onDownload() {
-      window.alert("下载: " + this.item.title);
+      this.$router.push(`/posts/${this.item.id}`);
     },
   },
 });
