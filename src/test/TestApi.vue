@@ -248,9 +248,14 @@ export default defineComponent({
           description: "测试资源描述",
         };
 
-        const response = await apiHttpClient.post("/api/resources", resourceData);
+        const response = await apiHttpClient.post(
+          "/api/resources",
+          resourceData
+        );
         postsData.value = response.data;
-        statusMessage.value = `✓ 成功创建资源 (ID: ${response.data.id || response.data.insertId || 'N/A'})`;
+        statusMessage.value = `✓ 成功创建资源 (ID: ${
+          response.data.id || response.data.insertId || "N/A"
+        })`;
         statusType.value = "success";
         console.log("创建资源成功:", response.data);
       } catch (error: any) {
