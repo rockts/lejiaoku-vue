@@ -40,7 +40,7 @@ export const postShowStoreModule: Module<PostShowStoreState, RootState> = {
 
  mutations: {
   setLoading(state, data) {
-   state.post = data;
+   state.loading = data;
   },
 
   setPost(state, data) {
