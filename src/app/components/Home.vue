@@ -14,7 +14,7 @@
         @clear="clearFilter"
         @clearAll="clearAllFilters"
       />
-      
+
       <!-- 加载状态 -->
       <div v-if="loading" class="text-center my-5">
         <div class="spinner-border text-primary" role="status">
@@ -22,10 +22,10 @@
         </div>
         <p class="mt-2 text-muted">正在加载资源...</p>
       </div>
-      
+
       <!-- 资源列表 -->
       <ResourceList v-else :resources="filteredResources" />
-      
+
       <div class="cta">
         <div class="cta-title">
           想上传自己的教学资源？加入我们，成为教师贡献者
@@ -114,26 +114,74 @@ export default defineComponent({
     },
     async fetchResources() {
       this.loading = true;
+      console.log("[Home] 开始获取资源列表...");
+      console.log("[Home] 请求接口: GET /api/resources");
+      
       try {
-        const response = await apiHttpClient.get("/posts");
+        const response = await apiHttpClient.get("/api/resources");
+        
+        console.log("[Home] 接口响应状态:", response.status);
+        console.log("[Home] 接口返回数据:", response.data);
+        console.log("[Home] 返回数据类型:", Array.isArray(response.data) ? '数组' : typeof response.data);
+        console.log("[Home] 返回数据数量:", Array.isArray(response.data) ? response.data.length : 'N/A');
+        
+        if (!Array.isArray(response.data)) {
+          console.error("[Home] 错误: 接口返回数据不是数组", response.data);
+          this.resources = [];
+          return;
+        }
+        
+        if (response.data.length === 0) {
+          console.warn("[Home] 接口返回空数组 - 这是正常的数据状态(暂无approved资源)");
+          this.resources = [];
+          return;
+        }
+        
         // 转换后端数据格式为前端需要的格式
-        this.resources = response.data.map((item) => ({
-          id: item.id,
-          title: item.title,
-          category: item.category || "其他",
-          format: this.guessFormat(item.file?.filename),
-          subject: item.subject || "未分类",
-          grade: item.grade || "未分级",
-          downloads: item.totalDownloads || 0,
-          createdAt: new Date(item.created_at).getTime(),
-          recommended: false, // 后端暂无推荐字段
-        }));
+        this.resources = response.data.map((item) => {
+          console.log("[Home] 处理资源项:", { id: item.id, title: item.title, category: item.category });
+          return {
+            id: item.id,
+            title: item.title,
+            category: item.category || "其他",
+            format: this.guessFormat(item.file?.filename || item.file_format),
+            subject: item.subject || "未分类",
+            grade: item.grade || "未分级",
+            downloads: item.totalDownloads || 0,
+            createdAt: new Date(item.created_at).getTime(),
+            recommended: false,
+          };
+        });
+        
+        console.log("[Home] 成功加载资源数量:", this.resources.length);
+        console.log("[Home] 转换后的资源数据:", this.resources);
+        
       } catch (error) {
-        console.error("获取资源列表失败:", error);
-        // 如果API失败,使用mock数据作为后备
-        this.resources = this.getMockData();
+        console.error("[Home] 接口请求失败:", error);
+        console.error("[Home] 错误详情:", {
+          message: error.message,
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data,
+        });
+        
+        // 明确说明这是接口问题,不使用mock数据
+        if (error.response?.status === 404) {
+          console.error("[Home] 接口问题: /api/resources 不存在 (404)");
+        } else if (error.response?.status === 500) {
+          console.error("[Home] 接口问题: 服务器内部错误 (500)");
+        } else if (error.response?.status === 401) {
+          console.error("[Home] 接口问题: 未授权 (401) - 可能需要登录");
+        } else if (!error.response) {
+          console.error("[Home] 接口问题: 网络错误或后端未启动");
+        } else {
+          console.error("[Home] 接口问题: 未知错误");
+        }
+        
+        this.resources = [];
       } finally {
         this.loading = false;
+        console.log("[Home] 资源加载流程结束");
       }
     },
     guessFormat(filename) {
@@ -152,41 +200,6 @@ export default defineComponent({
         JPEG: "图片",
       };
       return formatMap[ext] || ext;
-    },
-    getMockData() {
-      return [
-        {
-          id: 1,
-          title: "三年级数学上册第一单元课件",
-          category: "课件",
-          format: "PPT",
-          subject: "数学",
-          grade: "三年级",
-          downloads: 230,
-          createdAt: Date.now() - 3600e3,
-          recommended: true,
-        },
-        {
-          id: 2,
-          title: "语文一年级识字教案",
-          category: "教案",
-          format: "DOC",
-          subject: "语文",
-          grade: "一年级",
-          downloads: 540,
-          createdAt: Date.now() - 7200e3,
-        },
-        {
-          id: 3,
-          title: "英语四年级口语练习试题",
-          category: "习题",
-          format: "PDF",
-          subject: "英语",
-          grade: "四年级",
-          downloads: 120,
-          createdAt: Date.now() - 1800e3,
-        },
-      ];
     },
   },
 });
