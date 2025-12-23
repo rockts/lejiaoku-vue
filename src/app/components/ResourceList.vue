@@ -30,14 +30,38 @@ export default defineComponent({
   props: { resources: { type: Array, required: true } },
   computed: {
     latest() {
-      return [...this.resources].sort((a, b) => b.createdAt - a.createdAt).slice(0, 8);
+      // 最新上传：按创建时间倒序，取前8条
+      return [...this.resources]
+        .sort((a, b) => b.createdAt - a.createdAt)
+        .slice(0, 8);
     },
     most() {
-      return [...this.resources].sort((a, b) => b.downloads - a.downloads).slice(0, 8);
+      // 下载最多：按下载量倒序，排除已在"最新上传"中的资源
+      const latestIds = new Set(this.latest.map(r => r.id));
+      return [...this.resources]
+        .filter(r => !latestIds.has(r.id))
+        .sort((a, b) => b.downloads - a.downloads)
+        .slice(0, 8);
     },
     recommended() {
-      const rec = this.resources.filter((r) => r.recommended);
-      return (rec.length ? rec : this.most).slice(0, 8);
+      // 推荐资源：排除已在前两个区块的资源
+      const usedIds = new Set([
+        ...this.latest.map(r => r.id),
+        ...this.most.map(r => r.id),
+      ]);
+      
+      // 优先使用标记为推荐的资源
+      const markedAsRecommended = this.resources.filter(
+        r => r.recommended && !usedIds.has(r.id)
+      );
+      
+      // 如果推荐资源不足，从剩余资源中顺序补充
+      if (markedAsRecommended.length < 8) {
+        const remaining = this.resources.filter(r => !usedIds.has(r.id));
+        return [...markedAsRecommended, ...remaining].slice(0, 8);
+      }
+      
+      return markedAsRecommended.slice(0, 8);
     },
   },
 });
