@@ -57,8 +57,8 @@
 
           <div class="row create-post-attr mt-2">
             <div class="col-md-3">
-              <select class="form-control">
-                <option selected>年级</option>
+              <select class="form-control" v-model="grade">
+                <option value="" selected>年级</option>
                 <option>一年级上册</option>
                 <option>一年级下册</option>
                 <option>二年级上册</option>
@@ -74,8 +74,8 @@
               </select>
             </div>
             <div class="col-md-3">
-              <select class="form-control">
-                <option selected>学科</option>
+              <select class="form-control" v-model="subject">
+                <option value="" selected>学科</option>
                 <option>语文</option>
                 <option>数学</option>
                 <option>英语</option>
@@ -90,14 +90,19 @@
               </select>
             </div>
             <div class="col-md-3">
-              <select class="form-control">
-                <option selected>版本</option>
+              <select class="form-control" v-model="version">
+                <option value="" selected>版本</option>
                 <option>人教版</option>
               </select>
             </div>
             <div class="col-md-3">
-              <select class="form-control">
-                <option selected>类型</option>
+              <select class="form-control" v-model="category">
+                <option value="" selected>类型</option>
+                <option>教材</option>
+                <option>课件</option>
+                <option>教案</option>
+                <option>教辅</option>
+                <option>其他</option>
                 <ClassificationsOption />
               </select>
             </div>
@@ -226,14 +231,20 @@ export default defineComponent({
   },
 
   async created() {},
-  onChangeFile(event) {
-    const file = event.target.files[0];
-    if (file) {
-      this.file = file;
-    }
-  },
 
   methods: {
+    onChangeFile(event) {
+      const file = event.target.files[0];
+      if (file) {
+        this.file = file;
+        console.log("[PostCreate] 选择文件:", {
+          name: file.name,
+          size: file.size,
+          type: file.type,
+        });
+      }
+    },
+
     onDropDragZone(event) {
       console.log(event.dataTransfer.files);
 
@@ -325,9 +336,24 @@ export default defineComponent({
         // 使用 FormData 上传文件
         const formData = new FormData();
 
-        // 添加元数据字段
+        // 添加元数据字段 - 只添加有值的字段
         formData.append("title", this.title || "未命名资源");
-        formData.append("category", this.category || "课件");
+
+        if (this.category) {
+          formData.append("category", this.category);
+        }
+
+        if (this.grade) {
+          formData.append("grade", this.grade);
+        }
+
+        if (this.subject) {
+          formData.append("subject", this.subject);
+        }
+
+        if (this.version) {
+          formData.append("version", this.version);
+        }
 
         // 添加文件（如果有）
         if (this.file) {
@@ -338,12 +364,16 @@ export default defineComponent({
             type: this.file.type,
           });
         } else {
-          // 没有文件时使用占位 URL
-          formData.append("file_format", "PDF");
-          formData.append(
-            "file_url",
-            "https://placeholder.example.com/file.pdf"
-          );
+          console.warn('[PostCreate] 没有选择文件，无法上传');
+          this.errorMessage = '请选择要上传的文件';
+          this.isSubmitting = false;
+          return;
+        }
+
+        // 打印 FormData 内容（调试用）
+        console.log('[PostCreate] FormData 内容:');
+        for (let pair of formData.entries()) {
+          console.log(`  ${pair[0]}:`, pair[1]);
         }
 
         console.log("[PostCreate] 请求接口: POST /api/resources");

@@ -56,7 +56,7 @@
                 </li>
               </ul>
             </div>
-            <div class="author">
+            <div class="author" v-if="post.user">
               <img
                 v-if="post.user.avatar === null"
                 src="@/assets/img/avatar.png"
@@ -111,49 +111,91 @@
                 <span style="font-weight: bold">资源类型：</span
                 >{{ post.category }}
               </li>
-              <li v-if="post.file.mimetype.indexOf(`png`) > -1">
+              <li
+                v-if="
+                  post.file &&
+                  post.file.mimetype &&
+                  post.file.mimetype.indexOf(`png`) > -1
+                "
+              >
                 <span style="font-weight: bold">文件类型：</span>
                 <img
                   src="@/assets/icon/filetype/png.png"
                   class="filetypeicon"
                 />
               </li>
-              <li v-if="post.file.mimetype.indexOf(`bmp`) > -1">
+              <li
+                v-if="
+                  post.file &&
+                  post.file.mimetype &&
+                  post.file.mimetype.indexOf(`bmp`) > -1
+                "
+              >
                 <span style="font-weight: bold">文件类型：</span>
                 <img
                   src="@/assets/icon/filetype/bmp.png"
                   class="filetypeicon"
                 />
               </li>
-              <li v-if="post.file.mimetype.indexOf(`jpeg`) > -1">
+              <li
+                v-if="
+                  post.file &&
+                  post.file.mimetype &&
+                  post.file.mimetype.indexOf(`jpeg`) > -1
+                "
+              >
                 <span style="font-weight: bold">文件类型：</span>
                 <img
                   src="@/assets/icon/filetype/jpg.png"
                   class="filetypeicon"
                 />
               </li>
-              <li v-if="post.file.mimetype.indexOf(`jpg`) > -1">
+              <li
+                v-if="
+                  post.file &&
+                  post.file.mimetype &&
+                  post.file.mimetype.indexOf(`jpg`) > -1
+                "
+              >
                 <span style="font-weight: bold">文件类型：</span>
                 <img
                   src="@/assets/icon/filetype/jpg.png"
                   class="filetypeicon"
                 />
               </li>
-              <li v-if="post.file.mimetype.indexOf(`gif`) > -1">
+              <li
+                v-if="
+                  post.file &&
+                  post.file.mimetype &&
+                  post.file.mimetype.indexOf(`gif`) > -1
+                "
+              >
                 <span style="font-weight: bold">文件类型：</span>
                 <img
                   src="@/assets/icon/filetype/gif.png"
                   class="filetypeicon"
                 />
               </li>
-              <li v-if="post.file.mimetype.indexOf(`spreadsheetml.sheet`) > -1">
+              <li
+                v-if="
+                  post.file &&
+                  post.file.mimetype &&
+                  post.file.mimetype.indexOf(`spreadsheetml.sheet`) > -1
+                "
+              >
                 <span style="font-weight: bold">文件类型：</span>
                 <img
                   src="@/assets/icon/filetype/xlsx.png"
                   class="filetypeicon"
                 />
               </li>
-              <li v-if="post.file.mimetype.indexOf(`msword`) > -1">
+              <li
+                v-if="
+                  post.file &&
+                  post.file.mimetype &&
+                  post.file.mimetype.indexOf(`msword`) > -1
+                "
+              >
                 <span style="font-weight: bold">文件类型：</span>
                 <img
                   src="@/assets/icon/filetype/doc.png"
@@ -162,6 +204,8 @@
               </li>
               <li
                 v-if="
+                  post.file &&
+                  post.file.mimetype &&
                   post.file.mimetype.indexOf(`wordprocessingml.document`) > -1
                 "
               >
@@ -173,6 +217,8 @@
               </li>
               <li
                 v-if="
+                  post.file &&
+                  post.file.mimetype &&
                   post.file.mimetype.indexOf(`presentationml.presentation`) > -1
                 "
               >
@@ -182,28 +228,46 @@
                   class="filetypeicon"
                 />
               </li>
-              <li v-if="post.file.mimetype.indexOf(`pdf`) > -1">
+              <li
+                v-if="
+                  post.file &&
+                  post.file.mimetype &&
+                  post.file.mimetype.indexOf(`pdf`) > -1
+                "
+              >
                 <span style="font-weight: bold">文件类型：</span>
                 <img
                   src="@/assets/icon/filetype/pdf.png"
                   class="filetypeicon"
                 />
               </li>
-              <li v-if="post.file.mimetype.indexOf(`ms-powerpoint`) > -1">
+              <li
+                v-if="
+                  post.file &&
+                  post.file.mimetype &&
+                  post.file.mimetype.indexOf(`ms-powerpoint`) > -1
+                "
+              >
                 <span style="font-weight: bold">文件类型：</span>
                 <img
                   src="@/assets/icon/filetype/ppt.png"
                   class="filetypeicon"
                 />
               </li>
-              <li v-if="post.file.mimetype.indexOf(`ms-excel`) > -1">
+              <li
+                v-if="
+                  post.file &&
+                  post.file.mimetype &&
+                  post.file.mimetype.indexOf(`ms-excel`) > -1
+                "
+              >
                 <span style="font-weight: bold">文件类型：</span>
                 <img
                   src="@/assets/icon/filetype/xls.png"
                   class="filetypeicon"
                 />
               </li>
-              <li>
+              <li v-if="post.file && post.file.size">
                 <span style="font-weight: bold">文件大小：</span
                 >{{ fileSizeFormat() }}
               </li>
@@ -292,16 +356,29 @@ export default defineComponent({
       post: "post/show/post",
     }),
     postCoverURL() {
-      return `${API_BASE_URL}/covers/${this.post.cover.id}?size=thumbnail`;
+      if (this.post?.cover?.id) {
+        return `${API_BASE_URL}/covers/${this.post.cover.id}?size=thumbnail`;
+      }
+      return '';
     },
     postFileURL() {
-      return `${API_BASE_URL}/files/${this.post.file.id}`;
+      if (this.post?.file?.id) {
+        return `${API_BASE_URL}/files/${this.post.file.id}`;
+      }
+      return this.post?.file_url || '';
     },
     userAvatarURL() {
-      return `${API_BASE_URL}/users/${this.post.user.id}/avatar`;
+      if (this.post?.user?.id) {
+        return `${API_BASE_URL}/users/${this.post.user.id}/avatar`;
+      }
+      return '';
     },
 
     showPost() {
+      console.log("[PostShow.vue] showPost 计算:", {
+        loading: this.loading,
+        post: this.post,
+      });
       return !this.loading && this.post;
     },
   },
