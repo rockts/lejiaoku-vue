@@ -369,7 +369,8 @@
             class="form-control"
           />
           <p class="text-muted small mt-2 mb-0">
-            <i class="bi bi-lightbulb"></i> 提示：上传后系统可能自动补全封面、教材信息和简介（可稍后编辑）
+            <i class="bi bi-lightbulb"></i>
+            提示：上传后系统可能自动补全封面、教材信息和简介（可稍后编辑）
           </p>
         </div>
 
