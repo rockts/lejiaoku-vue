@@ -70,6 +70,13 @@ export default defineComponent({
   },
   async created() {
     await this.fetchResources();
+    
+    // 监听资源创建事件
+    window.addEventListener('resource-created', this.handleResourceCreated);
+  },
+  beforeUnmount() {
+    // 清理事件监听
+    window.removeEventListener('resource-created', this.handleResourceCreated);
   },
   computed: {
     filteredResources() {
@@ -116,30 +123,42 @@ export default defineComponent({
       this.loading = true;
       console.log("[Home] 开始获取资源列表...");
       console.log("[Home] 请求接口: GET /api/resources");
-      
+
       try {
         const response = await apiHttpClient.get("/api/resources");
-        
+
         console.log("[Home] 接口响应状态:", response.status);
         console.log("[Home] 接口返回数据:", response.data);
-        console.log("[Home] 返回数据类型:", Array.isArray(response.data) ? '数组' : typeof response.data);
-        console.log("[Home] 返回数据数量:", Array.isArray(response.data) ? response.data.length : 'N/A');
-        
+        console.log(
+          "[Home] 返回数据类型:",
+          Array.isArray(response.data) ? "数组" : typeof response.data
+        );
+        console.log(
+          "[Home] 返回数据数量:",
+          Array.isArray(response.data) ? response.data.length : "N/A"
+        );
+
         if (!Array.isArray(response.data)) {
           console.error("[Home] 错误: 接口返回数据不是数组", response.data);
           this.resources = [];
           return;
         }
-        
+
         if (response.data.length === 0) {
-          console.warn("[Home] 接口返回空数组 - 这是正常的数据状态(暂无approved资源)");
+          console.warn(
+            "[Home] 接口返回空数组 - 这是正常的数据状态(暂无approved资源)"
+          );
           this.resources = [];
           return;
         }
-        
+
         // 转换后端数据格式为前端需要的格式
         this.resources = response.data.map((item) => {
-          console.log("[Home] 处理资源项:", { id: item.id, title: item.title, category: item.category });
+          console.log("[Home] 处理资源项:", {
+            id: item.id,
+            title: item.title,
+            category: item.category,
+          });
           return {
             id: item.id,
             title: item.title,
@@ -152,10 +171,9 @@ export default defineComponent({
             recommended: false,
           };
         });
-        
+
         console.log("[Home] 成功加载资源数量:", this.resources.length);
         console.log("[Home] 转换后的资源数据:", this.resources);
-        
       } catch (error) {
         console.error("[Home] 接口请求失败:", error);
         console.error("[Home] 错误详情:", {
@@ -164,7 +182,7 @@ export default defineComponent({
           statusText: error.response?.statusText,
           data: error.response?.data,
         });
-        
+
         // 明确说明这是接口问题,不使用mock数据
         if (error.response?.status === 404) {
           console.error("[Home] 接口问题: /api/resources 不存在 (404)");
@@ -177,7 +195,7 @@ export default defineComponent({
         } else {
           console.error("[Home] 接口问题: 未知错误");
         }
-        
+
         this.resources = [];
       } finally {
         this.loading = false;
@@ -200,6 +218,11 @@ export default defineComponent({
         JPEG: "图片",
       };
       return formatMap[ext] || ext;
+    },
+    async handleResourceCreated() {
+      console.log('[Home] 收到资源创建事件,开始刷新列表...');
+      await this.fetchResources();
+      console.log('[Home] 资源列表刷新完成');
     },
   },
 });
