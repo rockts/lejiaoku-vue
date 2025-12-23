@@ -35,6 +35,18 @@
       </div>
     </div>
 
+    <!-- 创建资源测试 -->
+    <div class="mb-4">
+      <h4>创建资源测试</h4>
+      <button
+        @click="testCreateResource"
+        class="btn btn-success"
+        :disabled="loading"
+      >
+        测试 POST /api/resources
+      </button>
+    </div>
+
     <!-- 加载状态 -->
     <div v-if="loading" class="text-center my-4">
       <div class="spinner-border text-primary" role="status">
@@ -216,6 +228,45 @@ export default defineComponent({
       }
     };
 
+    const testCreateResource = async () => {
+      loading.value = true;
+      clearResults();
+      statusMessage.value = "正在请求 POST /api/resources...";
+      statusType.value = "info";
+
+      try {
+        // 最小元数据
+        const resourceData = {
+          title: "测试资源_" + Date.now(),
+          category: "课件",
+          file_format: "PDF",
+          file_url: "https://placeholder.example.com/test.pdf",
+          // 后端实际可能需要的字段
+          grade: "三年级",
+          subject: "数学",
+          version: "人教版",
+          description: "测试资源描述",
+        };
+
+        const response = await apiHttpClient.post("/api/resources", resourceData);
+        postsData.value = response.data;
+        statusMessage.value = `✓ 成功创建资源 (ID: ${response.data.id || response.data.insertId || 'N/A'})`;
+        statusType.value = "success";
+        console.log("创建资源成功:", response.data);
+      } catch (error: any) {
+        errorData.value = {
+          status: error.response?.status || "Unknown",
+          message: error.message,
+          data: error.response?.data || error,
+        };
+        statusMessage.value = `✗ 请求失败: ${error.message}`;
+        statusType.value = "error";
+        console.error("创建资源失败:", error.response?.data || error);
+      } finally {
+        loading.value = false;
+      }
+    };
+
     return {
       loading,
       statusMessage,
@@ -229,6 +280,7 @@ export default defineComponent({
       testUserApi,
       testPostsApi,
       testClassificationsApi,
+      testCreateResource,
     };
   },
 });
