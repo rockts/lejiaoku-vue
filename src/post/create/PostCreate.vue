@@ -60,12 +60,33 @@
               <select class="form-control">
                 <option selected>年级</option>
                 <option>一年级上册</option>
+                <option>一年级下册</option>
+                <option>二年级上册</option>
+                <option>二年级下册</option>
+                <option>三年级上册</option>
+                <option>三年级下册</option>
+                <option>四年级上册</option>
+                <option>四年级下册</option>
+                <option>五年级上册</option>
+                <option>五年级下册</option>
+                <option>六年级上册</option>
+                <option>六年级下册</option>
               </select>
             </div>
             <div class="col-md-3">
               <select class="form-control">
                 <option selected>学科</option>
                 <option>语文</option>
+                <option>数学</option>
+                <option>英语</option>
+                <option>道德与法治</option>
+                <option>科学</option>
+                <option>物理</option>
+                <option>化学</option>
+                <option>生物</option>
+                <option>地理</option>
+                <option>历史</option>
+                <option>政治</option>
               </select>
             </div>
             <div class="col-md-3">
@@ -178,15 +199,17 @@ export default defineComponent({
     ClassificationsOption,
   },
   name: "PostCreate",
+  props: {
+    user: {
+      type: Object,
+      default: null,
+    },
+  },
   data() {
     return {
       errorMessage: "",
       successMessage: "",
       isSubmitting: false,
-      user: {
-        email: "",
-        password: "",
-      },
       token: "",
       title: "",
       category: "",
