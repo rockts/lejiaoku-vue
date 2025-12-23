@@ -9,6 +9,7 @@
 import { RouteRecordRaw } from 'vue-router';
 import UserLogin from './login/user-login.vue';
 import UserRegister from './register/user-register.vue';
+import MyResources from './resources/MyResources.vue';
 
 /**
  * 定义路由
@@ -23,6 +24,11 @@ const routes: Array<RouteRecordRaw> = [
   path: '/register',
   name: 'UserRegister',
   component: UserRegister,
+ },
+ {
+  path: '/me/resources',
+  name: 'MyResources',
+  component: MyResources,
  },
 ];
 

@@ -3,6 +3,12 @@ module.exports = {
   transpileDependencies: ['vue-router'],
   devServer: {
     port: 8080,
+    proxy: {
+      '/uploads': {
+        target: 'http://localhost:3333',
+        changeOrigin: true,
+      },
+    },
   },
   chainWebpack: (config) => {
     try {

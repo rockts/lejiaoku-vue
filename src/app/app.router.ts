@@ -11,6 +11,7 @@ import postRoutes from '@/post/post.routes';
 import classificationsRoutes from '@/classifications/classifications.routes';
 import userRoutes from '@/user/user.routes';
 import testRoutes from '@/test/test.routes';
+import adminRoutes from '@/admin/admin.routes';
 
 /**
  * 创建路由器
@@ -18,7 +19,7 @@ import testRoutes from '@/test/test.routes';
 
 const router = createRouter({
     history: createWebHistory(),
-    routes: [...appRoutes, ...postRoutes, ...classificationsRoutes, ...userRoutes, ...testRoutes],
+    routes: [...appRoutes, ...postRoutes, ...classificationsRoutes, ...userRoutes, ...testRoutes, ...adminRoutes],
 });
 
 // const HAS_LOGINED = false;

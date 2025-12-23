@@ -152,26 +152,42 @@ export default defineComponent({
           return;
         }
 
-        // 转换后端数据格式为前端需要的格式
-        this.resources = response.data.map((item) => {
-          console.log("[Home] 处理资源项:", {
-            id: item.id,
-            title: item.title,
-            category: item.category,
+        // 转换后端数据格式为前端需要的格式，并过滤非 approved 状态的资源
+        this.resources = response.data
+          .filter((item) => {
+            // 只显示已审核通过的资源
+            if (item.status !== "approved") {
+              console.log(
+                "[Home] 过滤掉未审核资源:",
+                item.id,
+                item.title,
+                "status:",
+                item.status
+              );
+              return false;
+            }
+            return true;
+          })
+          .map((item) => {
+            console.log("[Home] 处理资源项:", {
+              id: item.id,
+              title: item.title,
+              category: item.category,
+            });
+            return {
+              id: item.id,
+              title: item.title,
+              category: item.category || "其他",
+              format: this.guessFormat(item.file?.filename || item.file_format),
+              subject: item.subject || "未分类",
+              grade: item.grade || "未分级",
+              downloads: item.totalDownloads || 0,
+              createdAt: new Date(item.created_at).getTime(),
+              recommended: false,
+              fileUrl: item.file?.url || item.file_url, // 文件下载 URL
+              coverUrl: item.cover_url, // 封面图 URL
+            };
           });
-          return {
-            id: item.id,
-            title: item.title,
-            category: item.category || "其他",
-            format: this.guessFormat(item.file?.filename || item.file_format),
-            subject: item.subject || "未分类",
-            grade: item.grade || "未分级",
-            downloads: item.totalDownloads || 0,
-            createdAt: new Date(item.created_at).getTime(),
-            recommended: false,
-            fileUrl: item.file?.url || item.file_url, // 文件下载URL
-          };
-        });
 
         console.log("[Home] 成功加载资源数量:", this.resources.length);
         console.log("[Home] 转换后的资源数据:", this.resources);

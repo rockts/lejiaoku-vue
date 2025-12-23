@@ -326,6 +326,16 @@ export default defineComponent({
 
     async createPost() {
       console.log("[PostCreate] 开始创建资源...");
+      console.log("[PostCreate] 当前表单数据:", {
+        title: this.title,
+        category: this.category,
+        grade: this.grade,
+        subject: this.subject,
+        version: this.version,
+        description: this.description,
+        hasFile: !!this.file,
+        hasCover: !!this.cover,
+      });
 
       // 清空之前的消息
       this.errorMessage = "";
@@ -355,6 +365,10 @@ export default defineComponent({
           formData.append("version", this.version);
         }
 
+        if (this.description) {
+          formData.append("description", this.description);
+        }
+
         // 添加文件（如果有）
         if (this.file) {
           formData.append("file", this.file);
@@ -368,6 +382,18 @@ export default defineComponent({
           this.errorMessage = "请选择要上传的文件";
           this.isSubmitting = false;
           return;
+        }
+
+        // 添加封面文件（如果有）
+        if (this.cover) {
+          formData.append("cover", this.cover);
+          console.log("[PostCreate] 上传封面:", {
+            name: this.cover.name,
+            size: this.cover.size,
+            type: this.cover.type,
+          });
+        } else {
+          console.log("[PostCreate] 没有选择封面，将使用默认封面");
         }
 
         // 打印 FormData 内容（调试用）

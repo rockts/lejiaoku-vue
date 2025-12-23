@@ -5,7 +5,7 @@
       <div class="res__header shadow bg-body rounded">
         <div class="row">
           <div class="col-md-4">
-            <div v-if="post.cover" class="cover">
+            <div v-if="postCoverURL" class="cover">
               <img
                 :src="postCoverURL"
                 :alt="`${post.title}`"
@@ -47,7 +47,7 @@
                 </li>
                 <li>
                   <button
-                    @click="onClick()"
+                    @click="showDownloadModal = true"
                     class="btn btn-outline-success"
                     alt="100"
                   >
@@ -93,21 +93,22 @@
         <hr />
         <div class="card-body">
           <h5>资源介绍</h5>
-          <p class="card-text">
+          <p class="card-text" v-if="post.description">
             {{ post.description }}
           </p>
+          <p class="card-text text-muted" v-else>暂无资源介绍</p>
           <div>
             <ul class="res__attr">
-              <li>
+              <li v-if="post.subject">
                 <span style="font-weight: bold">学科：</span>{{ post.subject }}
               </li>
-              <li>
+              <li v-if="post.grade">
                 <span style="font-weight: bold">年级：</span>{{ post.grade }}
               </li>
-              <li>
-                <span style="font-weight: bold">版本：</span>{{ post.version }}
+              <li v-if="post.textbook">
+                <span style="font-weight: bold">版本：</span>{{ post.textbook }}
               </li>
-              <li>
+              <li v-if="post.category">
                 <span style="font-weight: bold">资源类型：</span
                 >{{ post.category }}
               </li>
@@ -320,6 +321,63 @@
       </div>
     </div>
   </div>
+
+  <!-- 下载确认弹窗 -->
+  <Teleport to="body">
+    <div
+      class="modal fade"
+      :class="{ show: showDownloadModal }"
+      :style="{ display: showDownloadModal ? 'block' : 'none' }"
+      tabindex="-1"
+      @click.self="showDownloadModal = false"
+      v-if="showDownloadModal"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title"><i class="bi bi-download"></i> 确认下载</h5>
+            <button
+              type="button"
+              class="close"
+              @click="showDownloadModal = false"
+            >
+              <span>&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p class="mb-2">您确定要下载以下资源吗？</p>
+            <div class="download-info">
+              <strong>{{ post.title }}</strong>
+              <div class="text-muted small mt-1" v-if="post.category">
+                {{ post.category }} · {{ post.file_format || "PDF" }}
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              @click="showDownloadModal = false"
+            >
+              取消
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="confirmDownload"
+            >
+              <i class="bi bi-download"></i> 确认下载
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="modal-backdrop fade show"
+      v-if="showDownloadModal"
+      @click="showDownloadModal = false"
+    ></div>
+  </Teleport>
 </template>
 
 <script>
@@ -346,6 +404,12 @@ export default defineComponent({
     },
   },
 
+  data() {
+    return {
+      showDownloadModal: false,
+    };
+  },
+
   created() {
     this.getPostById(this.postId);
   },
@@ -356,9 +420,15 @@ export default defineComponent({
       post: "post/show/post",
     }),
     postCoverURL() {
-      if (this.post?.cover?.id) {
-        return `${API_BASE_URL}/covers/${this.post.cover.id}?size=thumbnail`;
+      console.log("[PostShow] post 对象:", this.post);
+      console.log("[PostShow] description 值:", this.post?.description);
+      console.log("[PostShow] grade 值:", this.post?.grade);
+
+      if (this.post?.cover_url) {
+        console.log("[PostShow] 封面URL:", this.post.cover_url);
+        return this.post.cover_url;
       }
+      console.log("[PostShow] 没有封面URL");
       return "";
     },
     postFileURL() {
@@ -404,30 +474,20 @@ export default defineComponent({
     }),
 
     onClick() {
-      // 检查是否有文件信息
-      if (this.post?.file?.id) {
-        // 有 file 对象,使用文件 ID 下载
-        axios({
-          url: `${API_BASE_URL}/files/${this.post.file.id}`,
-          method: "GET",
-          responseType: "blob",
-        }).then((response) => {
-          const fileURL = window.URL.createObjectURL(new Blob([response.data]));
-          const fileLink = document.createElement("a");
-
-          fileLink.href = fileURL;
-          fileLink.setAttribute("download", `${this.post.file.filename}`);
-          document.body.appendChild(fileLink);
-
-          fileLink.click();
-        });
-      } else if (this.post?.file_url) {
-        // 只有 file_url,直接打开
-        window.open(this.post.file_url, "_blank");
-      } else {
-        console.warn("[PostShow] 没有可下载的文件");
-        alert("该资源暂无可下载文件");
+      // 确认下载
+      if (confirm(`确定要下载《${this.post.title}》吗？`)) {
+        // 使用后端下载接口
+        const downloadUrl = `${API_BASE_URL}/api/resources/${this.post.id}/download`;
+        console.log("[PostShow] 下载文件:", downloadUrl);
+        window.open(downloadUrl, "_blank");
       }
+    },
+    confirmDownload() {
+      // 使用后端下载接口
+      const downloadUrl = `${API_BASE_URL}/api/resources/${this.post.id}/download`;
+      console.log("[PostShow] 下载文件:", downloadUrl);
+      window.open(downloadUrl, "_blank");
+      this.showDownloadModal = false;
     },
   },
 
@@ -506,5 +566,79 @@ export default defineComponent({
 
 .embed {
   height: 500px;
+}
+
+/* Modal 样式 */
+.modal {
+  z-index: 1050;
+  overflow: auto;
+}
+.modal.show {
+  display: block !important;
+}
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1040;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+.modal-dialog {
+  margin: 1.75rem auto;
+  max-width: 500px;
+}
+.modal-dialog-centered {
+  display: flex;
+  align-items: center;
+  min-height: calc(100vh - 3.5rem);
+}
+.modal-content {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+.modal-header {
+  border-bottom: 1px solid #e9ecef;
+  padding: 1.25rem 1.5rem;
+}
+.modal-header .close {
+  padding: 0;
+  margin: -1rem -1rem -1rem auto;
+  background: transparent;
+  border: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #000;
+  opacity: 0.5;
+  cursor: pointer;
+}
+.modal-header .close:hover {
+  opacity: 0.75;
+}
+.modal-body {
+  padding: 1.5rem;
+}
+.modal-footer {
+  border-top: 1px solid #e9ecef;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+.download-info {
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 3px solid #007bff;
+}
+.modal-header .bi {
+  margin-right: 8px;
+  color: #007bff;
+}
+.modal-footer .btn .bi {
+  margin-right: 4px;
 }
 </style>
