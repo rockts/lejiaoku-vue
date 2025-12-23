@@ -15,21 +15,21 @@ import MyResources from './resources/MyResources.vue';
  * 定义路由
  */
 const routes: Array<RouteRecordRaw> = [
- {
-  path: '/login',
-  name: 'UserLogin',
-  component: UserLogin,
- },
- {
-  path: '/register',
-  name: 'UserRegister',
-  component: UserRegister,
- },
- {
-  path: '/me/resources',
-  name: 'MyResources',
-  component: MyResources,
- },
+    {
+        path: '/login',
+        name: 'UserLogin',
+        component: UserLogin,
+    },
+    {
+        path: '/register',
+        name: 'UserRegister',
+        component: UserRegister,
+    },
+    {
+        path: '/me/resources',
+        name: 'MyResources',
+        component: MyResources,
+    },
 ];
 
 export default routes;

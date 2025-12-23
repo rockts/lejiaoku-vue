@@ -166,6 +166,13 @@ export default defineComponent({
               );
               return false;
             }
+
+            // 过滤视频资源
+            if (item.category === "视频" || item.category === "video") {
+              console.log("[Home] 过滤掉视频资源:", item.id, item.title);
+              return false;
+            }
+
             return true;
           })
           .map((item) => {

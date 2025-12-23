@@ -14,6 +14,10 @@
       <span class="badge format">{{ item.format }}</span>
       <span class="muted">{{ item.subject }} · {{ item.grade }}</span>
     </div>
+    <!-- 章节信息（可选） -->
+    <div class="resource-chapter" v-if="item.chapterInfo">
+      <i class="bi bi-bookmark"></i> {{ item.chapterInfo }}
+    </div>
     <div class="resource-actions">
       <button class="btn btn-sm btn-outline-primary" @click.stop="onPreview">
         预览
@@ -139,22 +143,26 @@ export default defineComponent({
 .resource-card:hover {
   transform: translateY(-2px);
 }
-.resource-cover {
+.resource-card .resource-cover {
   width: 100%;
   height: 160px;
   border-radius: 8px;
   overflow: hidden;
   margin-bottom: 12px;
-  background: rgba(var(--surface-rgb), 1);
+  background: #f8f9fa;
   border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: relative;
 }
-.resource-cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.resource-card .resource-cover img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  display: block !important;
 }
 .resource-cover.placeholder {
   background: linear-gradient(
@@ -202,6 +210,21 @@ export default defineComponent({
 .muted {
   color: var(--muted);
   font-size: 13px;
+}
+.resource-chapter {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.resource-chapter i {
+  font-size: 11px;
+  flex-shrink: 0;
 }
 .resource-actions {
   display: flex;

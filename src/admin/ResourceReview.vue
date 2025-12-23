@@ -78,7 +78,20 @@ export default defineComponent({
         const response = await apiHttpClient.get("/api/admin/resources", {
           params: { status: "pending" },
         });
-        this.resources = response.data;
+
+        // 过滤视频资源
+        this.resources = response.data.filter((item) => {
+          if (item.category === "视频" || item.category === "video") {
+            console.log(
+              "[ResourceReview] 过滤掉视频资源:",
+              item.id,
+              item.title
+            );
+            return false;
+          }
+          return true;
+        });
+
         console.log("[ResourceReview] 获取待审核资源:", this.resources.length);
         console.log("[ResourceReview] 资源详情:", this.resources);
         // 检查每个资源的 grade 字段

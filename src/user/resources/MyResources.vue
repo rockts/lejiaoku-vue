@@ -25,12 +25,9 @@
         <tr v-for="resource in resources" :key="resource.id">
           <td>{{ resource.id }}</td>
           <td>{{ resource.title }}</td>
-          <td>{{ resource.category || '-' }}</td>
+          <td>{{ resource.category || "-" }}</td>
           <td>
-            <span 
-              class="badge" 
-              :class="getStatusClass(resource.status)"
-            >
+            <span class="badge" :class="getStatusClass(resource.status)">
               {{ getStatusText(resource.status) }}
             </span>
           </td>
@@ -41,11 +38,11 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
-import { apiHttpClient } from '@/app/app.service';
+import { defineComponent } from "vue";
+import { apiHttpClient } from "@/app/app.service";
 
 export default defineComponent({
-  name: 'MyResources',
+  name: "MyResources",
 
   data() {
     return {
@@ -62,12 +59,24 @@ export default defineComponent({
     async fetchMyResources() {
       this.loading = true;
       try {
-        const response = await apiHttpClient.get('/api/my/resources');
-        this.resources = response.data;
-        console.log('[MyResources] 获取资源:', this.resources.length);
+        const response = await apiHttpClient.get("/api/my/resources");
+
+        // 过滤视频资源
+        this.resources = response.data.filter((item) => {
+          if (item.category === "视频" || item.category === "video") {
+            console.log("[MyResources] 过滤掉视频资源:", item.id, item.title);
+            return false;
+          }
+          return true;
+        });
+
+        console.log("[MyResources] 获取资源:", this.resources.length);
       } catch (error) {
-        console.error('[MyResources] 获取资源失败:', error);
-        alert('获取资源列表失败: ' + (error.response?.data?.message || error.message));
+        console.error("[MyResources] 获取资源失败:", error);
+        alert(
+          "获取资源列表失败: " +
+            (error.response?.data?.message || error.message)
+        );
       } finally {
         this.loading = false;
       }
@@ -75,20 +84,20 @@ export default defineComponent({
 
     getStatusText(status) {
       const statusMap = {
-        'pending': '待审核',
-        'approved': '已通过',
-        'rejected': '已拒绝',
+        pending: "待审核",
+        approved: "已通过",
+        rejected: "已拒绝",
       };
-      return statusMap[status] || status || '未知';
+      return statusMap[status] || status || "未知";
     },
 
     getStatusClass(status) {
       const classMap = {
-        'pending': 'badge-warning',
-        'approved': 'badge-success',
-        'rejected': 'badge-danger',
+        pending: "badge-warning",
+        approved: "badge-success",
+        rejected: "badge-danger",
       };
-      return classMap[status] || 'badge-secondary';
+      return classMap[status] || "badge-secondary";
     },
   },
 });

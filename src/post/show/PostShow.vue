@@ -97,6 +97,50 @@
             {{ post.description }}
           </p>
           <p class="card-text text-muted" v-else>暂无资源介绍</p>
+
+          <!-- AI 识别状态提示（仅 pending 时显示） -->
+          <div v-if="post.auto_meta_status === 'pending'" class="mt-2">
+            <p class="text-muted small mb-0">
+              <i class="bi bi-hourglass-split"></i>
+              系统正在分析资源元信息，稍后可能自动补全封面和教材信息
+            </p>
+          </div>
+
+          <!-- 章节信息（可选） -->
+          <div v-if="post.chapter_info" class="mt-3">
+            <h5>章节信息</h5>
+            <p class="text-muted">
+              <i class="bi bi-bookmark"></i> {{ post.chapter_info }}
+            </p>
+          </div>
+
+          <!-- 教材信息（可选） -->
+          <div v-if="post.textbook_info" class="mt-3">
+            <h5>教材信息</h5>
+            <ul class="res__attr">
+              <li v-if="post.textbook_info.stage">
+                <span style="font-weight: bold">学段：</span
+                >{{ post.textbook_info.stage }}
+              </li>
+              <li v-if="post.textbook_info.grade">
+                <span style="font-weight: bold">年级：</span
+                >{{ post.textbook_info.grade }}
+              </li>
+              <li v-if="post.textbook_info.subject">
+                <span style="font-weight: bold">学科：</span
+                >{{ post.textbook_info.subject }}
+              </li>
+              <li v-if="post.textbook_info.volume">
+                <span style="font-weight: bold">册别：</span
+                >{{ post.textbook_info.volume }}
+              </li>
+              <li v-if="post.textbook_info.version">
+                <span style="font-weight: bold">教材版本：</span
+                >{{ post.textbook_info.version }}
+              </li>
+            </ul>
+          </div>
+
           <div>
             <ul class="res__attr">
               <li v-if="post.subject">
