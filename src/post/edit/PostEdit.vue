@@ -103,35 +103,97 @@
 
         <!-- 封面信息 -->
         <div class="card shadow-sm mb-4">
-          <div class="card-header bg-white">
-            <h5 class="mb-0"><i class="bi bi-image"></i> 封面 URL（可选）</h5>
+          <div
+            class="card-header bg-white d-flex align-items-center justify-content-between"
+          >
+            <h5 class="mb-0"><i class="bi bi-image"></i> 封面（可选）</h5>
+            <div v-if="editForm.cover_url" class="d-flex align-items-center">
+              <button
+                type="button"
+                class="btn btn-outline-danger btn-sm ms-2"
+                @click="removeCover"
+              >
+                <i class="bi bi-trash"></i> 删除
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-secondary btn-sm ms-2"
+                @click="replaceCover"
+              >
+                <i class="bi bi-arrow-repeat"></i> 替换
+              </button>
+            </div>
           </div>
           <div class="card-body">
             <div class="row">
               <div class="col-md-4">
-                <div v-if="editForm.cover_url" class="mb-3">
+                <div v-if="editForm.cover_url" class="mb-3 text-center">
                   <img
                     :src="editForm.cover_url"
-                    class="img-thumbnail img-fluid"
+                    class="img-thumbnail img-fluid mb-2"
                     alt="封面"
                   />
+                  <div>
+                    <a
+                      :href="editForm.cover_url"
+                      target="_blank"
+                      class="btn btn-link btn-sm"
+                      >新窗口预览</a
+                    >
+                  </div>
+                </div>
+                <div
+                  v-else
+                  class="mb-3 text-center text-muted"
+                  style="
+                    height: 120px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border: 1px dashed #ccc;
+                    border-radius: 8px;
+                  "
+                >
+                  <span>暂无封面</span>
                 </div>
               </div>
               <div class="col-md-8">
                 <div class="mb-3">
-                  <label class="form-label">封面 URL</label>
+                  <label class="form-label">封面图片</label>
                   <input
-                    v-model="editForm.cover_url"
-                    type="text"
-                    class="form-control"
-                    placeholder="https://example.com/cover.jpg"
+                    ref="coverFileInput"
+                    type="file"
+                    accept="image/*"
+                    class="form-control mb-2"
+                    style="max-width: 300px"
+                    @change="handleCoverUpload"
                   />
-                  <small class="form-text text-muted">输入图片 URL 地址</small>
+                  <div class="d-flex align-items-center mb-2">
+                    <span class="me-2">或输入图片 URL：</span>
+                    <input
+                      v-model="editForm.cover_url"
+                      type="text"
+                      class="form-control"
+                      placeholder="https://example.com/cover.jpg"
+                      style="max-width: 300px"
+                    />
+                  </div>
+                  <small class="form-text text-muted"
+                    >支持本地上传或粘贴图片链接</small
+                  >
                 </div>
               </div>
             </div>
           </div>
         </div>
+        // 封面上传/删除/替换 handleCoverUpload(e) { const file =
+        e.target.files[0]; if (!file) return; //
+        简单本地预览（如需上传到服务器可扩展） const reader = new FileReader();
+        reader.onload = (ev) => { this.editForm.cover_url = ev.target.result; };
+        reader.readAsDataURL(file); }, removeCover() { this.editForm.cover_url =
+        ""; if (this.$refs.coverFileInput) this.$refs.coverFileInput.value = "";
+        }, replaceCover() { this.removeCover(); if (this.$refs.coverFileInput)
+        this.$refs.coverFileInput.click(); },
 
         <!-- 提交按钮 -->
         <div class="mb-4">
@@ -362,5 +424,6 @@ export default defineComponent({
 .img-thumbnail {
   max-height: 200px;
   object-fit: cover;
+  border-radius: 8px;
 }
 </style>
