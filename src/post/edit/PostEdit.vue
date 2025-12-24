@@ -104,29 +104,128 @@
         <!-- 封面信息 -->
         <div class="card shadow-sm mb-4">
           <div class="card-header bg-white">
-            <h5 class="mb-0"><i class="bi bi-image"></i> 封面 URL（可选）</h5>
+            <h5 class="mb-0"><i class="bi bi-image"></i> 资源封面</h5>
           </div>
           <div class="card-body">
-            <div class="row">
-              <div class="col-md-4">
-                <div v-if="editForm.cover_url" class="mb-3">
-                  <img
-                    :src="editForm.cover_url"
-                    class="img-thumbnail img-fluid"
-                    alt="封面"
-                  />
+            <div v-if="editForm.cover_url" class="cover-preview-container mb-3">
+              <div class="cover-preview">
+                <img
+                  :src="getCoverUrl(editForm.cover_url)"
+                  class="cover-image"
+                  alt="封面预览"
+                  @error="handleImageError"
+                />
+                <div class="cover-actions">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-light"
+                    @click="previewCover"
+                    title="预览"
+                  >
+                    <i class="bi bi-eye"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-light"
+                    @click="$refs.coverInput.click()"
+                    title="替换"
+                  >
+                    <i class="bi bi-arrow-repeat"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-danger"
+                    @click="removeCover"
+                    title="删除"
+                  >
+                    <i class="bi bi-trash"></i>
+                  </button>
                 </div>
               </div>
-              <div class="col-md-8">
-                <div class="mb-3">
-                  <label class="form-label">封面 URL</label>
-                  <input
-                    v-model="editForm.cover_url"
-                    type="text"
-                    class="form-control"
-                    placeholder="https://example.com/cover.jpg"
-                  />
-                  <small class="form-text text-muted">输入图片 URL 地址</small>
+            </div>
+
+            <div v-else class="upload-area" @click="$refs.coverInput.click()">
+              <i class="bi bi-cloud-upload upload-icon"></i>
+              <p class="mb-1">点击上传封面图片</p>
+              <small class="text-muted">支持 JPG、PNG 格式，建议尺寸 800x600</small>
+            </div>
+
+            <input
+              ref="coverInput"
+              type="file"
+              class="d-none"
+              accept="image/*"
+              @change="handleCoverUpload"
+            />
+
+            <div v-if="coverUploading" class="mt-2">
+              <div class="progress">
+                <div
+                  class="progress-bar progress-bar-striped progress-bar-animated"
+                  role="progressbar"
+                  :style="{ width: coverUploadProgress + '%' }"
+                >
+                  {{ coverUploadProgress }}%
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 资源文件信息 -->
+        <div class="card shadow-sm mb-4">
+          <div class="card-header bg-white">
+            <h5 class="mb-0"><i class="bi bi-file-earmark"></i> 资源文件</h5>
+          </div>
+          <div class="card-body">
+            <div v-if="resource.file_url" class="file-info-container">
+              <div class="file-info">
+                <div class="file-icon">
+                  <i :class="getFileIcon(resource.format)"></i>
+                </div>
+                <div class="file-details">
+                  <div class="file-name">{{ resource.filename || '资源文件' }}</div>
+                  <div class="file-meta">
+                    <span class="badge bg-secondary me-2">{{ resource.format }}</span>
+                    <span class="text-muted">{{ formatFileSize(resource.size) }}</span>
+                  </div>
+                </div>
+                <div class="file-actions">
+                  <a
+                    :href="getFileUrl(resource.file_url)"
+                    target="_blank"
+                    class="btn btn-sm btn-outline-primary me-2"
+                    title="预览/下载"
+                  >
+                    <i class="bi bi-eye"></i> 预览
+                  </a>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                    @click="$refs.fileInput.click()"
+                    title="替换文件"
+                  >
+                    <i class="bi bi-arrow-repeat"></i> 替换
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <input
+              ref="fileInput"
+              type="file"
+              class="d-none"
+              @change="handleFileUpload"
+            />
+
+            <div v-if="fileUploading" class="mt-3">
+              <div class="progress">
+                <div
+                  class="progress-bar progress-bar-striped progress-bar-animated"
+                  role="progressbar"
+                  :style="{ width: fileUploadProgress + '%' }"
+                >
+                  {{ fileUploadProgress }}%
                 </div>
               </div>
             </div>
@@ -134,20 +233,24 @@
         </div>
 
         <!-- 提交按钮 -->
-        <div class="mb-4">
+        <div class="mb-4 d-flex gap-3">
           <button
             type="button"
             @click="submitEdit"
-            class="btn btn-primary btn-lg"
+            class="btn btn-primary btn-lg px-5"
             :disabled="isSaving || !isEditFormValid"
           >
+            <i class="bi bi-check-circle me-2"></i>
             {{ isSaving ? "保存中..." : "保存修改" }}
           </button>
           <button
             type="button"
             @click="$router.back()"
-            class="btn btn-secondary btn-lg ms-2"
+            class="btn btn-outline-secondary btn-lg px-5"
           >
+            <i class="bi bi-x-circle me-2"></i>取消
+          </button>
+        </div>
             取消
           </button>
         </div>
@@ -208,6 +311,10 @@ export default defineComponent({
       isSaving: false,
       successMessage: "",
       errorMessage: "",
+      coverUploading: false,
+      coverUploadProgress: 0,
+      fileUploading: false,
+      fileUploadProgress: 0,
       editForm: {
         title: "",
         category: "",
@@ -286,6 +393,302 @@ export default defineComponent({
 
       const mappedField = fieldMap[fieldName];
       return autoMeta[mappedField] || null;
+    },
+
+    getCoverUrl(url) {
+      if (!url) return "";
+      if (url.startsWith("http")) return url;
+      return `${API_BASE_URL}${url}`;
+    },
+
+    getFileUrl(url) {
+      if (!url) return "";
+      if (url.startsWith("http")) return url;
+      return `${API_BASE_URL}${url}`;
+    },
+
+    getFileIcon(format) {
+      const iconMap = {
+        pdf: "bi bi-file-pdf-fill text-danger",
+        doc: "bi bi-file-word-fill text-primary",
+        docx: "bi bi-file-word-fill text-primary",
+        ppt: "bi bi-file-ppt-fill text-warning",
+        pptx: "bi bi-file-ppt-fill text-warning",
+        xls: "bi bi-file-excel-fill text-success",
+        xlsx: "bi bi-file-excel-fill text-success",
+        zip: "bi bi-file-zip-fill text-secondary",
+        rar: "bi bi-file-zip-fill text-secondary",
+      };
+      return iconMap[format?.toLowerCase()] || "bi bi-file-earmark-fill";
+    },
+
+    formatFileSize(bytes) {
+      if (!bytes) return "未知大小";
+      const mb = bytes / (1024 * 1024);
+      return mb.toFixed(2) + " MB";
+    },
+
+    handleImageError(e) {
+      e.target.src = "https://via.placeholder.com/400x300?text=封面加载失败";
+    },
+
+    previewCover() {
+      window.open(this.getCoverUrl(this.editForm.cover_url), "_blank");
+    },
+
+    removeCover() {
+      if (confirm("确定要删除封面吗？")) {
+        this.editForm.cover_url = "";
+        notification.info("封面已删除，记得保存修改");
+      }
+    },
+
+    async handleCoverUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      // 验证文件类型
+      if (!file.type.startsWith("image/")) {
+        notification.error("请选择图片文件");
+        return;
+      }
+
+      // 验证文件大小（限制5MB）
+      if (file.size > 5 * 1024 * 1024) {
+        notification.error("封面图片不能超过5MB");
+        return;
+      }
+
+  border-radius: 8px;
+}
+
+.card-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 8px 8px 0 0;
+}
+
+.card-header h5 {
+  color: white;
+  margin: 0;
+}
+
+.form-label {
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+/* 封面预览容器 */
+.cover-preview-container {
+  display: flex;
+  justify-content: center;
+}
+
+.cover-preview {
+  position: relative;
+  width: 400px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cover-image {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  display: block;
+}
+
+.cover-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.cover-actions .btn {
+  opacity: 0.9;
+  backdrop-filter: blur(5px);
+}
+
+.cover-actions .btn:hover {
+  opacity: 1;
+}
+
+/* 上传区域 */
+.upload-area {
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  padding: 60px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.upload-area:hover {
+  border-color: #667eea;
+  background-color: #f8f9ff;
+}
+
+.upload-icon {
+  font-size: 4rem;
+  color: #667eea;
+  margin-bottom: 1rem;
+}
+
+/* 文件信息容器 */
+.file-info-container {
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.file-icon {
+  font-size: 3rem;
+  flex-shrink: 0;
+}
+
+.file-details {
+  flex-grow: 1;
+}
+
+.file-name {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.file-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.file-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* 按钮样式统一 */
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  font-weight: 500;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-outline-secondary {
+  border-color: #6c757d;
+  color: #6c757d;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #6c757d;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.gap-3 {
+  gap: 1rem;
+}
+
+/* 进度条 */
+.progress {
+  height: 24px;
+  border-radius: 12px;
+}
+
+.progress-bar {
+  font-weight: 600
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+            onUploadProgress: (progressEvent) => {
+              this.coverUploadProgress = Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total
+              );
+            },
+          }
+        );
+
+        this.editForm.cover_url = response.data.cover_url;
+        notification.success("封面上传成功！");
+      } catch (error) {
+        console.error("[PostEdit] 封面上传失败:", error);
+        notification.error(
+          error.response?.data?.message || "封面上传失败，请重试"
+        );
+      } finally {
+        this.coverUploading = false;
+        event.target.value = ""; // 清空input
+      }
+    },
+
+    async handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      // 验证文件大小（限制100MB）
+      if (file.size > 100 * 1024 * 1024) {
+        notification.error("文件不能超过100MB");
+        return;
+      }
+
+      if (
+        !confirm(
+          `确定要替换当前资源文件吗？\n新文件：${file.name}\n大小：${this.formatFileSize(file.size)}`
+        )
+      ) {
+        return;
+      }
+
+      this.fileUploading = true;
+      this.fileUploadProgress = 0;
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const response = await apiHttpClient.post(
+          `/api/resources/${this.id}/file`,
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+            onUploadProgress: (progressEvent) => {
+              this.fileUploadProgress = Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total
+              );
+            },
+          }
+        );
+
+        // 更新资源文件信息
+        this.resource.file_url = response.data.file_url;
+        this.resource.filename = response.data.filename;
+        this.resource.format = response.data.format;
+        this.resource.size = response.data.size;
+
+        notification.success("资源文件替换成功！");
+      } catch (error) {
+        console.error("[PostEdit] 文件上传失败:", error);
+        notification.error(
+          error.response?.data?.message || "文件上传失败，请重试"
+        );
+      } finally {
+        this.fileUploading = false;
+        event.target.value = ""; // 清空input
+      }
     },
 
     async submitEdit() {
