@@ -44,15 +44,6 @@ const routes: Array<RouteRecordRaw> = [
         path: '/posts/create',
         redirect: '/resources/create',
     },
-    // Admin 历史路径重定向
-    {
-        path: '/admin/resources',
-        redirect: '/resources',
-    },
-    {
-        path: '/admin/resources/:id',
-        redirect: (to) => ({ path: `/resources/${to.params.id}` }),
-    },
 ];
 
 export default routes;
