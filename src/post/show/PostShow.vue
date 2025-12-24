@@ -130,9 +130,10 @@ export default defineComponent({
       // 优先级2：如果存在 auto_meta_result，显示 AI 识别教材
       if (this.resource?.auto_meta_result?.textbook_info) {
         const textbookInfo = this.resource.auto_meta_result.textbook_info;
-        const units = this.resource.auto_meta_result.textbook_structure?.map(
-          (unit) => unit.name
-        ) || [];
+        const units =
+          this.resource.auto_meta_result.textbook_structure?.map(
+            (unit) => unit.name
+          ) || [];
 
         return {
           isCatalog: false,
