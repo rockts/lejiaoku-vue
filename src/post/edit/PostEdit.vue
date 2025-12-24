@@ -19,7 +19,9 @@
           </div>
           <div class="card-body">
             <div class="mb-3">
-              <label class="form-label">资源标题 <span class="text-danger">*</span></label>
+              <label class="form-label"
+                >资源标题 <span class="text-danger">*</span></label
+              >
               <input
                 v-model="editForm.title"
                 type="text"
@@ -29,7 +31,9 @@
             </div>
 
             <div class="mb-3">
-              <label class="form-label">资源分类 <span class="text-danger">*</span></label>
+              <label class="form-label"
+                >资源分类 <span class="text-danger">*</span></label
+              >
               <select v-model="editForm.category" class="form-control">
                 <option value="">选择分类</option>
                 <option>教材</option>
@@ -108,7 +112,11 @@
             <div class="row">
               <div class="col-md-4">
                 <div v-if="editForm.cover_url" class="mb-3">
-                  <img :src="editForm.cover_url" class="img-thumbnail img-fluid" alt="封面" />
+                  <img
+                    :src="editForm.cover_url"
+                    class="img-thumbnail img-fluid"
+                    alt="封面"
+                  />
                 </div>
               </div>
               <div class="col-md-8">
@@ -162,7 +170,10 @@
           class="alert alert-danger d-flex align-items-center"
           role="alert"
         >
-          <i class="bi bi-exclamation-triangle-fill me-2" style="font-size: 20px"></i>
+          <i
+            class="bi bi-exclamation-triangle-fill me-2"
+            style="font-size: 20px"
+          ></i>
           <div class="flex-grow-1">{{ errorMessage }}</div>
         </div>
       </form>
@@ -175,7 +186,8 @@ import { defineComponent } from "vue";
 import { apiHttpClient } from "@/app/app.service";
 import BreadCrumbs from "@/app/components/BreadCrumbs.vue";
 
-const API_BASE_URL = process.env.VUE_APP_API_BASE_URL || "http://localhost:3333";
+const API_BASE_URL =
+  process.env.VUE_APP_API_BASE_URL || "http://localhost:3333";
 
 export default defineComponent({
   name: "PostEdit",
@@ -214,7 +226,11 @@ export default defineComponent({
 
   computed: {
     isEditFormValid() {
-      return this.editForm.title && this.editForm.title.trim() && this.editForm.category;
+      return (
+        this.editForm.title &&
+        this.editForm.title.trim() &&
+        this.editForm.category
+      );
     },
   },
 
@@ -244,8 +260,12 @@ export default defineComponent({
         category: this.resource.category || "",
         description: this.resource.description || "",
         grade: this.resource.grade || this.getFieldFromAutoMeta("grade") || "",
-        subject: this.resource.subject || this.getFieldFromAutoMeta("subject") || "",
-        textbook: this.resource.version || this.getFieldFromAutoMeta("textbook_version") || "",
+        subject:
+          this.resource.subject || this.getFieldFromAutoMeta("subject") || "",
+        textbook:
+          this.resource.version ||
+          this.getFieldFromAutoMeta("textbook_version") ||
+          "",
         chapter_info: this.resource.chapter_info || "",
         cover_url: this.resource.cover_url || "",
       };
@@ -279,7 +299,7 @@ export default defineComponent({
 
       try {
         console.log("[PostEdit] 提交修改，数据:", this.editForm);
-        
+
         const updateData = {
           title: this.editForm.title,
           category: this.editForm.category,
@@ -291,7 +311,8 @@ export default defineComponent({
           cover_url: this.editForm.cover_url || null,
         };
 
-        const response = await apiHttpClient.patch(
+        // 尝试 PUT 方法（后端可能使用 PUT 而不是 PATCH）
+        const response = await apiHttpClient.put(
           `/api/resources/${this.id}`,
           updateData
         );
@@ -305,7 +326,9 @@ export default defineComponent({
         }, 3000);
       } catch (error) {
         console.error("[PostEdit] 提交失败:", error);
-        this.errorMessage = `提交失败: ${error.response?.data?.message || error.message}`;
+        this.errorMessage = `提交失败: ${
+          error.response?.data?.message || error.message
+        }`;
       } finally {
         this.isSaving = false;
       }
