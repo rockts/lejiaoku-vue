@@ -94,6 +94,11 @@
             </a>
             <ul class="dropdown-menu" aria-labelledby="userDropdown">
               <li>
+                <router-link to="/me/profile" class="dropdown-item">
+                  <i class="bi bi-person-gear me-2"></i>个人中心
+                </router-link>
+              </li>
+              <li>
                 <router-link to="/me/resources" class="dropdown-item">
                   <i class="bi bi-file-earmark-text me-2"></i>我的资源
                 </router-link>

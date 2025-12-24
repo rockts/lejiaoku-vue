@@ -24,16 +24,16 @@
             <div class="modal-body">
             <form @submit.prevent="handleSubmit">
               <div class="mb-3">
-                <label class="form-label">邮箱</label>
+                <label class="form-label">用户名/邮箱</label>
                 <div class="input-group">
                   <span class="input-group-text">
-                    <i class="bi bi-envelope-fill"></i>
+                    <i class="bi bi-person-fill"></i>
                   </span>
                   <input
-                    type="email"
+                    type="text"
                     class="form-control"
-                    v-model="email"
-                    placeholder="输入邮箱"
+                    v-model="account"
+                    placeholder="输入用户名或邮箱"
                     required
                   />
                 </div>
@@ -126,7 +126,7 @@ export default defineComponent({
   emits: ["update:modelValue", "switch-to-register"],
   data() {
     return {
-      email: "",
+      account: "",
       password: "",
       loading: false,
     };
@@ -140,22 +140,24 @@ export default defineComponent({
       this.$emit("switch-to-register");
     },
     resetForm() {
-      this.email = "";
+      this.account = "";
       this.password = "";
       this.loading = false;
     },
     async handleSubmit() {
-      if (!this.email || !this.password) {
+      if (!this.account || !this.password) {
         notification.warning("请填写完整信息");
         return;
       }
 
       this.loading = true;
       try {
-        const response = await apiHttpClient.post("/login", {
-          email: this.email,
-          password: this.password,
-        });
+        // 支持用户名或邮箱登录
+        const loginData = this.account.includes("@")
+          ? { email: this.account, password: this.password }
+          : { username: this.account, password: this.password };
+
+        const response = await apiHttpClient.post("/login", loginData);
 
         const { token, user } = response.data;
         

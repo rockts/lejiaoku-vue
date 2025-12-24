@@ -8,11 +8,17 @@
 
 import { RouteRecordRaw } from 'vue-router';
 import MyResources from './resources/MyResources.vue';
+import UserProfile from './profile/UserProfile.vue';
 
 /**
  * 定义路由
  */
 const routes: Array<RouteRecordRaw> = [
+    {
+        path: '/me/profile',
+        name: 'UserProfile',
+        component: UserProfile,
+    },
     {
         path: '/me/resources',
         name: 'MyResources',
