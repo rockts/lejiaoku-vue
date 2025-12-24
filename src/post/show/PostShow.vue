@@ -24,6 +24,24 @@
         </div>
       </section>
 
+      <!-- 教材信息（直接展示 auto_meta_result）-->
+      <section v-if="resource.auto_meta_result" class="card section">
+        <h5 class="section-title">【教材信息】</h5>
+        <p class="text-muted mb-2">
+          {{ resource.auto_meta_result.textbook_version || "-" }} ·
+          {{ resource.auto_meta_result.subject || "-" }} ·
+          {{ resource.auto_meta_result.grade || "-" }}{{ resource.auto_meta_result.volume || "" }}
+        </p>
+        <div v-if="resource.auto_meta_result.structure">
+          <p class="mb-1"><strong>单元列表：</strong></p>
+          <ul class="structure">
+            <li v-for="(item, idx) in resource.auto_meta_result.structure" :key="idx">
+              {{ item.unit }}：{{ item.title }}
+            </li>
+          </ul>
+        </div>
+      </section>
+
       <!-- 2. 教材目录绑定信息 -->
       <section v-if="catalogInfo" class="card section">
         <h5 class="section-title">
