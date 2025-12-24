@@ -14,10 +14,12 @@
               </h5>
               <button
                 type="button"
-                class="btn-close"
+                class="close-btn"
                 @click="closeModal"
                 aria-label="Close"
-              ></button>
+              >
+                <i class="bi bi-x-lg"></i>
+              </button>
             </div>
             <div class="modal-body">
             <form @submit.prevent="handleSubmit">
