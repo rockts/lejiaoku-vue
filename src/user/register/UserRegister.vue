@@ -1,5 +1,7 @@
 <template>
-  <div class="register-page min-vh-100 d-flex align-items-center justify-content-center bg-light">
+  <div
+    class="register-page min-vh-100 d-flex align-items-center justify-content-center bg-light"
+  >
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-md-6 col-lg-5">
@@ -10,13 +12,21 @@
               </h2>
 
               <!-- 成功提示 -->
-              <div v-if="successMessage" class="alert alert-success d-flex align-items-center" role="alert">
+              <div
+                v-if="successMessage"
+                class="alert alert-success d-flex align-items-center"
+                role="alert"
+              >
                 <i class="bi bi-check-circle-fill me-2"></i>
                 <div>{{ successMessage }}</div>
               </div>
 
               <!-- 错误提示 -->
-              <div v-if="errorMessage" class="alert alert-danger d-flex align-items-center" role="alert">
+              <div
+                v-if="errorMessage"
+                class="alert alert-danger d-flex align-items-center"
+                role="alert"
+              >
                 <i class="bi bi-exclamation-triangle-fill me-2"></i>
                 <div>{{ errorMessage }}</div>
               </div>
@@ -34,7 +44,9 @@
                     maxlength="20"
                     required
                   />
-                  <small class="form-text text-muted">用户名用于登录和展示</small>
+                  <small class="form-text text-muted"
+                    >用户名用于登录和展示</small
+                  >
                 </div>
 
                 <div class="mb-3">
@@ -47,7 +59,9 @@
                     minlength="6"
                     required
                   />
-                  <small class="form-text text-muted">建议使用复杂密码提高安全性</small>
+                  <small class="form-text text-muted"
+                    >建议使用复杂密码提高安全性</small
+                  >
                 </div>
 
                 <div class="mb-3">
@@ -62,14 +76,12 @@
                   />
                 </div>
 
-                <div class="mb-4">
-                  <label class="form-label">用户角色</label>
-                  <select v-model="form.role" class="form-control" required>
-                    <option value="">选择角色</option>
-                    <option value="user">普通用户</option>
-                    <option value="admin">管理员</option>
-                  </select>
-                  <small class="form-text text-muted">管理员可以编辑和删除所有资源</small>
+                <!-- 注册提示：新用户默认为普通用户 -->
+                <div class="mb-4 alert alert-info" role="alert">
+                  <i class="bi bi-info-circle me-2"></i>
+                  <small
+                    >新用户默认为普通用户。若需管理员权限，请联系现有管理员。</small
+                  >
                 </div>
 
                 <button
@@ -78,7 +90,10 @@
                   :disabled="isLoading"
                 >
                   <span v-if="isLoading">
-                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    <span
+                      class="spinner-border spinner-border-sm me-2"
+                      role="status"
+                    ></span>
                     注册中...
                   </span>
                   <span v-else>注册</span>
@@ -89,7 +104,10 @@
               <div class="text-center">
                 <p class="text-muted mb-0">
                   已有账户？
-                  <router-link to="/login" class="text-primary text-decoration-none">
+                  <router-link
+                    to="/login"
+                    class="text-primary text-decoration-none"
+                  >
                     立即登录
                   </router-link>
                 </p>
@@ -115,7 +133,7 @@ export default defineComponent({
         username: "",
         password: "",
         confirmPassword: "",
-        role: "user",
+        // role 已移除，新用户默认为 'user'
       },
       isLoading: false,
       errorMessage: "",
@@ -125,7 +143,7 @@ export default defineComponent({
 
   methods: {
     async handleRegister() {
-      if (!this.form.username || !this.form.password || !this.form.role) {
+      if (!this.form.username || !this.form.password) {
         this.errorMessage = "请填写所有必填项";
         return;
       }
@@ -145,12 +163,11 @@ export default defineComponent({
       this.successMessage = "";
 
       try {
-        console.log("[UserRegister] 注册请求，用户名:", this.form.username, "角色:", this.form.role);
+        console.log("[UserRegister] 注册请求，用户名:", this.form.username);
 
         const response = await apiHttpClient.post("/api/register", {
           username: this.form.username,
           password: this.form.password,
-          role: this.form.role,
         });
 
         console.log("[UserRegister] 注册成功:", response.data);
