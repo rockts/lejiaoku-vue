@@ -77,29 +77,28 @@
             </router-link>
           </li>
           <li class="nav-item dropdown">
-            <a
-              class="nav-link dropdown-toggle"
-              href="#"
-              id="userDropdown"
-              role="button"
-              data-bs-toggle="dropdown"
+            <button
+              class="nav-link dropdown-toggle btn btn-link user-dropdown-btn"
+              type="button"
+              @click="toggleDropdown"
               aria-expanded="false"
             >
-              <i class="bi bi-person-circle me-1"></i>{{ currentUser.username }}
+              <i class="bi bi-person-circle me-1"></i
+              ><span class="user-name">{{ currentUser.username }}</span>
               <span
                 v-if="currentUser.role === 'admin'"
                 class="badge bg-danger ms-1"
                 >管理员</span
               >
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="userDropdown">
+            </button>
+            <ul class="dropdown-menu" :class="{ show: showUserDropdown }">
               <li>
-                <router-link to="/me/profile" class="dropdown-item">
+                <router-link to="/me/profile" class="dropdown-item" @click="closeDropdown">
                   <i class="bi bi-person-gear me-2"></i>个人中心
                 </router-link>
               </li>
               <li>
-                <router-link to="/me/resources" class="dropdown-item">
+                <router-link to="/me/resources" class="dropdown-item" @click="closeDropdown">
                   <i class="bi bi-file-earmark-text me-2"></i>我的资源
                 </router-link>
               </li>
@@ -155,6 +154,7 @@ export default defineComponent({
       theme: "light",
       showLoginModal: false,
       showRegisterModal: false,
+      showUserDropdown: false,
     };
   },
   computed: {
@@ -188,6 +188,14 @@ export default defineComponent({
       localStorage.setItem("theme", next);
       document.documentElement.setAttribute("data-theme", next);
     },
+
+    toggleDropdown() {
+      this.showUserDropdown = !this.showUserDropdown;
+    },
+
+    closeDropdown() {
+      this.showUserDropdown = false;
+    },
   },
   created() {
     const saved = localStorage.getItem("theme") || "light";
@@ -199,6 +207,32 @@ export default defineComponent({
 </script>
 
 <style scoped>
+
+/* 用户下拉菜单样式 */
+.user-dropdown-btn {
+  background: none;
+  border: none;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  color: rgba(0, 0, 0, 0.55);
+}
+
+.user-dropdown-btn:hover {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.user-name {
+  color: inherit;
+  font-weight: 500;
+}
+
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  left: auto;
+}
 .dropdown .dropdown-menu {
   min-width: 6rem;
 }
