@@ -39,7 +39,7 @@
           </li>
         </ul>
 
-        <HeaderSearch />
+        <HeaderSearch v-if="!isHomePage" />
 
         <button
           class="btn btn-outline-secondary btn-theme ml-2"
@@ -129,6 +129,9 @@ export default defineComponent({
     },
     themeIcon() {
       return this.theme === "dark" ? "bi bi-sun" : "bi bi-moon";
+    },
+    isHomePage() {
+      return this.$route.path === "/";
     },
   },
   data() {
