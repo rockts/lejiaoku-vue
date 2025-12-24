@@ -2,43 +2,30 @@
   <BreadCrumbs />
   <div class="post-create-page">
     <div class="container post-create-page-body">
-      <!-- 上传进度指示器 -->
-      <div class="upload-steps mb-4">
-        <div
-          class="step"
-          :class="{ active: currentStep >= 1, completed: currentStep > 1 }"
-        >
-          <div class="step-number">1</div>
-          <div class="step-label">基础信息</div>
-        </div>
-        <div class="step-line" :class="{ active: currentStep > 1 }"></div>
-        <div
-          class="step"
-          :class="{ active: currentStep >= 2, completed: currentStep > 2 }"
-        >
-          <div class="step-number">2</div>
-          <div class="step-label">教材信息</div>
-        </div>
-        <div class="step-line" :class="{ active: currentStep > 2 }"></div>
-        <div class="step" :class="{ active: currentStep >= 3 }">
-          <div class="step-number">3</div>
-          <div class="step-label">上传文件</div>
-        </div>
+      <!-- 上传提示 -->
+      <div class="alert alert-info mb-4" role="alert">
+        <i class="bi bi-info-circle me-2"></i>
+        <strong>上传流程：</strong>填写标题和分类 → 选择文件 → 点击发布 → 系统自动解析教材信息 → 8秒后跳转到资源详情页
       </div>
 
       <form>
         <!-- 资源标题 -->
-        <div class="create-post-title mb-4">
-          <label class="form-label" for="id_name"
-            >资源标题 <span class="text-danger">*</span></label
-          >
-          <input
-            v-model="title"
-            placeholder="请输入资源标题..."
-            type="text"
-            class="form-control"
-          />
-          <small v-if="!title" class="text-danger">必填项</small>
+        <div class="mb-4 card shadow-sm">
+          <div class="card-header bg-white">
+            <h6 class="mb-0">
+              <i class="bi bi-pencil-square"></i> 资源标题
+              <span class="text-danger">*</span>
+            </h6>
+          </div>
+          <div class="card-body">
+            <input
+              v-model="title"
+              placeholder="请输入资源标题..."
+              type="text"
+              class="form-control"
+            />
+            <small v-if="!title && isSubmitting" class="text-danger d-block mt-2">必填项</small>
+          </div>
         </div>
 
         <!-- 资源文件拖放区 -->
@@ -109,7 +96,7 @@
                   application/vnd.openxmlformats-officedocument.presentationml.presentation"
               />
             </div>
-            <small v-if="!file" class="text-danger d-block mt-2">必填项</small>
+            <small v-if="!file && isSubmitting" class="text-danger d-block mt-2">必填项</small>
           </div>
         </div>
 
@@ -189,8 +176,8 @@
           </div>
         </div>
 
-        <!-- 教材信息选择区 -->
-        <div class="mb-4 textbook-section card shadow-sm">
+        <!-- 教材信息选择区（隐藏，使用手动输入） -->
+        <div class="mb-4 textbook-section card shadow-sm" style="display: none;">
           <div class="card-header bg-white">
             <h5 class="mb-0"><i class="bi bi-book"></i> 教材信息（可选）</h5>
           </div>
@@ -326,7 +313,7 @@
                   <option>教辅</option>
                   <option>其他</option>
                 </select>
-                <small v-if="!category" class="text-danger">必填项</small>
+                <small v-if="!category && isSubmitting" class="text-danger">必填项</small>
               </div>
               <div class="col-md-6">
                 <label class="form-label small text-muted">年级</label>
