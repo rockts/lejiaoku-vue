@@ -106,16 +106,6 @@ export default defineComponent({
           createdAt: Date.now() - 1800e3,
         },
         {
-          id: 4,
-          title: "科学二年级观察视频",
-          category: "视频",
-          format: "MP4",
-          subject: "科学",
-          grade: "二年级",
-          downloads: 310,
-          createdAt: Date.now() - 5400e3,
-        },
-        {
           id: 5,
           title: "数学六年级毕业总复习教案",
           category: "教案",
@@ -145,16 +135,6 @@ export default defineComponent({
           grade: "三年级",
           downloads: 412,
           createdAt: Date.now() - 8600e3,
-        },
-        {
-          id: 8,
-          title: "科学五年级项目式学习视频",
-          category: "视频",
-          format: "MP4",
-          subject: "科学",
-          grade: "五年级",
-          downloads: 267,
-          createdAt: Date.now() - 12600e3,
         },
         {
           id: 9,

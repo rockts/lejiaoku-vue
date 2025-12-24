@@ -121,3 +121,60 @@
       --border: rgba(255,255,255,0.12);
       --shadow: 0 12px 36px rgba(0,0,0,0.35);
     }
+
+    /* Dark Mode Global Overrides */
+    [data-theme="dark"] .bg-light {
+      background-color: transparent !important; /* Let nav-glass handle it */
+    }
+    [data-theme="dark"] .navbar-light .navbar-brand,
+    [data-theme="dark"] .navbar-light .navbar-nav .nav-link {
+      color: var(--text);
+    }
+    [data-theme="dark"] .navbar-light .navbar-nav .nav-link:hover {
+      color: var(--primary);
+    }
+    [data-theme="dark"] .card {
+      background-color: var(--surface);
+      border-color: var(--border);
+      color: var(--text);
+    }
+    [data-theme="dark"] .text-muted {
+      color: var(--muted) !important;
+    }
+    [data-theme="dark"] .form-control {
+      background-color: rgba(255,255,255,0.05);
+      border-color: var(--border);
+      color: var(--text);
+    }
+    [data-theme="dark"] .form-control:focus {
+      background-color: rgba(255,255,255,0.1);
+      border-color: var(--primary);
+      color: var(--text);
+    }
+    [data-theme="dark"] .list-group-item {
+      background-color: var(--surface);
+      border-color: var(--border);
+      color: var(--text);
+    }
+    [data-theme="dark"] .dropdown-menu {
+      background-color: #1e222d;
+      border-color: var(--border);
+    }
+    [data-theme="dark"] .dropdown-item {
+      color: var(--text);
+    }
+    [data-theme="dark"] .dropdown-item:hover {
+      background-color: rgba(255,255,255,0.1);
+      color: var(--text);
+    }
+    [data-theme="dark"] .table {
+      color: var(--text);
+    }
+    [data-theme="dark"] .table td, 
+    [data-theme="dark"] .table th {
+      border-color: var(--border);
+    }
+    [data-theme="dark"] .breadcrumb-item.active {
+      color: var(--muted);
+    }
+
