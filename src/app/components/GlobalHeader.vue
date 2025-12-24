@@ -97,24 +97,37 @@
                 <i class="bi bi-shield-check me-1"></i>管理员
               </span>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end" :class="{ show: showUserDropdown }">
+            <ul
+              class="dropdown-menu dropdown-menu-end"
+              :class="{ show: showUserDropdown }"
+            >
               <li class="dropdown-header">
                 <div class="user-info">
                   <i class="bi bi-person-circle user-avatar-large"></i>
                   <div>
-                    <div class="user-name-large">{{ currentUser.username }}</div>
+                    <div class="user-name-large">
+                      {{ currentUser.username }}
+                    </div>
                     <div class="user-email">{{ currentUser.email }}</div>
                   </div>
                 </div>
               </li>
               <li><hr class="dropdown-divider" /></li>
               <li>
-                <router-link to="/me/profile" class="dropdown-item" @click="closeDropdown">
+                <router-link
+                  to="/me/profile"
+                  class="dropdown-item"
+                  @click="closeDropdown"
+                >
                   <i class="bi bi-person-gear me-2"></i>个人中心
                 </router-link>
               </li>
               <li>
-                <router-link to="/me/resources" class="dropdown-item" @click="closeDropdown">
+                <router-link
+                  to="/me/resources"
+                  class="dropdown-item"
+                  @click="closeDropdown"
+                >
                   <i class="bi bi-file-earmark-text me-2"></i>我的资源
                 </router-link>
               </li>
@@ -234,8 +247,7 @@ nav {
   position: relative;
   z-index: 1050;
 }
-上传按钮 */
-.btn-upload {
+上传按钮 */ .btn-upload {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
