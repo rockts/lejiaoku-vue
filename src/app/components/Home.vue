@@ -23,8 +23,14 @@
           <router-link to="/resources/create" class="btn btn-primary"
             >上传资源</router-link
           >
-          <div class="qr-wrapper" @mouseenter="showQR = true" @mouseleave="showQR = false">
-            <router-link to="#" class="btn btn-outline-primary">申请成为贡献者</router-link>
+          <div
+            class="qr-wrapper"
+            @mouseenter="showQR = true"
+            @mouseleave="showQR = false"
+          >
+            <router-link to="#" class="btn btn-outline-primary"
+              >申请成为贡献者</router-link
+            >
             <div v-if="showQR" class="qr-popover">
               <img
                 class="qr-image"
