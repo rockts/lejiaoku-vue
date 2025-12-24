@@ -50,17 +50,22 @@
         <!-- 未登录：显示登录注册按钮 -->
         <ul v-if="!isAuthenticated" class="navbar-nav">
           <li class="nav-item px-1 py-1">
-            <router-link
+            <button
               type="button"
-              to="/login"
+              @click="showLoginModal = true"
               class="btn btn-outline-primary"
-              >登录</router-link
             >
+              登录
+            </button>
           </li>
           <li class="nav-item px-1 py-1">
-            <router-link type="button" to="/register" class="btn btn-primary"
-              >注册</router-link
+            <button
+              type="button"
+              @click="showRegisterModal = true"
+              class="btn btn-primary"
             >
+              注册
+            </button>
           </li>
         </ul>
 
@@ -109,6 +114,24 @@
       </div>
     </div>
   </nav>
+
+  <!-- 登录弹窗 -->
+  <LoginModal
+    v-model="showLoginModal"
+    @switch-to-register="
+      showLoginModal = false;
+      showRegisterModal = true;
+    "
+  />
+
+  <!-- 注册弹窗 -->
+  <RegisterModal
+    v-model="showRegisterModal"
+    @switch-to-login="
+      showRegisterModal = false;
+      showLoginModal = true;
+    "
+  />
 </template>
 
 <script>
@@ -116,6 +139,8 @@ import { defineComponent } from "vue";
 import { mapGetters } from "vuex";
 import { API_BASE_URL } from "@/app/app.config";
 import HeaderSearch from "./form/HeaderSearch.vue";
+import LoginModal from "./LoginModal.vue";
+import RegisterModal from "./RegisterModal.vue";
 
 export default defineComponent({
   name: "GlobalHeader",
@@ -136,16 +161,18 @@ export default defineComponent({
   },
   computed: {
     ...mapGetters({
-      isAuthenticated: "auth/isAuthenticated",
-      currentUser: "auth/user",
-    }),
+      showLoginModal: false,
+      showRegisterModal: false,
+    };
+  },
 
-    userAvatarURL() {
-      return `${API_BASE_URL}/users/${this.user?.id}/avatar`;
-    },
+  created() {
+    const saved = localStorage.getItem("theme") || "light";
+    this.theme = saved;
+    document.documentElement.setAttribute("data-theme", saved);
+  },
 
-    themeIcon() {
-      return this.theme === "dark" ? "bi bi-sun" : "bi bi-moon";
+  components: { HeaderSearch, LoginModal, RegisterModal"dark" ? "bi bi-sun" : "bi bi-moon";
     },
 
     isHomePage() {
