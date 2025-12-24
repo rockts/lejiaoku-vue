@@ -1,9 +1,5 @@
 import { Module } from 'vuex';
 import { RootState } from '../app/app.store';
-import {
- userLoginStoreModule,
- UserLoginStoreState,
-} from './login/user-login.store';
 
 import {
  userIndexStoreModule,
@@ -21,7 +17,6 @@ export interface UserItem {
 }
 
 export interface UserStoreState {
- login: UserLoginStoreState;
  index: UserIndexStoreState;
 }
 
@@ -29,7 +24,6 @@ export const userStoreModule: Module<UserStoreState, RootState> = {
  namespaced: true,
 
  modules: {
-  login: userLoginStoreModule,
   index: userIndexStoreModule,
  },
 };
