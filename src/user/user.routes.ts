@@ -7,24 +7,12 @@
  */
 
 import { RouteRecordRaw } from 'vue-router';
-import UserLogin from './login/UserLogin.vue';
-import UserRegister from './register/UserRegister.vue';
 import MyResources from './resources/MyResources.vue';
 
 /**
  * 定义路由
  */
 const routes: Array<RouteRecordRaw> = [
-    {
-        path: '/login',
-        name: 'UserLogin',
-        component: UserLogin,
-    },
-    {
-        path: '/register',
-        name: 'UserRegister',
-        component: UserRegister,
-    },
     {
         path: '/me/resources',
         name: 'MyResources',
