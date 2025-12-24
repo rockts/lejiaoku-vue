@@ -247,7 +247,8 @@ nav {
   position: relative;
   z-index: 1050;
 }
-上传按钮 */ .btn-upload {
+/* 上传按钮 */
+.btn-upload {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
