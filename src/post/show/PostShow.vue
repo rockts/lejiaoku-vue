@@ -30,12 +30,16 @@
         <p class="text-muted mb-2">
           {{ resource.auto_meta_result.textbook_version || "-" }} ·
           {{ resource.auto_meta_result.subject || "-" }} ·
-          {{ resource.auto_meta_result.grade || "-" }}{{ resource.auto_meta_result.volume || "" }}
+          {{ resource.auto_meta_result.grade || "-"
+          }}{{ resource.auto_meta_result.volume || "" }}
         </p>
         <div v-if="resource.auto_meta_result.structure">
           <p class="mb-1"><strong>单元列表：</strong></p>
           <ul class="structure">
-            <li v-for="(item, idx) in resource.auto_meta_result.structure" :key="idx">
+            <li
+              v-for="(item, idx) in resource.auto_meta_result.structure"
+              :key="idx"
+            >
               {{ item.unit }}：{{ item.title }}
             </li>
           </ul>
@@ -134,7 +138,7 @@ export default defineComponent({
 
     catalogInfo() {
       console.log("[catalogInfo] 开始计算，resource:", this.resource);
-      
+
       // 优先级1：如果存在 catalog_info，显示所属教材
       if (this.resource?.catalog_info) {
         console.log("[catalogInfo] 使用 catalog_info");
@@ -181,7 +185,7 @@ export default defineComponent({
           `/api/resources/${resourceId}`
         );
         this.resource = response.data;
-        
+
         // 详细日志输出
         console.log("resource detail:", this.resource);
         console.log("auto_meta_result:", this.resource?.auto_meta_result);
