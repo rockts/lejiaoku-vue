@@ -23,28 +23,22 @@
           <router-link to="/resources/create" class="btn btn-primary"
             >上传资源</router-link
           >
-          <router-link
-            to="#"
-            class="btn btn-outline-primary"
-            @mouseenter="showQR = true"
-            @mouseleave="showQR = false"
-            >申请成为贡献者</router-link
-          >
-
-          <div
-            v-if="showQR"
-            class="qr-popover"
-            @mouseenter="showQR = true"
-            @mouseleave="showQR = false"
-          >
-            <img
-              class="qr-image"
-              :src="qrSrc"
-              alt="扫码成为贡献者"
-              @error="qrError = true"
-            />
-            <div class="qr-caption">
-              {{ qrError ? "未找到二维码，请在 public/ 放置 qr-contributor.jpg" : "申请成为贡献者" }}
+          <div class="qr-wrapper" @mouseenter="showQR = true" @mouseleave="showQR = false">
+            <router-link to="#" class="btn btn-outline-primary">申请成为贡献者</router-link>
+            <div v-if="showQR" class="qr-popover">
+              <img
+                class="qr-image"
+                :src="qrSrc"
+                alt="扫码成为贡献者"
+                @error="qrError = true"
+              />
+              <div class="qr-caption">
+                {{
+                  qrError
+                    ? "未找到二维码，请在 public/ 放置 qr-contributor.jpg"
+                    : "申请成为贡献者"
+                }}
+              </div>
             </div>
           </div>
         </div>
@@ -247,10 +241,16 @@ export default defineComponent({
   position: relative;
 }
 
+.qr-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
 .qr-popover {
   position: absolute;
-  top: 48px;
-  left: 0;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
   background: #fff;
   border: 1px solid var(--border);
   border-radius: 8px;
