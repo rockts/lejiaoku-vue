@@ -1,21 +1,21 @@
 <template>
   <bread-crumbs />
-  <div class="post-show-page my-3" v-if="showPost">
+  <div class="post-show-page my-3" v-if="showResource">
     <div class="container">
       <div class="res__header shadow bg-body rounded">
         <div class="row">
           <div class="col-md-4">
-            <div v-if="postCoverURL" class="cover">
+            <div v-if="resourceCoverURL" class="cover">
               <img
-                :src="postCoverURL"
-                :alt="`${post.title}`"
+                :src="resourceCoverURL"
+                :alt="`${resource.title}`"
                 class="img-fluid img-thumbnail"
               />
             </div>
             <div v-else class="cover">
               <img
                 src="@/assets/img/catagory.png"
-                :alt="`${post.title}`"
+                :alt="`${resource.title}`"
                 class="img-fluid img-thumbnail"
               />
             </div>
@@ -25,13 +25,13 @@
               <h5 class="title_tags">
                 <span
                   class="badge badge-pill badge-primary mx-2"
-                  v-for="item in post.tags"
+                  v-for="item in resource.tags"
                   :key="item.id"
                 >
                   {{ item.name }}
                 </span>
               </h5>
-              <h4 class="pt-3">{{ post.title }}</h4>
+              <h4 class="pt-3">{{ resource.title }}</h4>
             </div>
             <div class="res__btn my-4">
               <ul>
@@ -56,22 +56,24 @@
                 </li>
               </ul>
             </div>
-            <div class="author" v-if="post.user">
+            <div class="author" v-if="resource.user">
               <img
-                v-if="post.user.avatar === null"
+                v-if="resource.user.avatar === null"
                 src="@/assets/img/avatar.png"
-                :alt="post.user.name"
+                :alt="resource.user.name"
                 class="avatar"
               />
               <img
-                v-if="post.user.avatar === 1"
+                v-if="resource.user.avatar === 1"
                 :src="userAvatarURL"
-                :alt="post.user.name"
+                :alt="resource.user.name"
                 class="avatar"
               />
               <div class="author__text">
-                <p>贡献者：{{ post.user.name }}</p>
-                <small>更新于：{{ moment(post.updated_at).fromNow() }}</small>
+                <p>贡献者：{{ resource.user.name }}</p>
+                <small
+                  >更新于：{{ moment(resource.updated_at).fromNow() }}</small
+                >
               </div>
             </div>
             <div class="res__operating">
@@ -84,7 +86,7 @@
 
         <div id="demo" class="collapse">
           <iframe
-            :src="postFileURL"
+            :src="resourceFileURL"
             width="100%"
             height="100%"
             frameborder="0"
@@ -93,13 +95,13 @@
         <hr />
         <div class="card-body">
           <h5>资源介绍</h5>
-          <p class="card-text" v-if="post.description">
-            {{ post.description }}
+          <p class="card-text" v-if="resource.description">
+            {{ resource.description }}
           </p>
           <p class="card-text text-muted" v-else>暂无资源介绍</p>
 
           <!-- AI 识别状态提示（仅 pending 时显示） -->
-          <div v-if="post.auto_meta_status === 'pending'" class="mt-2">
+          <div v-if="resource.auto_meta_status === 'pending'" class="mt-2">
             <p class="text-muted small mb-0">
               <i class="bi bi-hourglass-split"></i>
               系统正在分析资源元信息，稍后可能自动补全封面和教材信息
@@ -107,62 +109,64 @@
           </div>
 
           <!-- 章节信息（可选） -->
-          <div v-if="post.chapter_info" class="mt-3">
+          <div v-if="resource.chapter_info" class="mt-3">
             <h5>章节信息</h5>
             <p class="text-muted">
-              <i class="bi bi-bookmark"></i> {{ post.chapter_info }}
+              <i class="bi bi-bookmark"></i> {{ resource.chapter_info }}
             </p>
           </div>
 
           <!-- 教材信息（可选） -->
-          <div v-if="post.textbook_info" class="mt-3">
+          <div v-if="resource.textbook_info" class="mt-3">
             <h5>教材信息</h5>
             <ul class="res__attr">
-              <li v-if="post.textbook_info.stage">
+              <li v-if="resource.textbook_info.stage">
                 <span style="font-weight: bold">学段：</span
-                >{{ post.textbook_info.stage }}
+                >{{ resource.textbook_info.stage }}
               </li>
-              <li v-if="post.textbook_info.grade">
+              <li v-if="resource.textbook_info.grade">
                 <span style="font-weight: bold">年级：</span
-                >{{ post.textbook_info.grade }}
+                >{{ resource.textbook_info.grade }}
               </li>
-              <li v-if="post.textbook_info.subject">
+              <li v-if="resource.textbook_info.subject">
                 <span style="font-weight: bold">学科：</span
-                >{{ post.textbook_info.subject }}
+                >{{ resource.textbook_info.subject }}
               </li>
-              <li v-if="post.textbook_info.volume">
+              <li v-if="resource.textbook_info.volume">
                 <span style="font-weight: bold">册别：</span
-                >{{ post.textbook_info.volume }}
+                >{{ resource.textbook_info.volume }}
               </li>
-              <li v-if="post.textbook_info.version">
+              <li v-if="resource.textbook_info.version">
                 <span style="font-weight: bold">教材版本：</span
-                >{{ post.textbook_info.version }}
+                >{{ resource.textbook_info.version }}
               </li>
             </ul>
           </div>
 
           <!-- 教材结构（MVP） -->
           <div
-            v-if="post.auto_meta_status === 'done' && post.auto_meta_result"
+            v-if="
+              resource.auto_meta_status === 'done' && resource.auto_meta_result
+            "
             class="mt-3"
           >
             <h5><i class="bi bi-book"></i> 教材结构</h5>
 
             <!-- 教材基本信息 -->
             <p class="text-muted">
-              {{ post.auto_meta_result.textbook_info?.version || "-" }} ·
-              {{ post.auto_meta_result.textbook_info?.subject || "-" }} ·
-              {{ post.auto_meta_result.textbook_info?.grade || "-" }} ·
-              {{ post.auto_meta_result.textbook_info?.volume || "-" }}
+              {{ resource.auto_meta_result.textbook_info?.version || "-" }} ·
+              {{ resource.auto_meta_result.textbook_info?.subject || "-" }} ·
+              {{ resource.auto_meta_result.textbook_info?.grade || "-" }} ·
+              {{ resource.auto_meta_result.textbook_info?.volume || "-" }}
             </p>
 
             <!-- 教材结构列表 -->
             <div
-              v-if="post.auto_meta_result.textbook_structure"
+              v-if="resource.auto_meta_result.textbook_structure"
               class="textbook-structure"
             >
               <div
-                v-for="unit in post.auto_meta_result.textbook_structure"
+                v-for="unit in resource.auto_meta_result.textbook_structure"
                 :key="unit.id || unit.name"
                 class="structure-item mb-2"
               >
@@ -199,31 +203,34 @@
           </div>
 
           <!-- 教材结构未生成提示 -->
-          <div v-else-if="post.auto_meta_status !== 'done'" class="mt-3">
+          <div v-else-if="resource.auto_meta_status !== 'done'" class="mt-3">
             <h5><i class="bi bi-book"></i> 教材结构</h5>
             <p class="text-muted small">教材结构尚未生成</p>
           </div>
 
           <div>
             <ul class="res__attr">
-              <li v-if="post.subject">
-                <span style="font-weight: bold">学科：</span>{{ post.subject }}
+              <li v-if="resource.subject">
+                <span style="font-weight: bold">学科：</span
+                >{{ resource.subject }}
               </li>
-              <li v-if="post.grade">
-                <span style="font-weight: bold">年级：</span>{{ post.grade }}
+              <li v-if="resource.grade">
+                <span style="font-weight: bold">年级：</span
+                >{{ resource.grade }}
               </li>
-              <li v-if="post.textbook">
-                <span style="font-weight: bold">版本：</span>{{ post.textbook }}
+              <li v-if="resource.textbook">
+                <span style="font-weight: bold">版本：</span
+                >{{ resource.textbook }}
               </li>
-              <li v-if="post.category">
+              <li v-if="resource.category">
                 <span style="font-weight: bold">资源类型：</span
-                >{{ post.category }}
+                >{{ resource.category }}
               </li>
               <li
                 v-if="
-                  post.file &&
-                  post.file.mimetype &&
-                  post.file.mimetype.indexOf(`png`) > -1
+                  resource.file &&
+                  resource.file.mimetype &&
+                  resource.file.mimetype.indexOf(`png`) > -1
                 "
               >
                 <span style="font-weight: bold">文件类型：</span>
@@ -234,9 +241,9 @@
               </li>
               <li
                 v-if="
-                  post.file &&
-                  post.file.mimetype &&
-                  post.file.mimetype.indexOf(`bmp`) > -1
+                  resource.file &&
+                  resource.file.mimetype &&
+                  resource.file.mimetype.indexOf(`bmp`) > -1
                 "
               >
                 <span style="font-weight: bold">文件类型：</span>
@@ -247,9 +254,9 @@
               </li>
               <li
                 v-if="
-                  post.file &&
-                  post.file.mimetype &&
-                  post.file.mimetype.indexOf(`jpeg`) > -1
+                  resource.file &&
+                  resource.file.mimetype &&
+                  resource.file.mimetype.indexOf(`jpeg`) > -1
                 "
               >
                 <span style="font-weight: bold">文件类型：</span>
@@ -260,9 +267,9 @@
               </li>
               <li
                 v-if="
-                  post.file &&
-                  post.file.mimetype &&
-                  post.file.mimetype.indexOf(`jpg`) > -1
+                  resource.file &&
+                  resource.file.mimetype &&
+                  resource.file.mimetype.indexOf(`jpg`) > -1
                 "
               >
                 <span style="font-weight: bold">文件类型：</span>
@@ -273,9 +280,9 @@
               </li>
               <li
                 v-if="
-                  post.file &&
-                  post.file.mimetype &&
-                  post.file.mimetype.indexOf(`gif`) > -1
+                  resource.file &&
+                  resource.file.mimetype &&
+                  resource.file.mimetype.indexOf(`gif`) > -1
                 "
               >
                 <span style="font-weight: bold">文件类型：</span>
@@ -286,9 +293,9 @@
               </li>
               <li
                 v-if="
-                  post.file &&
-                  post.file.mimetype &&
-                  post.file.mimetype.indexOf(`spreadsheetml.sheet`) > -1
+                  resource.file &&
+                  resource.file.mimetype &&
+                  resource.file.mimetype.indexOf(`spreadsheetml.sheet`) > -1
                 "
               >
                 <span style="font-weight: bold">文件类型：</span>
@@ -299,9 +306,9 @@
               </li>
               <li
                 v-if="
-                  post.file &&
-                  post.file.mimetype &&
-                  post.file.mimetype.indexOf(`msword`) > -1
+                  resource.file &&
+                  resource.file.mimetype &&
+                  resource.file.mimetype.indexOf(`msword`) > -1
                 "
               >
                 <span style="font-weight: bold">文件类型：</span>
@@ -312,9 +319,10 @@
               </li>
               <li
                 v-if="
-                  post.file &&
-                  post.file.mimetype &&
-                  post.file.mimetype.indexOf(`wordprocessingml.document`) > -1
+                  resource.file &&
+                  resource.file.mimetype &&
+                  resource.file.mimetype.indexOf(`wordprocessingml.document`) >
+                    -1
                 "
               >
                 <span style="font-weight: bold">文件类型：</span>
@@ -325,9 +333,11 @@
               </li>
               <li
                 v-if="
-                  post.file &&
-                  post.file.mimetype &&
-                  post.file.mimetype.indexOf(`presentationml.presentation`) > -1
+                  resource.file &&
+                  resource.file.mimetype &&
+                  resource.file.mimetype.indexOf(
+                    `presentationml.presentation`
+                  ) > -1
                 "
               >
                 <span style="font-weight: bold">文件类型：</span>
@@ -338,9 +348,9 @@
               </li>
               <li
                 v-if="
-                  post.file &&
-                  post.file.mimetype &&
-                  post.file.mimetype.indexOf(`pdf`) > -1
+                  resource.file &&
+                  resource.file.mimetype &&
+                  resource.file.mimetype.indexOf(`pdf`) > -1
                 "
               >
                 <span style="font-weight: bold">文件类型：</span>
@@ -351,9 +361,9 @@
               </li>
               <li
                 v-if="
-                  post.file &&
-                  post.file.mimetype &&
-                  post.file.mimetype.indexOf(`ms-powerpoint`) > -1
+                  resource.file &&
+                  resource.file.mimetype &&
+                  resource.file.mimetype.indexOf(`ms-powerpoint`) > -1
                 "
               >
                 <span style="font-weight: bold">文件类型：</span>
@@ -364,9 +374,9 @@
               </li>
               <li
                 v-if="
-                  post.file &&
-                  post.file.mimetype &&
-                  post.file.mimetype.indexOf(`ms-excel`) > -1
+                  resource.file &&
+                  resource.file.mimetype &&
+                  resource.file.mimetype.indexOf(`ms-excel`) > -1
                 "
               >
                 <span style="font-weight: bold">文件类型：</span>
@@ -375,7 +385,7 @@
                   class="filetypeicon"
                 />
               </li>
-              <li v-if="post.file && post.file.size">
+              <li v-if="resource.file && resource.file.size">
                 <span style="font-weight: bold">文件大小：</span
                 >{{ fileSizeFormat() }}
               </li>
@@ -390,7 +400,7 @@
                   ></a>
                 </div>
                 <div class="statistics-item__text">
-                  {{ post.totalLikes }} 赞
+                  {{ resource.totalLikes }} 赞
                 </div>
               </div>
               <div class="statistics-item">
@@ -400,7 +410,7 @@
                   ></a>
                 </div>
                 <div class="statistics-item__text">
-                  {{ post.totalSaves }} 收藏
+                  {{ resource.totalSaves }} 收藏
                 </div>
               </div>
               <div class="statistics-item">
@@ -419,7 +429,7 @@
                   ></a>
                 </div>
                 <div class="statistics-item__text">
-                  {{ post.totalComments }} 评论
+                  {{ resource.totalComments }} 评论
                 </div>
               </div>
             </div>
@@ -454,9 +464,9 @@
           <div class="modal-body">
             <p class="mb-2">您确定要下载以下资源吗？</p>
             <div class="download-info">
-              <strong>{{ post.title }}</strong>
-              <div class="text-muted small mt-1" v-if="post.category">
-                {{ post.category }} · {{ post.file_format || "PDF" }}
+              <strong>{{ resource.title }}</strong>
+              <div class="text-muted small mt-1" v-if="resource.category">
+                {{ resource.category }} · {{ resource.file_format || "PDF" }}
               </div>
             </div>
           </div>
@@ -492,19 +502,20 @@ import { defineComponent } from "vue";
 import BreadCrumbs from "@/app/components/BreadCrumbs.vue";
 import { mapGetters, mapActions } from "vuex";
 import { API_BASE_URL } from "@/app/app.config";
+import { apiHttpClient } from "@/app/app.service";
 import axios from "axios";
 import moment from "moment";
 import { getReadableFileSizeString } from "@/utils/utils";
 
 export default defineComponent({
   title() {
-    if (this.showPost) {
-      return this.post.title;
+    if (this.showResource) {
+      return this.resource.title;
     }
   },
 
   props: {
-    postId: String,
+    id: String,
     user: {
       type: Object,
       default: null,
@@ -514,35 +525,37 @@ export default defineComponent({
   data() {
     return {
       showDownloadModal: false,
-      resource: null,  // 存储从 API 获取的资源数据
-      loading: false,  // 加载状态
+      resource: null, // 存储从 API 获取的资源数据
+      loading: false, // 加载状态
     };
   },
 
   created() {
-    this.getPostById(this.postId);
+    this.getResourceById(this.id);
   },
 
   computed: {
-    // 由于不再使用 store，post 现在是本地数据
-    post() {
-      return this.resource;
-    },
-    
-    postCoverURL() {
+    resourceCoverURL() {
       console.log("[PostShow] resource 对象:", this.resource);
       console.log("[PostShow] description 值:", this.resource?.description);
       console.log("[PostShow] grade 值:", this.resource?.grade);
-      console.log("[PostShow] auto_meta_result 值:", this.resource?.auto_meta_result);
+      console.log(
+        "[PostShow] auto_meta_result 值:",
+        this.resource?.auto_meta_result
+      );
 
       if (this.resource?.cover_url) {
         console.log("[PostShow] 封面URL:", this.resource.cover_url);
-        return this.resource.cover_url;
+        // 如果是完整URL，直接返回；如果是相对路径，拼接 API_BASE_URL
+        if (this.resource.cover_url.startsWith("http")) {
+          return this.resource.cover_url;
+        }
+        return `${API_BASE_URL}${this.resource.cover_url}`;
       }
       console.log("[PostShow] 没有封面URL");
       return "";
     },
-    postFileURL() {
+    resourceFileURL() {
       if (this.resource?.file?.id) {
         return `${API_BASE_URL}/files/${this.resource.file.id}`;
       }
@@ -555,8 +568,8 @@ export default defineComponent({
       return "";
     },
 
-    showPost() {
-      console.log("[PostShow.vue] showPost 计算:", {
+    showResource() {
+      console.log("[PostShow.vue] showResource 计算:", {
         loading: this.loading,
         resource: this.resource,
       });
@@ -575,29 +588,33 @@ export default defineComponent({
       return result;
     },
     fileSizeFormat() {
-      return getReadableFileSizeString(this.post.file.size);
+      return getReadableFileSizeString(this.resource.file.size);
     },
     moment(...args) {
       return moment(...args);
     },
-    
+
     // 直接调用 API 获取资源详情
-    async getPostById(postId) {
+    async getResourceById(resourceId) {
       this.loading = true;
       try {
-        console.log(`[PostShow] 请求资源详情: /api/resources/${postId}`);
-        const response = await apiHttpClient.get(`/api/resources/${postId}`);
+        console.log(`[PostShow] 请求资源详情: /api/resources/${resourceId}`);
+        const response = await apiHttpClient.get(
+          `/api/resources/${resourceId}`
+        );
         this.resource = response.data;
-        
+
         // 暴露资源对象到 window 用于调试
         window.__RESOURCE__ = response.data;
-        
-        console.log('[PostShow] 资源详情获取成功:', response.data);
-        console.log('[PostShow] auto_meta_result:', response.data.auto_meta_result);
-        console.log('[PostShow] chapter_info:', response.data.chapter_info);
-        
+
+        console.log("[PostShow] 资源详情获取成功:", response.data);
+        console.log(
+          "[PostShow] auto_meta_result:",
+          response.data.auto_meta_result
+        );
+        console.log("[PostShow] chapter_info:", response.data.chapter_info);
       } catch (error) {
-        console.error('[PostShow] 获取资源详情失败:', error);
+        console.error("[PostShow] 获取资源详情失败:", error);
       } finally {
         this.loading = false;
       }

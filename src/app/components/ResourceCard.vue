@@ -106,10 +106,13 @@ export default defineComponent({
   },
   computed: {
     coverUrl() {
-      // 如果后端返回了 cover_url，直接使用
-      if (this.item.coverUrl) {
-        // 修正端口号
-        return this.item.coverUrl.replace("localhost:8080", "localhost:3333");
+      // 如果后端返回了 cover_url，拼接完整 URL
+      if (this.item.cover_url) {
+        // 如果是完整URL，直接返回；如果是相对路径，拼接 API_BASE_URL
+        if (this.item.cover_url.startsWith("http")) {
+          return this.item.cover_url;
+        }
+        return `${API_BASE_URL}${this.item.cover_url}`;
       }
       return null;
     },
@@ -139,6 +142,10 @@ export default defineComponent({
   transition: transform 160ms ease, box-shadow 160ms ease;
   cursor: pointer;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 340px;
+  height: 100%;
 }
 .resource-card:hover {
   transform: translateY(-2px);
@@ -152,6 +159,7 @@ export default defineComponent({
   background: #f8f9fa;
   border: 1px solid var(--border);
   position: relative;
+  flex-shrink: 0;
 }
 .resource-card .resource-cover img {
   width: 100% !important;
@@ -170,6 +178,9 @@ export default defineComponent({
     rgba(79, 140, 255, 0.1) 0%,
     rgba(155, 123, 255, 0.1) 100%
   );
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .resource-cover.placeholder i {
   font-size: 48px;
@@ -179,10 +190,15 @@ export default defineComponent({
 .resource-title {
   font-size: 16px;
   font-weight: 600;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
+  min-height: 44px;
+  max-height: 44px;
 }
 .resource-meta {
   margin-top: 6px;
@@ -190,6 +206,7 @@ export default defineComponent({
   gap: 8px;
   align-items: center;
   flex-wrap: wrap;
+  min-height: 28px;
 }
 .badge.category {
   background: var(--primary);
@@ -221,6 +238,7 @@ export default defineComponent({
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  min-height: 20px;
 }
 .resource-chapter i {
   font-size: 11px;
@@ -230,7 +248,8 @@ export default defineComponent({
   display: flex;
   gap: 8px;
   align-items: center;
-  margin-top: 10px;
+  margin-top: auto;
+  padding-top: 10px;
 }
 .downloads {
   margin-left: auto;

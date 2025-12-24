@@ -17,7 +17,7 @@ export interface Post {
 
 export interface PostShowStoreState {
     loading: boolean;
-    post: Post;
+    resource: Post;
 }
 
 export const postShowStoreModule: Module<PostShowStoreState, RootState> = {
@@ -25,7 +25,7 @@ export const postShowStoreModule: Module<PostShowStoreState, RootState> = {
 
     state: {
         loading: false,
-        post: {},
+        resource: {},
     } as PostShowStoreState,
 
     getters: {
@@ -33,8 +33,8 @@ export const postShowStoreModule: Module<PostShowStoreState, RootState> = {
             return state.loading;
         },
 
-        post(state) {
-            return Object.keys(state.post).length ? state.post : null;
+        resource(state) {
+            return Object.keys(state.resource).length ? state.resource : null;
         },
     },
 
@@ -43,21 +43,21 @@ export const postShowStoreModule: Module<PostShowStoreState, RootState> = {
             state.loading = data;
         },
 
-        setPost(state, data) {
-            console.log('[PostShow.store] setPost 被调用，数据:', data);
-            state.post = data;
-            console.log('[PostShow.store] state.post 已设置:', state.post);
+        setResource(state, data) {
+            console.log('[PostShow.store] setResource 被调用，数据:', data);
+            state.resource = data;
+            console.log('[PostShow.store] state.resource 已设置:', state.resource);
         },
     },
 
     actions: {
-        async getPostById({ commit }, postId) {
+        async getResourceById({ commit }, resourceId) {
             commit('setLoading', true);
 
             try {
-                const response = await apiHttpClient.get(`/api/resources/${postId}`);
+                const response = await apiHttpClient.get(`/api/resources/${resourceId}`);
                 commit('setLoading', false);
-                commit('setPost', response.data);
+                commit('setResource', response.data);
 
                 console.log('返回数据：', response);
 
