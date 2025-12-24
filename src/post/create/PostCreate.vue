@@ -1,6 +1,6 @@
 <template>
   <BreadCrumbs />
-  
+
   <!-- 未登录提示 -->
   <div v-if="!isAuthenticated" class="container my-5 text-center">
     <div class="alert alert-warning mb-4" role="alert">
@@ -571,12 +571,12 @@ export default defineComponent({
     // 检查认证状态
     this.isAuthenticated = this.$store.state.auth?.isAuthenticated || false;
     console.log("[PostCreate] 认证状态:", this.isAuthenticated);
-    
+
     if (!this.isAuthenticated) {
       console.log("[PostCreate] 未登录，不加载教材目录");
       return;
     }
-    
+
     await this.fetchTextbookCatalog();
   },
 

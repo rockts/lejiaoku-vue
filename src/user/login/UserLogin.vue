@@ -1,5 +1,7 @@
 <template>
-  <div class="login-page min-vh-100 d-flex align-items-center justify-content-center bg-light">
+  <div
+    class="login-page min-vh-100 d-flex align-items-center justify-content-center bg-light"
+  >
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-md-6 col-lg-5">
@@ -10,13 +12,21 @@
               </h2>
 
               <!-- 成功提示 -->
-              <div v-if="successMessage" class="alert alert-success d-flex align-items-center" role="alert">
+              <div
+                v-if="successMessage"
+                class="alert alert-success d-flex align-items-center"
+                role="alert"
+              >
                 <i class="bi bi-check-circle-fill me-2"></i>
                 <div>{{ successMessage }}</div>
               </div>
 
               <!-- 错误提示 -->
-              <div v-if="errorMessage" class="alert alert-danger d-flex align-items-center" role="alert">
+              <div
+                v-if="errorMessage"
+                class="alert alert-danger d-flex align-items-center"
+                role="alert"
+              >
                 <i class="bi bi-exclamation-triangle-fill me-2"></i>
                 <div>{{ errorMessage }}</div>
               </div>
@@ -51,7 +61,10 @@
                   :disabled="isLoading"
                 >
                   <span v-if="isLoading">
-                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    <span
+                      class="spinner-border spinner-border-sm me-2"
+                      role="status"
+                    ></span>
                     登录中...
                   </span>
                   <span v-else>登录</span>
@@ -62,7 +75,10 @@
               <div class="text-center">
                 <p class="text-muted mb-0">
                   还没有账户？
-                  <router-link to="/register" class="text-primary text-decoration-none">
+                  <router-link
+                    to="/register"
+                    class="text-primary text-decoration-none"
+                  >
                     立即注册
                   </router-link>
                 </p>
@@ -129,7 +145,7 @@ export default defineComponent({
         if (token) {
           localStorage.setItem("auth_token", token);
           localStorage.setItem("user_info", JSON.stringify(user));
-          
+
           // 更新 Vuex store
           this.$store.commit("auth/setToken", token);
           this.$store.commit("auth/setUser", user);

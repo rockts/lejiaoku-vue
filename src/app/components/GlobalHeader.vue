@@ -82,7 +82,11 @@
               aria-expanded="false"
             >
               <i class="bi bi-person-circle me-1"></i>{{ currentUser.username }}
-              <span v-if="currentUser.role === 'admin'" class="badge bg-danger ms-1">管理员</span>
+              <span
+                v-if="currentUser.role === 'admin'"
+                class="badge bg-danger ms-1"
+                >管理员</span
+              >
             </a>
             <ul class="dropdown-menu" aria-labelledby="userDropdown">
               <li>
@@ -92,7 +96,11 @@
               </li>
               <li><hr class="dropdown-divider" /></li>
               <li>
-                <a href="javascript:void(0)" @click="handleLogout" class="dropdown-item">
+                <a
+                  href="javascript:void(0)"
+                  @click="handleLogout"
+                  class="dropdown-item"
+                >
                   <i class="bi bi-box-arrow-right me-2"></i>退出登录
                 </a>
               </li>
@@ -119,7 +127,7 @@ export default defineComponent({
       this.$store.dispatch("auth/logout");
       this.$router.push("/");
     },
-    
+
     toggleTheme() {
       const next = this.theme === "dark" ? "light" : "dark";
       this.theme = next;
@@ -136,22 +144,22 @@ export default defineComponent({
     userAvatarURL() {
       return `${API_BASE_URL}/users/${this.user?.id}/avatar`;
     },
-    
+
     themeIcon() {
       return this.theme === "dark" ? "bi bi-sun" : "bi bi-moon";
     },
-    
+
     isHomePage() {
       return this.$route.path === "/";
     },
   },
-  
+
   data() {
     return {
       theme: "light",
     };
   },
-  
+
   created() {
     const saved = localStorage.getItem("theme") || "light";
     this.theme = saved;

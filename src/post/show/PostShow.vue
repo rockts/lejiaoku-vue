@@ -40,12 +40,13 @@
               :disabled="isDeleting"
             >
               <span v-if="isDeleting">
-                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                <span
+                  class="spinner-border spinner-border-sm me-2"
+                  role="status"
+                ></span>
                 删除中...
               </span>
-              <span v-else>
-                <i class="bi bi-trash"></i> 删除
-              </span>
+              <span v-else> <i class="bi bi-trash"></i> 删除 </span>
             </button>
           </div>
         </div>

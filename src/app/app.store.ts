@@ -13,25 +13,25 @@ import { classificationsStoreModule } from '@/classifications/classifications.st
 import { authStoreModule, AuthStoreState } from './modules/auth.store';
 
 export interface RootState {
- appName: string;
- post: PostStoreState;
- auth: AuthStoreState;
+    appName: string;
+    post: PostStoreState;
+    auth: AuthStoreState;
 }
 
 /**
  * 创建 Store
  */
 const store = createStore({
- state: {
-  appName: '乐教库',
- } as RootState,
+    state: {
+        appName: '乐教库',
+    } as RootState,
 
- modules: {
-  post: postStoreModule,
-  user: userStoreModule,
-  classifications: classificationsStoreModule,
-  auth: authStoreModule,
- },
+    modules: {
+        post: postStoreModule,
+        user: userStoreModule,
+        classifications: classificationsStoreModule,
+        auth: authStoreModule,
+    },
 });
 
 // 应用启动时恢复认证状态
