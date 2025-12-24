@@ -24,7 +24,23 @@
         </div>
       </section>
 
-      <!-- 2. 教材结构（只读） -->
+      <!-- 2. 教材目录绑定信息 -->
+      <section v-if="catalogInfo" class="card section">
+        <h5 class="section-title">
+          {{ catalogInfo.isCatalog ? "📚 所属教材" : "📚 AI识别教材" }}
+        </h5>
+        <p class="text-muted mb-2">
+          {{ catalogInfo.version }} · {{ catalogInfo.subject }} ·
+          {{ catalogInfo.grade }} · {{ catalogInfo.volume }}
+        </p>
+        <ul v-if="catalogInfo.units?.length" class="structure">
+          <li v-for="(unit, idx) in catalogInfo.units" :key="idx">
+            {{ unit }}
+          </li>
+        </ul>
+      </section>
+
+      <!-- 3. 教材结构（只读） -->
       <section v-if="resource.auto_meta_result" class="card section">
         <h5 class="section-title">教材结构</h5>
         <p class="text-muted mb-2">
@@ -47,7 +63,7 @@
         </ul>
       </section>
 
-      <!-- 3. 资源说明 -->
+      <!-- 4. 资源说明 -->
       <section v-if="resource.description" class="card section">
         <h5 class="section-title">资源说明</h5>
         <p class="text-body">{{ resource.description }}</p>
@@ -96,6 +112,40 @@ export default defineComponent({
 
     showResource() {
       return !this.loading && this.resource;
+    },
+
+    catalogInfo() {
+      // 优先级1：如果存在 catalog_info，显示所属教材
+      if (this.resource?.catalog_info) {
+        return {
+          isCatalog: true,
+          version: this.resource.catalog_info.version || "-",
+          subject: this.resource.catalog_info.subject || "-",
+          grade: this.resource.catalog_info.grade || "-",
+          volume: this.resource.catalog_info.volume || "-",
+          units: null, // catalog_info 不显示单元列表
+        };
+      }
+
+      // 优先级2：如果存在 auto_meta_result，显示 AI 识别教材
+      if (this.resource?.auto_meta_result?.textbook_info) {
+        const textbookInfo = this.resource.auto_meta_result.textbook_info;
+        const units = this.resource.auto_meta_result.textbook_structure?.map(
+          (unit) => unit.name
+        ) || [];
+
+        return {
+          isCatalog: false,
+          version: textbookInfo.version || "-",
+          subject: textbookInfo.subject || "-",
+          grade: textbookInfo.grade || "-",
+          volume: textbookInfo.volume || "-",
+          units: units.length > 0 ? units : null,
+        };
+      }
+
+      // 都不存在，返回 null（区块不显示）
+      return null;
     },
   },
 
