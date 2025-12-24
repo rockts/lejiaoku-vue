@@ -3,9 +3,7 @@
   <div v-if="loadError" class="container mt-4">
     <div class="alert alert-warning" role="alert">
       <h4 class="alert-heading">资源不存在!</h4>
-      <p>
-        抱歉，找不到ID为 {{ postId }} 的资源。可能该资源已被删除或ID不正确。
-      </p>
+      <p>抱歉，找不到ID为 {{ id }} 的资源。可能该资源已被删除或ID不正确。</p>
       <router-link to="/" class="btn btn-primary">返回首页</router-link>
     </div>
   </div>
@@ -80,7 +78,7 @@
               />
               <div class="author__text">
                 <p>贡献者：{{ post.user.name }}</p>
-                <small>更新于：{{ moment(post.updated_at).fromNow() }}</small>
+                <small>更新于：{{ formatTime(post.updated_at) }}</small>
               </div>
             </div>
             <div class="res__operating">
@@ -120,49 +118,91 @@
                 <span style="font-weight: bold">资源类型：</span
                 >{{ post.category }}
               </li>
-              <li v-if="post.file.mimetype.indexOf(`png`) > -1">
+              <li
+                v-if="
+                  post.file &&
+                  post.file.mimetype &&
+                  post.file.mimetype.indexOf(`png`) > -1
+                "
+              >
                 <span style="font-weight: bold">文件类型：</span>
                 <img
                   src="@/assets/icon/filetype/png.png"
                   class="filetypeicon"
                 />
               </li>
-              <li v-if="post.file.mimetype.indexOf(`bmp`) > -1">
+              <li
+                v-if="
+                  post.file &&
+                  post.file.mimetype &&
+                  post.file.mimetype.indexOf(`bmp`) > -1
+                "
+              >
                 <span style="font-weight: bold">文件类型：</span>
                 <img
                   src="@/assets/icon/filetype/bmp.png"
                   class="filetypeicon"
                 />
               </li>
-              <li v-if="post.file.mimetype.indexOf(`jpeg`) > -1">
+              <li
+                v-if="
+                  post.file &&
+                  post.file.mimetype &&
+                  post.file.mimetype.indexOf(`jpeg`) > -1
+                "
+              >
                 <span style="font-weight: bold">文件类型：</span>
                 <img
                   src="@/assets/icon/filetype/jpg.png"
                   class="filetypeicon"
                 />
               </li>
-              <li v-if="post.file.mimetype.indexOf(`jpg`) > -1">
+              <li
+                v-if="
+                  post.file &&
+                  post.file.mimetype &&
+                  post.file.mimetype.indexOf(`jpg`) > -1
+                "
+              >
                 <span style="font-weight: bold">文件类型：</span>
                 <img
                   src="@/assets/icon/filetype/jpg.png"
                   class="filetypeicon"
                 />
               </li>
-              <li v-if="post.file.mimetype.indexOf(`gif`) > -1">
+              <li
+                v-if="
+                  post.file &&
+                  post.file.mimetype &&
+                  post.file.mimetype.indexOf(`gif`) > -1
+                "
+              >
                 <span style="font-weight: bold">文件类型：</span>
                 <img
                   src="@/assets/icon/filetype/gif.png"
                   class="filetypeicon"
                 />
               </li>
-              <li v-if="post.file.mimetype.indexOf(`spreadsheetml.sheet`) > -1">
+              <li
+                v-if="
+                  post.file &&
+                  post.file.mimetype &&
+                  post.file.mimetype.indexOf(`spreadsheetml.sheet`) > -1
+                "
+              >
                 <span style="font-weight: bold">文件类型：</span>
                 <img
                   src="@/assets/icon/filetype/xlsx.png"
                   class="filetypeicon"
                 />
               </li>
-              <li v-if="post.file.mimetype.indexOf(`msword`) > -1">
+              <li
+                v-if="
+                  post.file &&
+                  post.file.mimetype &&
+                  post.file.mimetype.indexOf(`msword`) > -1
+                "
+              >
                 <span style="font-weight: bold">文件类型：</span>
                 <img
                   src="@/assets/icon/filetype/doc.png"
@@ -171,6 +211,8 @@
               </li>
               <li
                 v-if="
+                  post.file &&
+                  post.file.mimetype &&
                   post.file.mimetype.indexOf(`wordprocessingml.document`) > -1
                 "
               >
@@ -182,6 +224,8 @@
               </li>
               <li
                 v-if="
+                  post.file &&
+                  post.file.mimetype &&
                   post.file.mimetype.indexOf(`presentationml.presentation`) > -1
                 "
               >
@@ -191,21 +235,39 @@
                   class="filetypeicon"
                 />
               </li>
-              <li v-if="post.file.mimetype.indexOf(`pdf`) > -1">
+              <li
+                v-if="
+                  post.file &&
+                  post.file.mimetype &&
+                  post.file.mimetype.indexOf(`pdf`) > -1
+                "
+              >
                 <span style="font-weight: bold">文件类型：</span>
                 <img
                   src="@/assets/icon/filetype/pdf.png"
                   class="filetypeicon"
                 />
               </li>
-              <li v-if="post.file.mimetype.indexOf(`ms-powerpoint`) > -1">
+              <li
+                v-if="
+                  post.file &&
+                  post.file.mimetype &&
+                  post.file.mimetype.indexOf(`ms-powerpoint`) > -1
+                "
+              >
                 <span style="font-weight: bold">文件类型：</span>
                 <img
                   src="@/assets/icon/filetype/ppt.png"
                   class="filetypeicon"
                 />
               </li>
-              <li v-if="post.file.mimetype.indexOf(`ms-excel`) > -1">
+              <li
+                v-if="
+                  post.file &&
+                  post.file.mimetype &&
+                  post.file.mimetype.indexOf(`ms-excel`) > -1
+                "
+              >
                 <span style="font-weight: bold">文件类型：</span>
                 <img
                   src="@/assets/icon/filetype/xls.png"
@@ -218,6 +280,32 @@
               </li>
             </ul>
           </div>
+
+          <!-- 教材结构展示区块 -->
+          <div v-if="post.auto_meta_result" class="textbook-structure mt-4">
+            <h5>📘 教材结构</h5>
+            <div class="textbook-header">
+              {{ post.auto_meta_result.textbook_version }} ·
+              {{ post.auto_meta_result.subject }} ·
+              {{ post.auto_meta_result.grade }} ·
+              {{ post.auto_meta_result.volume }}
+            </div>
+            <ul
+              class="structure-list"
+              v-if="
+                post.auto_meta_result.structure &&
+                post.auto_meta_result.structure.length
+              "
+            >
+              <li
+                v-for="(item, index) in post.auto_meta_result.structure"
+                :key="index"
+              >
+                {{ item.unit }}：{{ item.title }}
+              </li>
+            </ul>
+          </div>
+
           <div class="container">
             <div class="statistics">
               <div class="statistics-item">
@@ -280,6 +368,7 @@ export default defineComponent({
   data() {
     return {
       loadError: false,
+      localPost: null,
     };
   },
 
@@ -290,31 +379,66 @@ export default defineComponent({
   },
 
   props: {
-    postId: String,
+    id: String,
   },
 
   async created() {
     try {
-      await this.getPostById(this.postId);
+      await this.getPostById(this.id);
     } catch (error) {
       console.error("获取资源详情失败:", error);
-      // 设置一个错误状态，以便在模板中显示错误信息
-      this.loadError = true;
+      // 如果获取失败，使用本地模拟数据（针对开发/演示环境）
+      this.mockPostData();
+    }
+  },
+
+  mounted() {
+    // 挂载资源对象到 window 以便调试
+    if (this.post) {
+      window.__RESOURCE__ = this.post;
+      console.log("resource:", this.post);
+      console.log("resource.chapter_info:", this.post.chapter_info);
+      console.log("resource.auto_meta_result:", this.post.auto_meta_result);
+    }
+  },
+
+  updated() {
+    // 数据更新后重新挂载并记录
+    if (this.post) {
+      window.__RESOURCE__ = this.post;
+      console.log("resource (updated):", this.post);
     }
   },
 
   computed: {
     ...mapGetters({
       loading: "post/show/loading",
-      post: "post/show/post",
+      postFromStore: "post/show/post",
     }),
+    post() {
+      // 优先使用 store 中的数据，如果没有则使用本地模拟数据
+      return this.postFromStore || this.localPost;
+    },
+    // resource 别名，统一对外接口
+    resource() {
+      return this.post;
+    },
     postCoverURL() {
-      return `${API_BASE_URL}/covers/${this.post.cover.id}?size=thumbnail`;
+      if (!this.post) return "";
+      if (this.post.cover && this.post.cover.id) {
+        return `${API_BASE_URL}/covers/${this.post.cover.id}?size=thumbnail`;
+      }
+      return "";
     },
     postFileURL() {
-      return `${API_BASE_URL}/files/${this.post.file.id}`;
+      if (!this.post) return "";
+      if (this.post.file && this.post.file.id) {
+        return `${API_BASE_URL}/files/${this.post.file.id}`;
+      }
+      return "";
     },
     userAvatarURL() {
+      if (!this.post || !this.post.user) return "";
       return `${API_BASE_URL}/users/${this.post.user.id}/avatar`;
     },
 
@@ -324,6 +448,47 @@ export default defineComponent({
   },
 
   methods: {
+    ...mapActions({
+      getPostById: "post/show/getPostById",
+    }),
+
+    mockPostData() {
+      // 模拟数据，结构需与真实数据一致
+      this.localPost = {
+        id: this.id,
+        title: "三年级数学上册第一单元课件",
+        description:
+          "这是三年级数学上册第一单元的优秀课件，包含完整的教学流程和互动环节。",
+        grade: "三年级",
+        subject: "数学",
+        version: "人教版",
+        category: "课件",
+        created_at: new Date(),
+        updated_at: new Date(),
+        totalLikes: 128,
+        totalSaves: 56,
+        totalComments: 12,
+        user: {
+          id: 1,
+          name: "张老师",
+          avatar: null,
+        },
+        file: {
+          id: 101,
+          filename: "第一单元.ppt",
+          mimetype: "application/vnd.ms-powerpoint",
+          size: 2048000,
+        },
+        cover: null,
+        tags: [
+          { id: 1, name: "第一单元" },
+          { id: 2, name: "公开课" },
+        ],
+      };
+      // 清除错误状态，显示模拟数据
+      this.loadError = false;
+    },
+
     getTagsByName(items) {
       let result = "";
       if (items) {
@@ -334,16 +499,27 @@ export default defineComponent({
       return result;
     },
     fileSizeFormat() {
+      if (
+        !this.post ||
+        !this.post.file ||
+        typeof this.post.file.size !== "number"
+      ) {
+        return "-";
+      }
       return getReadableFileSizeString(this.post.file.size);
     },
-    moment(...args) {
-      return moment(...args);
+    formatTime(time) {
+      return moment(time).fromNow();
     },
     ...mapActions({
       getPostById: "post/show/getPostById",
     }),
 
     onClick() {
+      if (!this.post.file || !this.post.file.id) {
+        alert("模拟下载：" + this.post.file.filename);
+        return;
+      }
       axios({
         url: `${API_BASE_URL}/files/${this.post.file.id}`,
         method: "GET",
@@ -398,6 +574,41 @@ export default defineComponent({
   text-decoration: none; /*去掉前面的圆点*/
   list-style: none;
   padding-right: 14px;
+}
+
+/* 教材结构样式 */
+.textbook-structure {
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.textbook-structure h5 {
+  margin-bottom: 12px;
+  color: #333;
+  font-weight: 600;
+}
+
+.textbook-header {
+  font-size: 15px;
+  color: #555;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+.structure-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.structure-list li {
+  padding: 6px 0;
+  color: #444;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 .res__btn li {

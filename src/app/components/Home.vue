@@ -20,7 +20,7 @@
           想上传自己的教学资源？加入我们，成为教师贡献者
         </div>
         <div class="cta-actions">
-          <router-link to="/posts/create" class="btn btn-primary"
+          <router-link to="/resources/create" class="btn btn-primary"
             >上传资源</router-link
           >
           <router-link to="#" class="btn btn-outline-primary"
@@ -57,7 +57,16 @@ export default defineComponent({
     };
   },
 
+  watch: {
+    "$route.query.q"(newVal) {
+      this.filterState.keyword = newVal || "";
+    },
+  },
+
   async created() {
+    if (this.$route.query.q) {
+      this.filterState.keyword = this.$route.query.q;
+    }
     try {
       const response = await apiHttpClient.get("/api/resources");
       this.resources = response.data;

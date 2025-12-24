@@ -31,7 +31,7 @@ export default defineComponent({
     const router = useRouter();
 
     const goToDetail = (id) => {
-      router.push({ name: "postShow", params: { postId: id } });
+      router.push({ name: "resourceShow", params: { id } });
     };
 
     return {

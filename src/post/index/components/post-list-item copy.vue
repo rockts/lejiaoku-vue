@@ -23,8 +23,8 @@
                             {{item.category}}
                         </span>
                         </h4>
-                        <h5 class="card-title">
-                            <router-link :to="{name: 'postShow', params: {postId: item.id}}">
+                        <h5 class="card-title" >
+                            <router-link :to="{name: 'resourceShow', params: {id: item.id}}">
                                 {{ item.title }}
                             </router-link>
                         </h5>
@@ -66,10 +66,9 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
-import { API_BASE_URL } from '@/app/app.config';
-import moment from 'moment';
-
+import { defineComponent } from "vue";
+import { API_BASE_URL } from "@/app/app.config";
+import moment from "moment";
 
 export default defineComponent({
   props: {
@@ -77,18 +76,17 @@ export default defineComponent({
   },
   methods: {
     moment(...args) {
-    return moment(...args);
-   },
+      return moment(...args);
+    },
   },
   computed: {
     postCoverURL() {
-        return `${API_BASE_URL}/covers/${this.item.cover.id}?size=thumbnail`;
+      return `${API_BASE_URL}/covers/${this.item.cover.id}?size=thumbnail`;
     },
     userAvatarURL() {
-        return `${API_BASE_URL}/users/${this.item.user.id}/avatar`;
-    }
+      return `${API_BASE_URL}/users/${this.item.user.id}/avatar`;
+    },
   },
-
 });
 </script>
 
@@ -104,7 +102,6 @@ export default defineComponent({
 }
 
 .posttype {
-    float:right;
-
+  float: right;
 }
 </style>

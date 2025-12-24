@@ -13,6 +13,8 @@ export interface Post {
     created_at: Date;
     updated_at: Date;
     file?: string;
+    chapter_info?: any;
+    auto_meta_result?: any;
 }
 
 export interface PostShowStoreState {
@@ -53,7 +55,7 @@ export const postShowStoreModule: Module<PostShowStoreState, RootState> = {
             commit('setLoading', true);
 
             try {
-                const response = await apiHttpClient.get(`/posts/${postId}`);
+                const response = await apiHttpClient.get(`/resources/${postId}`);
                 commit('setLoading', false);
                 commit('setPost', response.data);
 
