@@ -10,10 +10,12 @@ import { createStore } from 'vuex';
 import { postStoreModule, PostStoreState } from '../post/post.store';
 import { userStoreModule } from '../user/user.store';
 import { classificationsStoreModule } from '@/classifications/classifications.store';
+import { authStoreModule, AuthStoreState } from './modules/auth.store';
 
 export interface RootState {
  appName: string;
  post: PostStoreState;
+ auth: AuthStoreState;
 }
 
 /**
@@ -28,8 +30,12 @@ const store = createStore({
   post: postStoreModule,
   user: userStoreModule,
   classifications: classificationsStoreModule,
+  auth: authStoreModule,
  },
 });
+
+// 应用启动时恢复认证状态
+store.dispatch('auth/initAuth');
 
 /**
  * 默认导出

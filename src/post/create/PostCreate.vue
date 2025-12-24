@@ -1,11 +1,29 @@
 <template>
   <BreadCrumbs />
-  <div class="post-create-page">
+  
+  <!-- 未登录提示 -->
+  <div v-if="!isAuthenticated" class="container my-5 text-center">
+    <div class="alert alert-warning mb-4" role="alert">
+      <i class="bi bi-exclamation-triangle me-2"></i>
+      <strong>需要登录</strong>
+    </div>
+    <p class="mb-4">上传资源需要先登录，请点击下方按钮登录或注册</p>
+    <router-link to="/login" class="btn btn-primary me-2">
+      <i class="bi bi-box-arrow-in-right me-2"></i>登录
+    </router-link>
+    <router-link to="/register" class="btn btn-outline-primary">
+      <i class="bi bi-person-plus me-2"></i>注册
+    </router-link>
+  </div>
+
+  <!-- 已登录，显示上传表单 -->
+  <div v-else class="post-create-page">
     <div class="container post-create-page-body">
       <!-- 上传提示 -->
       <div class="alert alert-info mb-4" role="alert">
         <i class="bi bi-info-circle me-2"></i>
-        <strong>上传流程：</strong>填写标题和分类 → 选择文件 → 点击发布 → 系统自动解析教材信息 → 8秒后跳转到资源详情页
+        <strong>上传流程：</strong>填写标题和分类 → 选择文件 → 点击发布 →
+        系统自动解析教材信息 → 8秒后跳转到资源详情页
       </div>
 
       <form>
@@ -24,7 +42,11 @@
               type="text"
               class="form-control"
             />
-            <small v-if="!title && isSubmitting" class="text-danger d-block mt-2">必填项</small>
+            <small
+              v-if="!title && isSubmitting"
+              class="text-danger d-block mt-2"
+              >必填项</small
+            >
           </div>
         </div>
 
@@ -96,7 +118,9 @@
                   application/vnd.openxmlformats-officedocument.presentationml.presentation"
               />
             </div>
-            <small v-if="!file && isSubmitting" class="text-danger d-block mt-2">必填项</small>
+            <small v-if="!file && isSubmitting" class="text-danger d-block mt-2"
+              >必填项</small
+            >
           </div>
         </div>
 
@@ -177,7 +201,7 @@
         </div>
 
         <!-- 教材信息选择区（隐藏，使用手动输入） -->
-        <div class="mb-4 textbook-section card shadow-sm" style="display: none;">
+        <div class="mb-4 textbook-section card shadow-sm" style="display: none">
           <div class="card-header bg-white">
             <h5 class="mb-0"><i class="bi bi-book"></i> 教材信息（可选）</h5>
           </div>
@@ -313,7 +337,9 @@
                   <option>教辅</option>
                   <option>其他</option>
                 </select>
-                <small v-if="!category && isSubmitting" class="text-danger">必填项</small>
+                <small v-if="!category && isSubmitting" class="text-danger"
+                  >必填项</small
+                >
               </div>
               <div class="col-md-6">
                 <label class="form-label small text-muted">年级</label>
@@ -537,10 +563,20 @@ export default defineComponent({
 
       // 步骤控制
       currentStep: 1, // 当前步骤（1:基础信息, 2:教材信息, 3:上传文件）
+      isAuthenticated: false, // 认证状态
     };
   },
 
   async created() {
+    // 检查认证状态
+    this.isAuthenticated = this.$store.state.auth?.isAuthenticated || false;
+    console.log("[PostCreate] 认证状态:", this.isAuthenticated);
+    
+    if (!this.isAuthenticated) {
+      console.log("[PostCreate] 未登录，不加载教材目录");
+      return;
+    }
+    
     await this.fetchTextbookCatalog();
   },
 

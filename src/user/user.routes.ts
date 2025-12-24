@@ -7,8 +7,8 @@
  */
 
 import { RouteRecordRaw } from 'vue-router';
-import UserLogin from './login/user-login.vue';
-import UserRegister from './register/user-register.vue';
+import UserLogin from './login/UserLogin.vue';
+import UserRegister from './register/UserRegister.vue';
 import MyResources from './resources/MyResources.vue';
 
 /**

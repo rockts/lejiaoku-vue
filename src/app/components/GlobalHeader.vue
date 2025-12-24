@@ -48,7 +48,8 @@
           <i :class="themeIcon"></i>
         </button>
 
-        <ul v-if="!user" class="navbar-nav">
+        <!-- 未登录：显示登录注册按钮 -->
+        <ul v-if="!isAuthenticated" class="navbar-nav">
           <li class="nav-item px-1 py-1">
             <router-link
               type="button"
@@ -64,38 +65,38 @@
           </li>
         </ul>
 
-        <ul v-if="user" class="list-inline mb-0 px-5">
-          <li class="nav-item dropdown" :title="user.name">
-            <router-link
+        <!-- 已登录：显示用户菜单 -->
+        <ul v-if="isAuthenticated && currentUser" class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <router-link to="/resources/create" class="nav-link me-2">
+              <i class="bi bi-cloud-upload"></i> 上传资源
+            </router-link>
+          </li>
+          <li class="nav-item dropdown">
+            <a
               class="nav-link dropdown-toggle"
-              to="#"
-              id="usersDropdown"
+              href="#"
+              id="userDropdown"
               role="button"
-              data-toggle="dropdown"
-              aria-haspopup="true"
+              data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              <!-- <img
-        v-if="(code = 404)"
-        class="img-circle avatar"
-        src="@/assets/img/avatar.png"
-       /> -->
-              <img class="img-circle avatar" :src="userAvatarURL" />
-              {{ user.name }}
-            </router-link>
-            <div class="dropdown-menu" aria-labelledby="usersDropdown">
-              <router-link to="/posts/create" class="dropdown-item"
-                >发布文章</router-link
-              >
-              <router-link to="#" class="dropdown-item">个人中心</router-link>
-              <router-link to="#" class="dropdown-item">设置账户</router-link>
-              <a
-                href="javascript:void(0)"
-                @click="handleClick"
-                class="dropdown-item"
-                >退出账户</a
-              >
-            </div>
+              <i class="bi bi-person-circle me-1"></i>{{ currentUser.username }}
+              <span v-if="currentUser.role === 'admin'" class="badge bg-danger ms-1">管理员</span>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="userDropdown">
+              <li>
+                <router-link to="/me/resources" class="dropdown-item">
+                  <i class="bi bi-file-earmark-text me-2"></i>我的资源
+                </router-link>
+              </li>
+              <li><hr class="dropdown-divider" /></li>
+              <li>
+                <a href="javascript:void(0)" @click="handleLogout" class="dropdown-item">
+                  <i class="bi bi-box-arrow-right me-2"></i>退出登录
+                </a>
+              </li>
+            </ul>
           </li>
         </ul>
       </div>
@@ -105,6 +106,7 @@
 
 <script>
 import { defineComponent } from "vue";
+import { mapGetters } from "vuex";
 import { API_BASE_URL } from "@/app/app.config";
 import HeaderSearch from "./form/HeaderSearch.vue";
 
@@ -112,10 +114,12 @@ export default defineComponent({
   name: "GlobalHeader",
   props: ["user"],
   methods: {
-    handleClick() {
-      localStorage.removeItem("token");
+    handleLogout() {
+      console.log("[GlobalHeader] 执行退出登录");
+      this.$store.dispatch("auth/logout");
       this.$router.push("/");
     },
+    
     toggleTheme() {
       const next = this.theme === "dark" ? "light" : "dark";
       this.theme = next;
@@ -124,21 +128,30 @@ export default defineComponent({
     },
   },
   computed: {
+    ...mapGetters({
+      isAuthenticated: "auth/isAuthenticated",
+      currentUser: "auth/user",
+    }),
+
     userAvatarURL() {
-      return `${API_BASE_URL}/users/${this.user.id}/avatar`;
+      return `${API_BASE_URL}/users/${this.user?.id}/avatar`;
     },
+    
     themeIcon() {
       return this.theme === "dark" ? "bi bi-sun" : "bi bi-moon";
     },
+    
     isHomePage() {
       return this.$route.path === "/";
     },
   },
+  
   data() {
     return {
       theme: "light",
     };
   },
+  
   created() {
     const saved = localStorage.getItem("theme") || "light";
     this.theme = saved;

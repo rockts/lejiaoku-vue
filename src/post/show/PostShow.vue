@@ -22,12 +22,30 @@
             >
               下载
             </a>
+            <!-- 编辑按钮：仅权限用户显示 -->
             <button
+              v-if="canEdit"
               type="button"
               class="btn btn-outline-secondary ms-2"
               @click="$router.push(`/resources/${id}/edit`)"
             >
               <i class="bi bi-pencil"></i> 编辑
+            </button>
+            <!-- 删除按钮：仅权限用户显示 -->
+            <button
+              v-if="canDelete"
+              type="button"
+              class="btn btn-outline-danger ms-2"
+              @click="handleDelete"
+              :disabled="isDeleting"
+            >
+              <span v-if="isDeleting">
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                删除中...
+              </span>
+              <span v-else>
+                <i class="bi bi-trash"></i> 删除
+              </span>
             </button>
           </div>
         </div>
@@ -126,6 +144,7 @@ export default defineComponent({
     return {
       resource: null, // 只读资源数据
       loading: false, // 加载状态
+      isDeleting: false, // 删除中状态
     };
   },
 
@@ -143,6 +162,30 @@ export default defineComponent({
 
     showResource() {
       return !this.loading && this.resource;
+    },
+
+    // 检查当前用户是否可以编辑
+    canEdit() {
+      const user = this.$store.state.auth?.user;
+      if (!user) return false;
+      // 管理员或资源创建者可以编辑
+      return (
+        user.role === "admin" ||
+        user.id === this.resource?.creator_id ||
+        user.username === this.resource?.creator
+      );
+    },
+
+    // 检查当前用户是否可以删除
+    canDelete() {
+      const user = this.$store.state.auth?.user;
+      if (!user) return false;
+      // 管理员或资源创建者可以删除
+      return (
+        user.role === "admin" ||
+        user.id === this.resource?.creator_id ||
+        user.username === this.resource?.creator
+      );
     },
 
     catalogInfo() {
@@ -203,6 +246,28 @@ export default defineComponent({
         console.error("[PostShow] 获取资源详情失败:", error);
       } finally {
         this.loading = false;
+      }
+    },
+
+    async handleDelete() {
+      if (!confirm("确定要删除这个资源吗？此操作不可撤销。")) {
+        return;
+      }
+
+      this.isDeleting = true;
+
+      try {
+        console.log("[PostShow] 删除资源，ID:", this.id);
+        await apiHttpClient.delete(`/api/resources/${this.id}`);
+        console.log("[PostShow] 资源删除成功");
+        this.$router.push("/resources");
+        // 显示成功提示
+        this.$store.commit("post/index/setResources", []); // 重置列表
+      } catch (error) {
+        console.error("[PostShow] 删除失败:", error);
+        alert("删除失败：" + (error.response?.data?.message || error.message));
+      } finally {
+        this.isDeleting = false;
       }
     },
   },

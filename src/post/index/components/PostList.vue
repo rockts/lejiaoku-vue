@@ -76,12 +76,16 @@
         class="shadow p-3 mb-5 bg-body rounded"
       />
       <!-- </div> -->
-      
+
       <!-- 分页控件 -->
       <nav v-if="!loading && totalPages > 1" aria-label="分页" class="mt-4">
         <ul class="pagination justify-content-center">
           <li class="page-item" :class="{ disabled: currentPage === 1 }">
-            <button class="page-link" @click="changePage(currentPage - 1)" :disabled="currentPage === 1">
+            <button
+              class="page-link"
+              @click="changePage(currentPage - 1)"
+              :disabled="currentPage === 1"
+            >
               上一页
             </button>
           </li>
@@ -95,8 +99,15 @@
               {{ page }}
             </button>
           </li>
-          <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-            <button class="page-link" @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">
+          <li
+            class="page-item"
+            :class="{ disabled: currentPage === totalPages }"
+          >
+            <button
+              class="page-link"
+              @click="changePage(currentPage + 1)"
+              :disabled="currentPage === totalPages"
+            >
               下一页
             </button>
           </li>
@@ -150,11 +161,11 @@ export default defineComponent({
       const maxDisplay = 5;
       let start = Math.max(1, this.currentPage - 2);
       let end = Math.min(this.totalPages, start + maxDisplay - 1);
-      
+
       if (end - start < maxDisplay - 1) {
         start = Math.max(1, end - maxDisplay + 1);
       }
-      
+
       for (let i = start; i <= end; i++) {
         pages.push(i);
       }
@@ -173,7 +184,7 @@ export default defineComponent({
         page: 1, // 搜索时重置到第一页
         limit: this.pageSize,
       };
-      
+
       Object.keys(this.filters).forEach((key) => {
         if (this.filters[key].trim()) {
           params[key] = this.filters[key].trim();
@@ -205,23 +216,23 @@ export default defineComponent({
         return;
       }
       this.currentPage = page;
-      
+
       const params = {
         page: this.currentPage,
         limit: this.pageSize,
       };
-      
+
       Object.keys(this.filters).forEach((key) => {
         if (this.filters[key].trim()) {
           params[key] = this.filters[key].trim();
         }
       });
-      
+
       console.log(`[PostList] 切换到第 ${page} 页，参数:`, params);
       this.fetchFilteredResources(params);
-      
+
       // 滚动到顶部
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     },
 
     async fetchFilteredResources(params) {
@@ -231,13 +242,16 @@ export default defineComponent({
         const response = await apiHttpClient.get("/api/resources", { params });
         console.log("[PostList] 过滤结果:", response.data);
         console.log("[PostList] 响应头:", response.headers);
-        
+
         // 从响应中获取总数
-        const totalCount = response.headers['x-total-count'] || response.data.length;
+        const totalCount =
+          response.headers["x-total-count"] || response.data.length;
         this.total = parseInt(totalCount) || response.data.length;
-        
-        console.log(`[PostList] 总计 ${this.total} 条，当前第 ${this.currentPage}/${this.totalPages} 页`);
-        
+
+        console.log(
+          `[PostList] 总计 ${this.total} 条，当前第 ${this.currentPage}/${this.totalPages} 页`
+        );
+
         this.$store.commit("post/index/setResources", response.data);
       } catch (error) {
         console.error("[PostList] 过滤失败:", error);

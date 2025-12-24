@@ -14,14 +14,17 @@ export const apiHttpClient = axios.create({
  */
 apiHttpClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    // 从 localStorage 获取 token 并添加到请求头
+    const token = localStorage.getItem('auth_token');
     if (token) {
       config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;
+      console.log('[APIClient] 已添加 Authorization 头');
     }
     return config;
   },
   (error) => {
+    console.error('[APIClient] 请求拦截器错误:', error);
     return Promise.reject(error);
   }
 );
