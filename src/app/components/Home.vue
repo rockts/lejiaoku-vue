@@ -23,9 +23,30 @@
           <router-link to="/resources/create" class="btn btn-primary"
             >上传资源</router-link
           >
-          <router-link to="#" class="btn btn-outline-primary"
+          <router-link
+            to="#"
+            class="btn btn-outline-primary"
+            @mouseenter="showQR = true"
+            @mouseleave="showQR = false"
             >申请成为贡献者</router-link
           >
+
+          <div
+            v-if="showQR"
+            class="qr-popover"
+            @mouseenter="showQR = true"
+            @mouseleave="showQR = false"
+          >
+            <img
+              class="qr-image"
+              :src="qrSrc"
+              alt="扫码成为贡献者"
+              @error="qrError = true"
+            />
+            <div class="qr-caption">
+              {{ qrError ? "未找到二维码，请在 public/ 放置 qr-contributor.jpg" : "申请成为贡献者" }}
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -54,6 +75,9 @@ export default defineComponent({
         grades: [],
       },
       resources: [],
+      showQR: false,
+      qrError: false,
+      qrSrc: process.env.BASE_URL + "qr-contributor.jpg",
     };
   },
 
@@ -220,5 +244,31 @@ export default defineComponent({
 .cta-actions {
   display: flex;
   gap: 12px;
+  position: relative;
+}
+
+.qr-popover {
+  position: absolute;
+  top: 48px;
+  left: 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 12px;
+  z-index: 10;
+}
+
+.qr-image {
+  width: 240px;
+  height: auto;
+  display: block;
+}
+
+.qr-caption {
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-secondary, #666);
+  margin-top: 8px;
 }
 </style>
