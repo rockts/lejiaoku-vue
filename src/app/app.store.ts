@@ -9,7 +9,6 @@
 import { createStore } from 'vuex';
 import { postStoreModule, PostStoreState } from '../post/post.store';
 import { userStoreModule } from '../user/user.store';
-import { classificationsStoreModule } from '@/classifications/classifications.store';
 import { authStoreModule, AuthStoreState } from './modules/auth.store';
 
 export interface RootState {
@@ -29,7 +28,6 @@ const store = createStore({
     modules: {
         post: postStoreModule,
         user: userStoreModule,
-        classifications: classificationsStoreModule,
         auth: authStoreModule,
     },
 });

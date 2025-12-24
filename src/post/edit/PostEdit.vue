@@ -36,11 +36,9 @@
               >
               <select v-model="editForm.category" class="form-control">
                 <option value="">选择分类</option>
-                <option>教材</option>
-                <option>课件</option>
-                <option>教案</option>
-                <option>教辅</option>
-                <option>其他</option>
+                <option v-for="cat in categories" :key="cat" :value="cat">
+                  {{ cat }}
+                </option>
               </select>
             </div>
 
@@ -186,6 +184,7 @@ import { defineComponent } from "vue";
 import { apiHttpClient } from "@/app/app.service";
 import BreadCrumbs from "@/app/components/BreadCrumbs.vue";
 import notification from "@/utils/notification";
+import { RESOURCE_CATEGORIES } from "@/utils/constants";
 
 const API_BASE_URL =
   process.env.VUE_APP_API_BASE_URL || "http://localhost:3333";
@@ -203,6 +202,7 @@ export default defineComponent({
   },
   data() {
     return {
+      categories: RESOURCE_CATEGORIES, // 资源分类列表（静态）
       resource: null,
       loading: true,
       isSaving: false,

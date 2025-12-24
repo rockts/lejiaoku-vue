@@ -331,11 +331,9 @@
                   :class="{ 'is-invalid': !category && isSubmitting }"
                 >
                   <option value="">选择分类</option>
-                  <option>教材</option>
-                  <option>课件</option>
-                  <option>教案</option>
-                  <option>教辅</option>
-                  <option>其他</option>
+                  <option v-for="cat in categories" :key="cat" :value="cat">
+                    {{ cat }}
+                  </option>
                 </select>
                 <small v-if="!category && isSubmitting" class="text-danger"
                   >必填项</small
@@ -494,9 +492,9 @@
 import { apiHttpClient } from "@/app/app.service";
 import { defineComponent } from "vue";
 import BreadCrumbs from "@/app/components/BreadCrumbs.vue";
-import ClassificationsOption from "@/classifications/index/components/ClassificationsOption.vue";
 import TextbookStructure from "./components/TextbookStructure.vue"; // 新增教材结构组件
 import notification from "@/utils/notification";
+import { RESOURCE_CATEGORIES } from "@/utils/constants";
 
 export default defineComponent({
   title() {
@@ -504,7 +502,6 @@ export default defineComponent({
   },
   components: {
     BreadCrumbs,
-    ClassificationsOption,
     TextbookStructure, // 新增教材结构组件
   },
   name: "PostCreate",
@@ -516,6 +513,7 @@ export default defineComponent({
   },
   data() {
     return {
+      categories: RESOURCE_CATEGORIES, // 资源分类列表（静态）
       errorMessage: "",
       successMessage: "",
       isSubmitting: false,
