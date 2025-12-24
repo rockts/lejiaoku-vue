@@ -115,8 +115,11 @@ export default defineComponent({
     },
 
     catalogInfo() {
+      console.log("[catalogInfo] 开始计算，resource:", this.resource);
+      
       // 优先级1：如果存在 catalog_info，显示所属教材
       if (this.resource?.catalog_info) {
+        console.log("[catalogInfo] 使用 catalog_info");
         return {
           isCatalog: true,
           version: this.resource.catalog_info.version || "-",
@@ -129,6 +132,7 @@ export default defineComponent({
 
       // 优先级2：如果存在 auto_meta_result，显示 AI 识别教材
       if (this.resource?.auto_meta_result?.textbook_info) {
+        console.log("[catalogInfo] 使用 auto_meta_result");
         const textbookInfo = this.resource.auto_meta_result.textbook_info;
         const units =
           this.resource.auto_meta_result.textbook_structure?.map(
@@ -146,6 +150,7 @@ export default defineComponent({
       }
 
       // 都不存在，返回 null（区块不显示）
+      console.log("[catalogInfo] 都不存在，返回 null");
       return null;
     },
   },
@@ -158,7 +163,11 @@ export default defineComponent({
           `/api/resources/${resourceId}`
         );
         this.resource = response.data;
-        console.log("[PostShow] resource:", this.resource);
+        
+        // 详细日志输出
+        console.log("resource detail:", this.resource);
+        console.log("auto_meta_result:", this.resource?.auto_meta_result);
+        console.log("catalog_info:", this.resource?.catalog_info);
       } catch (error) {
         console.error("[PostShow] 获取资源详情失败:", error);
       } finally {
