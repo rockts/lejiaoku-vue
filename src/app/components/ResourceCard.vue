@@ -22,73 +22,17 @@
       <button class="btn btn-sm btn-outline-primary" @click.stop="onPreview">
         预览
       </button>
-      <button
+      <a
         class="btn btn-sm btn-primary"
-        @click.stop="showDownloadModal = true"
+        :href="downloadUrl"
+        target="_blank"
+        rel="noopener"
+        @click.stop
       >
         下载
-      </button>
+      </a>
       <span class="downloads">⬇ {{ item.downloads }}</span>
     </div>
-
-    <!-- 下载确认弹窗 - 使用 Teleport 挂载到 body -->
-    <Teleport to="body">
-      <div
-        class="modal fade"
-        :class="{ show: showDownloadModal }"
-        :style="{ display: showDownloadModal ? 'block' : 'none' }"
-        tabindex="-1"
-        @click.self="showDownloadModal = false"
-        v-if="showDownloadModal"
-      >
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">
-                <i class="bi bi-download"></i> 确认下载
-              </h5>
-              <button
-                type="button"
-                class="close"
-                @click="showDownloadModal = false"
-              >
-                <span>&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <p class="mb-2">您确定要下载以下资源吗？</p>
-              <div class="download-info">
-                <strong>{{ item.title }}</strong>
-                <div class="text-muted small mt-1">
-                  {{ item.category }} · {{ item.format }}
-                </div>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                @click="showDownloadModal = false"
-              >
-                取消
-              </button>
-              <button
-                type="button"
-                class="btn btn-primary"
-                @click="confirmDownload"
-              >
-                <i class="bi bi-download"></i> 确认下载
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        class="modal-backdrop fade show"
-        v-if="showDownloadModal"
-        @click="showDownloadModal = false"
-      ></div>
-    </Teleport>
   </div>
 </template>
 
@@ -99,11 +43,6 @@ import { API_BASE_URL } from "@/app/app.config";
 export default defineComponent({
   name: "ResourceCard",
   props: { item: { type: Object, required: true } },
-  data() {
-    return {
-      showDownloadModal: false,
-    };
-  },
   computed: {
     coverUrl() {
       // 如果后端返回了 cover_url，拼接完整 URL
@@ -115,6 +54,11 @@ export default defineComponent({
         return `${API_BASE_URL}${this.item.cover_url}`;
       }
       return null;
+    },
+    downloadUrl() {
+      if (!this.item?.file_url) return "";
+      if (this.item.file_url.startsWith("http")) return this.item.file_url;
+      return `${API_BASE_URL}${this.item.file_url}`;
     },
     textbookInfo() {
       // 优先使用 catalog_info，fallback 到 auto_meta_result
@@ -136,13 +80,6 @@ export default defineComponent({
   methods: {
     onPreview() {
       this.$router.push(`/posts/${this.item.id}`);
-    },
-    confirmDownload() {
-      // 使用后端下载接口
-      const downloadUrl = `${API_BASE_URL}/api/resources/${this.item.id}/download`;
-      console.log("[ResourceCard] 下载文件:", downloadUrl);
-      window.open(downloadUrl, "_blank");
-      this.showDownloadModal = false;
     },
   },
 });
