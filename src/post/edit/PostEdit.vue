@@ -327,9 +327,10 @@ export default defineComponent({
         }, 3000);
       } catch (error) {
         console.error("[PostEdit] 提交失败:", error);
-        notification.error(`提交失败: ${
-          error.response?.data?.message || error.message
-        }`, 5000);
+        notification.error(
+          `提交失败: ${error.response?.data?.message || error.message}`,
+          5000
+        );
       } finally {
         this.isSaving = false;
       }
