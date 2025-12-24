@@ -147,7 +147,9 @@
             <div v-else class="upload-area" @click="$refs.coverInput.click()">
               <i class="bi bi-cloud-upload upload-icon"></i>
               <p class="mb-1">点击上传封面图片</p>
-              <small class="text-muted">支持 JPG、PNG 格式，建议尺寸 800x600</small>
+              <small class="text-muted"
+                >支持 JPG、PNG 格式，建议尺寸 800x600</small
+              >
             </div>
 
             <input
@@ -184,10 +186,16 @@
                   <i :class="getFileIcon(resource.format)"></i>
                 </div>
                 <div class="file-details">
-                  <div class="file-name">{{ resource.filename || '资源文件' }}</div>
+                  <div class="file-name">
+                    {{ resource.filename || "资源文件" }}
+                  </div>
                   <div class="file-meta">
-                    <span class="badge bg-secondary me-2">{{ resource.format }}</span>
-                    <span class="text-muted">{{ formatFileSize(resource.size) }}</span>
+                    <span class="badge bg-secondary me-2">{{
+                      resource.format
+                    }}</span>
+                    <span class="text-muted">{{
+                      formatFileSize(resource.size)
+                    }}</span>
                   </div>
                 </div>
                 <div class="file-actions">
@@ -249,9 +257,6 @@
             class="btn btn-outline-secondary btn-lg px-5"
           >
             <i class="bi bi-x-circle me-2"></i>取消
-          </button>
-        </div>
-            取消
           </button>
         </div>
 

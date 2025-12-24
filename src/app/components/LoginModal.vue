@@ -1,11 +1,7 @@
 <template>
   <Teleport to="body">
     <Transition name="modal">
-      <div
-        v-if="modelValue"
-        class="modal-overlay"
-        @click.self="closeModal"
-      >
+      <div v-if="modelValue" class="modal-overlay" @click.self="closeModal">
         <div class="modal-container">
           <div class="modal-content">
             <div class="modal-header">
@@ -22,90 +18,90 @@
               </button>
             </div>
             <div class="modal-body">
-            <form @submit.prevent="handleSubmit">
-              <div class="mb-3">
-                <label class="form-label">用户名/邮箱</label>
-                <div class="input-group">
-                  <span class="input-group-text">
-                    <i class="bi bi-person-fill"></i>
-                  </span>
-                  <input
-                    type="text"
-                    class="form-control"
-                    v-model="account"
-                    placeholder="输入用户名或邮箱"
-                    required
-                  />
+              <form @submit.prevent="handleSubmit">
+                <div class="mb-3">
+                  <label class="form-label">用户名/邮箱</label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-person-fill"></i>
+                    </span>
+                    <input
+                      type="text"
+                      class="form-control"
+                      v-model="account"
+                      placeholder="输入用户名或邮箱"
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div class="mb-3">
-                <label class="form-label">密码</label>
-                <div class="input-group">
-                  <span class="input-group-text">
-                    <i class="bi bi-lock-fill"></i>
-                  </span>
-                  <input
-                    type="password"
-                    class="form-control"
-                    v-model="password"
-                    placeholder="输入密码"
-                    required
-                  />
+                <div class="mb-3">
+                  <label class="form-label">密码</label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-lock-fill"></i>
+                    </span>
+                    <input
+                      type="password"
+                      class="form-control"
+                      v-model="password"
+                      placeholder="输入密码"
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div class="d-flex justify-content-between mb-3">
-                <a href="#" class="text-muted small">忘记密码？</a>
-                <a href="#" @click.prevent="switchToRegister" class="small"
-                  >还没有账号？立即注册</a
+                <div class="d-flex justify-content-between mb-3">
+                  <a href="#" class="text-muted small">忘记密码？</a>
+                  <a href="#" @click.prevent="switchToRegister" class="small"
+                    >还没有账号？立即注册</a
+                  >
+                </div>
+
+                <button
+                  type="submit"
+                  class="w-100 btn btn-primary"
+                  :disabled="loading"
                 >
-              </div>
+                  <span
+                    v-if="loading"
+                    class="spinner-border spinner-border-sm me-2"
+                  ></span>
+                  {{ loading ? "登录中..." : "登录" }}
+                </button>
 
-              <button
-                type="submit"
-                class="w-100 btn btn-primary"
-                :disabled="loading"
-              >
-                <span
-                  v-if="loading"
-                  class="spinner-border spinner-border-sm me-2"
-                ></span>
-                {{ loading ? "登录中..." : "登录" }}
-              </button>
-
-              <div class="text-center mt-4">
-                <p class="text-muted small mb-2">社交账号登录</p>
-                <div class="d-flex justify-content-center gap-3">
-                  <button
-                    type="button"
-                    class="btn btn-outline-secondary btn-sm"
-                  >
-                    <img
-                      src="@/assets/img/weixin.png"
-                      style="width: 20px; height: 20px"
-                      alt="微信"
-                    />
-                    微信
-                  </button>
-                  <button
-                    type="button"
-                    class="btn btn-outline-secondary btn-sm"
-                  >
-                    <img
-                      src="@/assets/img/qq.png"
-                      style="width: 20px; height: 20px"
-                      alt="QQ"
-                    />
-                    QQ
-                  </button>
+                <div class="text-center mt-4">
+                  <p class="text-muted small mb-2">社交账号登录</p>
+                  <div class="d-flex justify-content-center gap-3">
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary btn-sm"
+                    >
+                      <img
+                        src="@/assets/img/weixin.png"
+                        style="width: 20px; height: 20px"
+                        alt="微信"
+                      />
+                      微信
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary btn-sm"
+                    >
+                      <img
+                        src="@/assets/img/qq.png"
+                        style="width: 20px; height: 20px"
+                        alt="QQ"
+                      />
+                      QQ
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </Transition>
   </Teleport>
 </template>
@@ -160,16 +156,16 @@ export default defineComponent({
         const response = await apiHttpClient.post("/login", loginData);
 
         const { token, user } = response.data;
-        
+
         // 保存 token 和用户信息
         localStorage.setItem("token", token);
         localStorage.setItem("auth_token", token);
         localStorage.setItem("user_info", JSON.stringify(user));
-        
+
         // 更新 store
         this.$store.commit("auth/setToken", token);
         this.$store.commit("auth/setUser", user);
-        
+
         notification.success("登录成功！");
         this.closeModal();
 

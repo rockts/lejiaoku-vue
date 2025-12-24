@@ -5,13 +5,13 @@
       <div class="col-md-3">
         <div class="card">
           <div class="card-body text-center">
-            <i class="bi bi-person-circle" style="font-size: 5rem; color: #667eea"></i>
+            <i
+              class="bi bi-person-circle"
+              style="font-size: 5rem; color: #667eea"
+            ></i>
             <h5 class="mt-3">{{ currentUser?.username }}</h5>
             <p class="text-muted small mb-2">{{ currentUser?.email }}</p>
-            <span
-              v-if="currentUser?.role === 'admin'"
-              class="badge bg-danger"
-            >
+            <span v-if="currentUser?.role === 'admin'" class="badge bg-danger">
               管理员
             </span>
             <span v-else class="badge bg-secondary">普通用户</span>
@@ -82,8 +82,15 @@
                   placeholder="介绍一下自己..."
                 ></textarea>
               </div>
-              <button type="submit" class="btn btn-primary" :disabled="updating">
-                <span v-if="updating" class="spinner-border spinner-border-sm me-2"></span>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                :disabled="updating"
+              >
+                <span
+                  v-if="updating"
+                  class="spinner-border spinner-border-sm me-2"
+                ></span>
                 {{ updating ? "保存中..." : "保存修改" }}
               </button>
             </form>
@@ -128,8 +135,15 @@
                   required
                 />
               </div>
-              <button type="submit" class="btn btn-primary" :disabled="changingPassword">
-                <span v-if="changingPassword" class="spinner-border spinner-border-sm me-2"></span>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                :disabled="changingPassword"
+              >
+                <span
+                  v-if="changingPassword"
+                  class="spinner-border spinner-border-sm me-2"
+                ></span>
                 {{ changingPassword ? "修改中..." : "修改密码" }}
               </button>
             </form>
@@ -139,14 +153,20 @@
         <!-- 账号安全 -->
         <div v-if="activeTab === 'security'" class="card">
           <div class="card-header">
-            <h5 class="mb-0"><i class="bi bi-shield-check me-2"></i>账号安全</h5>
+            <h5 class="mb-0">
+              <i class="bi bi-shield-check me-2"></i>账号安全
+            </h5>
           </div>
           <div class="card-body">
             <div class="list-group">
-              <div class="list-group-item d-flex justify-content-between align-items-center">
+              <div
+                class="list-group-item d-flex justify-content-between align-items-center"
+              >
                 <div>
                   <h6 class="mb-1">登录密码</h6>
-                  <small class="text-muted">定期更改密码可以提高账号安全性</small>
+                  <small class="text-muted"
+                    >定期更改密码可以提高账号安全性</small
+                  >
                 </div>
                 <button
                   class="btn btn-sm btn-outline-primary"
@@ -155,17 +175,23 @@
                   修改
                 </button>
               </div>
-              <div class="list-group-item d-flex justify-content-between align-items-center">
+              <div
+                class="list-group-item d-flex justify-content-between align-items-center"
+              >
                 <div>
                   <h6 class="mb-1">邮箱验证</h6>
                   <small class="text-muted">{{ currentUser?.email }}</small>
                 </div>
                 <span class="badge bg-success">已验证</span>
               </div>
-              <div class="list-group-item d-flex justify-content-between align-items-center">
+              <div
+                class="list-group-item d-flex justify-content-between align-items-center"
+              >
                 <div>
                   <h6 class="mb-1">账号注册时间</h6>
-                  <small class="text-muted">{{ formatDate(currentUser?.created_at) }}</small>
+                  <small class="text-muted">{{
+                    formatDate(currentUser?.created_at)
+                  }}</small>
                 </div>
               </div>
             </div>
@@ -217,17 +243,22 @@ export default defineComponent({
     async updateProfile() {
       this.updating = true;
       try {
-        const response = await apiHttpClient.put("/user/profile", this.profileForm);
-        
+        const response = await apiHttpClient.put(
+          "/user/profile",
+          this.profileForm
+        );
+
         // 更新本地用户信息
         const updatedUser = { ...this.currentUser, ...response.data };
         localStorage.setItem("user_info", JSON.stringify(updatedUser));
         this.$store.commit("auth/setUser", updatedUser);
-        
+
         notification.success("个人信息更新成功！");
       } catch (error) {
         console.error("[UserProfile] 更新失败:", error);
-        notification.error(error.response?.data?.message || "更新失败，请稍后重试");
+        notification.error(
+          error.response?.data?.message || "更新失败，请稍后重试"
+        );
       } finally {
         this.updating = false;
       }
@@ -251,7 +282,7 @@ export default defineComponent({
         });
 
         notification.success("密码修改成功！");
-        
+
         // 清空表单
         this.passwordForm = {
           oldPassword: "",
@@ -260,7 +291,9 @@ export default defineComponent({
         };
       } catch (error) {
         console.error("[UserProfile] 修改密码失败:", error);
-        notification.error(error.response?.data?.message || "修改密码失败，请检查当前密码");
+        notification.error(
+          error.response?.data?.message || "修改密码失败，请检查当前密码"
+        );
       } finally {
         this.changingPassword = false;
       }
