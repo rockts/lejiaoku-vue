@@ -22,17 +22,13 @@
           <li class="nav-item">
             <router-link class="nav-link" to="/posts">资源 </router-link>
           </li>
-          <li class="nav-item">
-            <router-link class="nav-link" to="/classifications"
-              >分类
-            </router-link>
-          </li>
 
           <li class="nav-item">
             <router-link class="nav-link" to="/">贡献者</router-link>
           </li>
 
-          <li class="nav-item">
+          <!-- API测试：仅管理员可见 -->
+          <li v-if="isAuthenticated && currentUser?.role === 'admin'" class="nav-item">
             <router-link class="nav-link" to="/test-api">
               <i class="bi bi-wrench"></i> API测试
             </router-link>
