@@ -145,6 +145,31 @@ import RegisterModal from "./RegisterModal.vue";
 export default defineComponent({
   name: "GlobalHeader",
   props: ["user"],
+  data() {
+    return {
+      theme: "light",
+      showLoginModal: false,
+      showRegisterModal: false,
+    };
+  },
+  computed: {
+    ...mapGetters({
+      isAuthenticated: "auth/isAuthenticated",
+      currentUser: "auth/user",
+    }),
+
+    userAvatarURL() {
+      return `${API_BASE_URL}/users/${this.user?.id}/avatar`;
+    },
+
+    themeIcon() {
+      return this.theme === "dark" ? "bi bi-sun" : "bi bi-moon";
+    },
+
+    isHomePage() {
+      return this.$route.path === "/";
+    },
+  },
   methods: {
     handleLogout() {
       console.log("[GlobalHeader] 执行退出登录");
@@ -159,40 +184,12 @@ export default defineComponent({
       document.documentElement.setAttribute("data-theme", next);
     },
   },
-  computed: {
-    ...mapGetters({
-      showLoginModal: false,
-      showRegisterModal: false,
-    };
-  },
-
   created() {
     const saved = localStorage.getItem("theme") || "light";
     this.theme = saved;
     document.documentElement.setAttribute("data-theme", saved);
   },
-
-  components: { HeaderSearch, LoginModal, RegisterModal"dark" ? "bi bi-sun" : "bi bi-moon";
-    },
-
-    isHomePage() {
-      return this.$route.path === "/";
-    },
-  },
-
-  data() {
-    return {
-      theme: "light",
-    };
-  },
-
-  created() {
-    const saved = localStorage.getItem("theme") || "light";
-    this.theme = saved;
-    document.documentElement.setAttribute("data-theme", saved);
-  },
-
-  components: { HeaderSearch },
+  components: { HeaderSearch, LoginModal, RegisterModal },
 });
 </script>
 

@@ -100,7 +100,10 @@
               <div class="text-center mt-4">
                 <p class="text-muted small mb-2">社交账号直接注册</p>
                 <div class="d-flex justify-content-center gap-3">
-                  <button type="button" class="btn btn-outline-secondary btn-sm">
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary btn-sm"
+                  >
                     <img
                       src="@/assets/img/weixin.png"
                       style="width: 20px; height: 20px"
@@ -108,7 +111,10 @@
                     />
                     微信
                   </button>
-                  <button type="button" class="btn btn-outline-secondary btn-sm">
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary btn-sm"
+                  >
                     <img
                       src="@/assets/img/qq.png"
                       style="width: 20px; height: 20px"
