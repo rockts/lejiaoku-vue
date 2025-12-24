@@ -157,18 +157,22 @@ export default defineComponent({
           password: this.password,
         });
 
-        localStorage.setItem("token", response.data.token);
+        const { token, user } = response.data;
+        
+        // 保存 token 和用户信息
+        localStorage.setItem("token", token);
+        localStorage.setItem("auth_token", token);
+        localStorage.setItem("user_info", JSON.stringify(user));
+        
+        // 更新 store
+        this.$store.commit("auth/setToken", token);
+        this.$store.commit("auth/setUser", user);
+        
         notification.success("登录成功！");
-
-        // 刷新页面状态
-        await this.$store.dispatch("auth/getCurrentUser");
-
         this.closeModal();
 
-        // 如果在登录页，跳转到首页
-        if (this.$route.path === "/login") {
-          this.$router.push("/");
-        }
+        // 刷新页面以更新UI状态
+        window.location.reload();
       } catch (error) {
         console.error("[LoginModal] 登录失败:", error);
         notification.error(
