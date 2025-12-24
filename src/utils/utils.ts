@@ -12,3 +12,29 @@ export function getReadableFileSizeString(fileSizeInBytes: number) {
 
 // 资源类型 Icon 显示
 // export function getFileTypeIcon() {}
+
+/**
+ * 防抖函数 - 延迟执行，只执行最后一次
+ * @param func 要执行的函数
+ * @param wait 延迟时间（毫秒）
+ * @returns 防抖后的函数
+ */
+export function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number = 300
+): (...args: Parameters<T>) => void {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+  
+  return function (this: any, ...args: Parameters<T>) {
+    const context = this;
+    
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+    
+    timeout = setTimeout(() => {
+      func.apply(context, args);
+      timeout = null;
+    }, wait);
+  };
+}

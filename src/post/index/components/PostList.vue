@@ -10,6 +10,7 @@
             type="text"
             class="form-control form-control-sm"
             placeholder="如：二年级"
+            @input="debouncedApplyFilters"
           />
         </div>
         <div class="col-md-2">
@@ -19,6 +20,7 @@
             type="text"
             class="form-control form-control-sm"
             placeholder="如：语文"
+            @input="debouncedApplyFilters"
           />
         </div>
         <div class="col-md-2">
@@ -28,6 +30,7 @@
             type="text"
             class="form-control form-control-sm"
             placeholder="如：人教版"
+            @input="debouncedApplyFilters"
           />
         </div>
         <div class="col-md-2">
@@ -37,6 +40,7 @@
             type="text"
             class="form-control form-control-sm"
             placeholder="如：上册"
+            @input="debouncedApplyFilters"
           />
         </div>
         <div class="col-md-2">
@@ -46,6 +50,7 @@
             type="text"
             class="form-control form-control-sm"
             placeholder="如：春天"
+            @input="debouncedApplyFilters"
           />
         </div>
         <div class="col-md-2 d-flex align-items-end">
@@ -121,6 +126,7 @@
 import { defineComponent } from "vue";
 import { mapGetters, mapActions } from "vuex";
 import PostListItem from "./PostListItem.vue";
+import { debounce } from "@/utils/utils";
 
 export default defineComponent({
   name: "PostList",
@@ -137,10 +143,16 @@ export default defineComponent({
       currentPage: 1,
       pageSize: 30,
       total: 0,
+      debouncedApplyFilters: null, // 防抖函数实例
     };
   },
 
   async created() {
+    // 创建防抖函数实例（延迟600ms执行搜索）
+    this.debouncedApplyFilters = debounce(() => {
+      this.applyFilters();
+    }, 600);
+
     // 初始加载时使用分页参数
     this.fetchFilteredResources({ page: 1, limit: this.pageSize });
   },

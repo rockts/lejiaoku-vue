@@ -185,6 +185,7 @@
 import { defineComponent } from "vue";
 import { apiHttpClient } from "@/app/app.service";
 import BreadCrumbs from "@/app/components/BreadCrumbs.vue";
+import notification from "@/utils/notification";
 
 const API_BASE_URL =
   process.env.VUE_APP_API_BASE_URL || "http://localhost:3333";
@@ -247,7 +248,7 @@ export default defineComponent({
         this.fillEditForm();
       } catch (error) {
         console.error("[PostEdit] 资源加载失败:", error);
-        this.errorMessage = `加载资源失败: ${error.message}`;
+        notification.error(`加载资源失败: ${error.message}`, 5000);
       } finally {
         this.loading = false;
       }
@@ -289,7 +290,7 @@ export default defineComponent({
 
     async submitEdit() {
       if (!this.isEditFormValid) {
-        this.errorMessage = "请填写必填项：标题、分类";
+        notification.warning("请填写必填项：标题、分类");
         return;
       }
 
@@ -318,7 +319,7 @@ export default defineComponent({
         );
 
         console.log("[PostEdit] 修改成功:", response.data);
-        this.successMessage = "✓ 资源已成功更新！3秒后返回详情页...";
+        notification.success("资源已成功更新！3秒后返回详情页...", 3000);
 
         // 3秒后返回详情页
         setTimeout(() => {
@@ -326,9 +327,9 @@ export default defineComponent({
         }, 3000);
       } catch (error) {
         console.error("[PostEdit] 提交失败:", error);
-        this.errorMessage = `提交失败: ${
+        notification.error(`提交失败: ${
           error.response?.data?.message || error.message
-        }`;
+        }`, 5000);
       } finally {
         this.isSaving = false;
       }

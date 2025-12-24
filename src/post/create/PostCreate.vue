@@ -496,6 +496,7 @@ import { defineComponent } from "vue";
 import BreadCrumbs from "@/app/components/BreadCrumbs.vue";
 import ClassificationsOption from "@/classifications/index/components/ClassificationsOption.vue";
 import TextbookStructure from "./components/TextbookStructure.vue"; // 新增教材结构组件
+import notification from "@/utils/notification";
 
 export default defineComponent({
   title() {
@@ -1176,7 +1177,7 @@ export default defineComponent({
       if (cover) {
         // 检查是否为图片文件
         if (!cover.type.startsWith("image/")) {
-          this.errorMessage = "请上传图片文件（JPG, PNG, GIF）";
+          notification.error("请上传图片文件（JPG, PNG, GIF）");
           return;
         }
 
@@ -1252,7 +1253,7 @@ export default defineComponent({
           });
         } else {
           console.warn("[PostCreate] 没有选择文件，无法上传");
-          this.errorMessage = "请选择要上传的文件";
+          notification.warning("请选择要上传的文件");
           this.isSubmitting = false;
           return;
         }
@@ -1296,9 +1297,7 @@ export default defineComponent({
         const resourceId = response.data.id || response.data.insertId;
 
         // 显示成功消息
-        this.successMessage = `✓ 资源上传成功! ID: ${
-          resourceId || "N/A"
-        }，正在处理教材信息...`;
+        notification.success(`资源上传成功！ID: ${resourceId || "N/A"}，正在处理教材信息...`, 3000);
 
         // 立即调用 auto-parse 接口
         if (resourceId) {
@@ -1306,10 +1305,10 @@ export default defineComponent({
             console.log("[PostCreate] 调用 auto-parse 接口...");
             await apiHttpClient.post(`/api/resources/${resourceId}/auto-parse`);
             console.log("[PostCreate] auto-parse 调用成功");
-            this.successMessage = `✓ 资源上传成功! 教材信息已自动提取，8秒后跳转到详情页...`;
+            notification.success("教材信息已自动提取，8秒后跳转到详情页...", 8000);
           } catch (error) {
             console.error("[PostCreate] auto-parse 调用失败:", error);
-            this.successMessage = `✓ 资源上传成功! ID: ${resourceId}，教材信息提取失败，5秒后跳转到详情页...`;
+            notification.warning(`教材信息提取失败，5秒后仍将跳转到详情页`, 5000);
           }
 
           // 绑定教材（如果有选择）
@@ -1340,9 +1339,9 @@ export default defineComponent({
           data: error.response?.data,
         });
 
-        this.errorMessage = `上传失败: ${
+        notification.error(`上传失败: ${
           error.response?.data?.message || error.message
-        }`;
+        }`, 5000);
       } finally {
         this.isSubmitting = false;
         console.log("[PostCreate] 上传流程结束");
