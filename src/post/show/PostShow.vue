@@ -1,18 +1,11 @@
 <template>
   <bread-crumbs />
-  <div v-if="loadError" class="container mt-4">
-    <div class="alert alert-warning" role="alert">
-      <h4 class="alert-heading">资源不存在!</h4>
-      <p>抱歉，找不到ID为 {{ id }} 的资源。可能该资源已被删除或ID不正确。</p>
-      <router-link to="/" class="btn btn-primary">返回首页</router-link>
-    </div>
-  </div>
-  <div class="post-show-page my-3" v-else-if="showPost">
+  <div class="post-show-page my-3" v-if="showPost">
     <div class="container">
       <div class="res__header shadow bg-body rounded">
         <div class="row">
           <div class="col-md-4">
-            <div v-if="post.cover" class="cover">
+            <div v-if="postCoverURL" class="cover">
               <img
                 :src="postCoverURL"
                 :alt="`${post.title}`"
@@ -54,7 +47,7 @@
                 </li>
                 <li>
                   <button
-                    @click="onClick()"
+                    @click="showDownloadModal = true"
                     class="btn btn-outline-success"
                     alt="100"
                   >
@@ -63,7 +56,7 @@
                 </li>
               </ul>
             </div>
-            <div class="author">
+            <div class="author" v-if="post.user">
               <img
                 v-if="post.user.avatar === null"
                 src="@/assets/img/avatar.png"
@@ -78,7 +71,7 @@
               />
               <div class="author__text">
                 <p>贡献者：{{ post.user.name }}</p>
-                <small>更新于：{{ formatTime(post.updated_at) }}</small>
+                <small>更新于：{{ moment(post.updated_at).fromNow() }}</small>
               </div>
             </div>
             <div class="res__operating">
@@ -100,21 +93,129 @@
         <hr />
         <div class="card-body">
           <h5>资源介绍</h5>
-          <p class="card-text">
+          <p class="card-text" v-if="post.description">
             {{ post.description }}
           </p>
+          <p class="card-text text-muted" v-else>暂无资源介绍</p>
+
+          <!-- AI 识别状态提示（仅 pending 时显示） -->
+          <div v-if="post.auto_meta_status === 'pending'" class="mt-2">
+            <p class="text-muted small mb-0">
+              <i class="bi bi-hourglass-split"></i>
+              系统正在分析资源元信息，稍后可能自动补全封面和教材信息
+            </p>
+          </div>
+
+          <!-- 章节信息（可选） -->
+          <div v-if="post.chapter_info" class="mt-3">
+            <h5>章节信息</h5>
+            <p class="text-muted">
+              <i class="bi bi-bookmark"></i> {{ post.chapter_info }}
+            </p>
+          </div>
+
+          <!-- 教材信息（可选） -->
+          <div v-if="post.textbook_info" class="mt-3">
+            <h5>教材信息</h5>
+            <ul class="res__attr">
+              <li v-if="post.textbook_info.stage">
+                <span style="font-weight: bold">学段：</span
+                >{{ post.textbook_info.stage }}
+              </li>
+              <li v-if="post.textbook_info.grade">
+                <span style="font-weight: bold">年级：</span
+                >{{ post.textbook_info.grade }}
+              </li>
+              <li v-if="post.textbook_info.subject">
+                <span style="font-weight: bold">学科：</span
+                >{{ post.textbook_info.subject }}
+              </li>
+              <li v-if="post.textbook_info.volume">
+                <span style="font-weight: bold">册别：</span
+                >{{ post.textbook_info.volume }}
+              </li>
+              <li v-if="post.textbook_info.version">
+                <span style="font-weight: bold">教材版本：</span
+                >{{ post.textbook_info.version }}
+              </li>
+            </ul>
+          </div>
+
+          <!-- 教材结构（MVP） -->
+          <div
+            v-if="post.auto_meta_status === 'done' && post.auto_meta_result"
+            class="mt-3"
+          >
+            <h5><i class="bi bi-book"></i> 教材结构</h5>
+
+            <!-- 教材基本信息 -->
+            <p class="text-muted">
+              {{ post.auto_meta_result.textbook_info?.version || "-" }} ·
+              {{ post.auto_meta_result.textbook_info?.subject || "-" }} ·
+              {{ post.auto_meta_result.textbook_info?.grade || "-" }} ·
+              {{ post.auto_meta_result.textbook_info?.volume || "-" }}
+            </p>
+
+            <!-- 教材结构列表 -->
+            <div
+              v-if="post.auto_meta_result.textbook_structure"
+              class="textbook-structure"
+            >
+              <div
+                v-for="unit in post.auto_meta_result.textbook_structure"
+                :key="unit.id || unit.name"
+                class="structure-item mb-2"
+              >
+                <div class="unit-title fw-bold">
+                  {{ unit.name }}
+                </div>
+
+                <!-- 单元下的课/章节 -->
+                <div
+                  v-for="lesson in unit.children || []"
+                  :key="lesson.id || lesson.name"
+                  class="lesson-item ms-3 mt-1"
+                >
+                  <div class="lesson-title">
+                    {{ lesson.name }}
+                  </div>
+
+                  <!-- 课下的子目 -->
+                  <div
+                    v-for="subtopic in lesson.children || []"
+                    :key="subtopic.id || subtopic.name"
+                    class="subtopic-item ms-3 mt-1"
+                  >
+                    <div class="subtopic-title">
+                      {{ subtopic.name }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 无结构信息提示 -->
+            <div v-else class="text-muted small">暂无教材结构信息</div>
+          </div>
+
+          <!-- 教材结构未生成提示 -->
+          <div v-else-if="post.auto_meta_status !== 'done'" class="mt-3">
+            <h5><i class="bi bi-book"></i> 教材结构</h5>
+            <p class="text-muted small">教材结构尚未生成</p>
+          </div>
+
           <div>
             <ul class="res__attr">
-              <li>
+              <li v-if="post.subject">
                 <span style="font-weight: bold">学科：</span>{{ post.subject }}
               </li>
-              <li>
+              <li v-if="post.grade">
                 <span style="font-weight: bold">年级：</span>{{ post.grade }}
               </li>
-              <li>
-                <span style="font-weight: bold">版本：</span>{{ post.version }}
+              <li v-if="post.textbook">
+                <span style="font-weight: bold">版本：</span>{{ post.textbook }}
               </li>
-              <li>
+              <li v-if="post.category">
                 <span style="font-weight: bold">资源类型：</span
                 >{{ post.category }}
               </li>
@@ -274,38 +375,12 @@
                   class="filetypeicon"
                 />
               </li>
-              <li>
+              <li v-if="post.file && post.file.size">
                 <span style="font-weight: bold">文件大小：</span
                 >{{ fileSizeFormat() }}
               </li>
             </ul>
           </div>
-
-          <!-- 教材结构展示区块 -->
-          <div v-if="post.auto_meta_result" class="textbook-structure mt-4">
-            <h5>📘 教材结构</h5>
-            <div class="textbook-header">
-              {{ post.auto_meta_result.textbook_version }} ·
-              {{ post.auto_meta_result.subject }} ·
-              {{ post.auto_meta_result.grade }} ·
-              {{ post.auto_meta_result.volume }}
-            </div>
-            <ul
-              class="structure-list"
-              v-if="
-                post.auto_meta_result.structure &&
-                post.auto_meta_result.structure.length
-              "
-            >
-              <li
-                v-for="(item, index) in post.auto_meta_result.structure"
-                :key="index"
-              >
-                {{ item.unit }}：{{ item.title }}
-              </li>
-            </ul>
-          </div>
-
           <div class="container">
             <div class="statistics">
               <div class="statistics-item">
@@ -353,6 +428,63 @@
       </div>
     </div>
   </div>
+
+  <!-- 下载确认弹窗 -->
+  <Teleport to="body">
+    <div
+      class="modal fade"
+      :class="{ show: showDownloadModal }"
+      :style="{ display: showDownloadModal ? 'block' : 'none' }"
+      tabindex="-1"
+      @click.self="showDownloadModal = false"
+      v-if="showDownloadModal"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title"><i class="bi bi-download"></i> 确认下载</h5>
+            <button
+              type="button"
+              class="close"
+              @click="showDownloadModal = false"
+            >
+              <span>&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p class="mb-2">您确定要下载以下资源吗？</p>
+            <div class="download-info">
+              <strong>{{ post.title }}</strong>
+              <div class="text-muted small mt-1" v-if="post.category">
+                {{ post.category }} · {{ post.file_format || "PDF" }}
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              @click="showDownloadModal = false"
+            >
+              取消
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="confirmDownload"
+            >
+              <i class="bi bi-download"></i> 确认下载
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="modal-backdrop fade show"
+      v-if="showDownloadModal"
+      @click="showDownloadModal = false"
+    ></div>
+  </Teleport>
 </template>
 
 <script>
@@ -365,13 +497,6 @@ import moment from "moment";
 import { getReadableFileSizeString } from "@/utils/utils";
 
 export default defineComponent({
-  data() {
-    return {
-      loadError: false,
-      localPost: null,
-    };
-  },
-
   title() {
     if (this.showPost) {
       return this.post.title;
@@ -379,116 +504,67 @@ export default defineComponent({
   },
 
   props: {
-    id: String,
+    postId: String,
+    user: {
+      type: Object,
+      default: null,
+    },
   },
 
-  async created() {
-    try {
-      await this.getPostById(this.id);
-    } catch (error) {
-      console.error("获取资源详情失败:", error);
-      // 如果获取失败，使用本地模拟数据（针对开发/演示环境）
-      this.mockPostData();
-    }
+  data() {
+    return {
+      showDownloadModal: false,
+      resource: null,  // 存储从 API 获取的资源数据
+      loading: false,  // 加载状态
+    };
   },
 
-  mounted() {
-    // 挂载资源对象到 window 以便调试
-    if (this.post) {
-      window.__RESOURCE__ = this.post;
-      console.log("resource:", this.post);
-      console.log("resource.chapter_info:", this.post.chapter_info);
-      console.log("resource.auto_meta_result:", this.post.auto_meta_result);
-    }
-  },
-
-  updated() {
-    // 数据更新后重新挂载并记录
-    if (this.post) {
-      window.__RESOURCE__ = this.post;
-      console.log("resource (updated):", this.post);
-    }
+  created() {
+    this.getPostById(this.postId);
   },
 
   computed: {
-    ...mapGetters({
-      loading: "post/show/loading",
-      postFromStore: "post/show/post",
-    }),
+    // 由于不再使用 store，post 现在是本地数据
     post() {
-      // 优先使用 store 中的数据，如果没有则使用本地模拟数据
-      return this.postFromStore || this.localPost;
+      return this.resource;
     },
-    // resource 别名，统一对外接口
-    resource() {
-      return this.post;
-    },
+    
     postCoverURL() {
-      if (!this.post) return "";
-      if (this.post.cover && this.post.cover.id) {
-        return `${API_BASE_URL}/covers/${this.post.cover.id}?size=thumbnail`;
+      console.log("[PostShow] resource 对象:", this.resource);
+      console.log("[PostShow] description 值:", this.resource?.description);
+      console.log("[PostShow] grade 值:", this.resource?.grade);
+      console.log("[PostShow] auto_meta_result 值:", this.resource?.auto_meta_result);
+
+      if (this.resource?.cover_url) {
+        console.log("[PostShow] 封面URL:", this.resource.cover_url);
+        return this.resource.cover_url;
       }
+      console.log("[PostShow] 没有封面URL");
       return "";
     },
     postFileURL() {
-      if (!this.post) return "";
-      if (this.post.file && this.post.file.id) {
-        return `${API_BASE_URL}/files/${this.post.file.id}`;
+      if (this.resource?.file?.id) {
+        return `${API_BASE_URL}/files/${this.resource.file.id}`;
+      }
+      return this.resource?.file_url || "";
+    },
+    userAvatarURL() {
+      if (this.resource?.user?.id) {
+        return `${API_BASE_URL}/users/${this.resource.user.id}/avatar`;
       }
       return "";
     },
-    userAvatarURL() {
-      if (!this.post || !this.post.user) return "";
-      return `${API_BASE_URL}/users/${this.post.user.id}/avatar`;
-    },
 
     showPost() {
-      return !this.loading && this.post;
+      console.log("[PostShow.vue] showPost 计算:", {
+        loading: this.loading,
+        resource: this.resource,
+      });
+      return !this.loading && this.resource;
     },
   },
 
   methods: {
-    ...mapActions({
-      getPostById: "post/show/getPostById",
-    }),
-
-    mockPostData() {
-      // 模拟数据，结构需与真实数据一致
-      this.localPost = {
-        id: this.id,
-        title: "三年级数学上册第一单元课件",
-        description:
-          "这是三年级数学上册第一单元的优秀课件，包含完整的教学流程和互动环节。",
-        grade: "三年级",
-        subject: "数学",
-        version: "人教版",
-        category: "课件",
-        created_at: new Date(),
-        updated_at: new Date(),
-        totalLikes: 128,
-        totalSaves: 56,
-        totalComments: 12,
-        user: {
-          id: 1,
-          name: "张老师",
-          avatar: null,
-        },
-        file: {
-          id: 101,
-          filename: "第一单元.ppt",
-          mimetype: "application/vnd.ms-powerpoint",
-          size: 2048000,
-        },
-        cover: null,
-        tags: [
-          { id: 1, name: "第一单元" },
-          { id: 2, name: "公开课" },
-        ],
-      };
-      // 清除错误状态，显示模拟数据
-      this.loadError = false;
-    },
-
     getTagsByName(items) {
       let result = "";
       if (items) {
@@ -499,41 +575,49 @@ export default defineComponent({
       return result;
     },
     fileSizeFormat() {
-      if (
-        !this.post ||
-        !this.post.file ||
-        typeof this.post.file.size !== "number"
-      ) {
-        return "-";
-      }
       return getReadableFileSizeString(this.post.file.size);
     },
-    formatTime(time) {
-      return moment(time).fromNow();
+    moment(...args) {
+      return moment(...args);
     },
-    ...mapActions({
-      getPostById: "post/show/getPostById",
-    }),
+    
+    // 直接调用 API 获取资源详情
+    async getPostById(postId) {
+      this.loading = true;
+      try {
+        console.log(`[PostShow] 请求资源详情: /api/resources/${postId}`);
+        const response = await apiHttpClient.get(`/api/resources/${postId}`);
+        this.resource = response.data;
+        
+        // 暴露资源对象到 window 用于调试
+        window.__RESOURCE__ = response.data;
+        
+        console.log('[PostShow] 资源详情获取成功:', response.data);
+        console.log('[PostShow] auto_meta_result:', response.data.auto_meta_result);
+        console.log('[PostShow] chapter_info:', response.data.chapter_info);
+        
+      } catch (error) {
+        console.error('[PostShow] 获取资源详情失败:', error);
+      } finally {
+        this.loading = false;
+      }
+    },
 
     onClick() {
-      if (!this.post.file || !this.post.file.id) {
-        alert("模拟下载：" + this.post.file.filename);
-        return;
+      // 确认下载
+      if (confirm(`确定要下载《${this.resource.title}》吗？`)) {
+        // 使用后端下载接口
+        const downloadUrl = `${API_BASE_URL}/api/resources/${this.resource.id}/download`;
+        console.log("[PostShow] 下载文件:", downloadUrl);
+        window.open(downloadUrl, "_blank");
       }
-      axios({
-        url: `${API_BASE_URL}/files/${this.post.file.id}`,
-        method: "GET",
-        responseType: "blob",
-      }).then((response) => {
-        const fileURL = window.URL.createObjectURL(new Blob([response.data]));
-        const fileLink = document.createElement("a");
-
-        fileLink.href = fileURL;
-        fileLink.setAttribute("download", `${this.post.file.filename}`);
-        document.body.appendChild(fileLink);
-
-        fileLink.click();
-      });
+    },
+    confirmDownload() {
+      // 使用后端下载接口
+      const downloadUrl = `${API_BASE_URL}/api/resources/${this.resource.id}/download`;
+      console.log("[PostShow] 下载文件:", downloadUrl);
+      window.open(downloadUrl, "_blank");
+      this.showDownloadModal = false;
     },
   },
 
@@ -576,41 +660,6 @@ export default defineComponent({
   padding-right: 14px;
 }
 
-/* 教材结构样式 */
-.textbook-structure {
-  padding: 16px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
-}
-
-.textbook-structure h5 {
-  margin-bottom: 12px;
-  color: #333;
-  font-weight: 600;
-}
-
-.textbook-header {
-  font-size: 15px;
-  color: #555;
-  margin-bottom: 12px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #ddd;
-}
-
-.structure-list {
-  list-style: none;
-  padding-left: 0;
-  margin: 0;
-}
-
-.structure-list li {
-  padding: 6px 0;
-  color: #444;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
 .res__btn li {
   list-style: none;
   display: inline-flex;
@@ -647,5 +696,114 @@ export default defineComponent({
 
 .embed {
   height: 500px;
+}
+
+/* Modal 样式 */
+.modal {
+  z-index: 1050;
+  overflow: auto;
+}
+.modal.show {
+  display: block !important;
+}
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1040;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+.modal-dialog {
+  margin: 1.75rem auto;
+  max-width: 500px;
+}
+.modal-dialog-centered {
+  display: flex;
+  align-items: center;
+  min-height: calc(100vh - 3.5rem);
+}
+.modal-content {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+.modal-header {
+  border-bottom: 1px solid #e9ecef;
+  padding: 1.25rem 1.5rem;
+}
+.modal-header .close {
+  padding: 0;
+  margin: -1rem -1rem -1rem auto;
+  background: transparent;
+  border: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #000;
+  opacity: 0.5;
+  cursor: pointer;
+}
+.modal-header .close:hover {
+  opacity: 0.75;
+}
+.modal-body {
+  padding: 1.5rem;
+}
+.modal-footer {
+  border-top: 1px solid #e9ecef;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+.download-info {
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 3px solid #007bff;
+}
+.modal-header .bi {
+  margin-right: 8px;
+  color: #007bff;
+}
+.modal-footer .btn .bi {
+  margin-right: 4px;
+}
+
+/* 教材结构样式 */
+.textbook-structure {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 12px;
+  margin-top: 8px;
+}
+
+.structure-item {
+  border-left: 3px solid #007bff;
+  padding-left: 12px;
+  background-color: white;
+  border-radius: 4px;
+}
+
+.unit-title {
+  color: #007bff;
+  font-size: 14px;
+}
+
+.lesson-item {
+  color: #6c757d;
+  font-size: 13px;
+}
+
+.subtopic-item {
+  color: #868e96;
+  font-size: 12px;
+}
+
+.lesson-title,
+.subtopic-title {
+  padding: 2px 0;
 }
 </style>

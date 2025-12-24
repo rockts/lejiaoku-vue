@@ -4,10 +4,9 @@ module.exports = {
   devServer: {
     port: 8080,
     proxy: {
-      '^/api': {
-        target: 'http://localhost:3000',
+      '/uploads': {
+        target: 'http://localhost:3333',
         changeOrigin: true,
-        ws: true,
       },
     },
   },

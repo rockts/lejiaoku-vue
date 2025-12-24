@@ -3,10 +3,9 @@
     "version": "0.1.1",
     "private": true,
     "scripts": {
-        "serve": "vue-cli-service serve --port 8080",
+        "serve": "vue-cli-service serve",
         "build": "vue-cli-service build",
-        "lint": "vue-cli-service lint",
-        "check:for-agent": "node scripts/for-agent-check.js"
+        "lint": "vue-cli-service lint"
     },
     "dependencies": {
         "axios": "^0.21.1",
@@ -17,7 +16,7 @@
         "moment": "^2.29.1",
         "normalize.css": "^8.0.1",
         "popper.js": "^1.16.1",
-        "vue": "3.2.47",
+        "vue": "^3.2.13",
         "vue-router": "^4.0.12",
         "vuex": "^4.0.0-0"
     },
@@ -32,7 +31,7 @@
         "@vue/cli-plugin-typescript": "~4.5.0",
         "@vue/cli-plugin-vuex": "~4.5.0",
         "@vue/cli-service": "~4.5.0",
-        "@vue/compiler-sfc": "3.2.47",
+        "@vue/compiler-sfc": "^3.2.13",
         "@vue/eslint-config-typescript": "^5.0.2",
         "babel-loader": "^8.2.5",
         "css-loader": "^5.1.1",
@@ -43,11 +42,6 @@
         "vue-loader": "^16.8.3"
     },
     "resolutions": {
-        "fork-ts-checker-webpack-plugin": "4.1.6",
-        "entities": "2.2.0",
-        "vue": "3.2.47",
-        "@vue/compiler-sfc": "3.2.47",
-        "@vue/compiler-dom": "3.2.47",
-        "@vue/compiler-core": "3.2.47"
+        "fork-ts-checker-webpack-plugin": "4.1.6"
     }
 }

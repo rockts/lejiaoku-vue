@@ -23,7 +23,7 @@
                         </span>
                         </h5>
                         <h5 class="card-title text-justify">
-                            <router-link :to="{name: 'resourceShow', params: {id: item.id}}">
+                            <router-link :to="{name: 'postShow', params: {postId: item.id}}">
                                 {{ item.title }}
                             </router-link>
                         </h5>
@@ -73,7 +73,7 @@
             </span>
         </h5>
         <h5 class="card-title" >
-            <router-link :to="{name: 'resourceShow', params: {id: item.id}}">
+            <router-link :to="{name: 'postShow', params: {postId: item.id}}">
                 {{ item.title }}
             </router-link>
         </h5>
@@ -89,7 +89,7 @@
                 <li><span  style="font-weight: bold">版本：</span>{{item.version}}</li>
             </ul>
         </p>
-         <router-link :to="{name: 'resourceShow', params: {id: item.id}}" class="btn btn-outline-primary btn-sm">查看详情</router-link>
+         <router-link :to="{name: 'postShow', params: {postId: item.id}}" class="btn btn-outline-primary btn-sm">查看详情</router-link>
     </div>
     <div class="card-footer">
         <div class="author">  
@@ -112,37 +112,37 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
-import { API_BASE_URL } from "@/app/app.config";
-import moment from "moment";
+ import { defineComponent } from 'vue';
+ import { API_BASE_URL } from '@/app/app.config';
+ import moment from 'moment';
 
-export default defineComponent({
+ export default defineComponent({
   props: {
-    item: Object,
+   item: Object,
   },
   methods: {
-    moment(...args) {
-      return moment(...args);
-    },
+   moment(...args) {
+    return moment(...args);
+   },
   },
   computed: {
-    postCoverURL() {
-      return `${API_BASE_URL}/covers/${this.item.cover.id}?size=thumbnail`;
-    },
-    userAvatarURL() {
-      return `${API_BASE_URL}/users/${this.item.user.id}/avatar`;
-    },
+   postCoverURL() {
+    return `${API_BASE_URL}/covers/${this.item.cover.id}?size=thumbnail`;
+   },
+   userAvatarURL() {
+    return `${API_BASE_URL}/users/${this.item.user.id}/avatar`;
+   },
   },
-});
+ });
 </script>
 
 <style scoped>
-.attr > li {
+ .attr > li {
   list-style: none;
   text-align: left;
-}
+ }
 
-.posttype {
+ .posttype {
   float: right;
-}
+ }
 </style>

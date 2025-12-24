@@ -13,8 +13,6 @@ export interface Post {
     created_at: Date;
     updated_at: Date;
     file?: string;
-    chapter_info?: any;
-    auto_meta_result?: any;
 }
 
 export interface PostShowStoreState {
@@ -41,12 +39,14 @@ export const postShowStoreModule: Module<PostShowStoreState, RootState> = {
     },
 
     mutations: {
-        setLoading(state, loading) {
-            state.loading = loading;
+        setLoading(state, data) {
+            state.loading = data;
         },
 
         setPost(state, data) {
+            console.log('[PostShow.store] setPost 被调用，数据:', data);
             state.post = data;
+            console.log('[PostShow.store] state.post 已设置:', state.post);
         },
     },
 
@@ -55,7 +55,7 @@ export const postShowStoreModule: Module<PostShowStoreState, RootState> = {
             commit('setLoading', true);
 
             try {
-                const response = await apiHttpClient.get(`/resources/${postId}`);
+                const response = await apiHttpClient.get(`/api/resources/${postId}`);
                 commit('setLoading', false);
                 commit('setPost', response.data);
 

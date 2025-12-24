@@ -4,7 +4,7 @@
       <h2 class="text-center mb-4">用户协议</h2>
       <div class="legal-content">
         <p class="lead text-center mb-5">
-          欢迎使用乐教库（LeJiaoKu）。在使用本平台的资源、搜索、下载、上传等功能前，请仔细阅读本用户协议。
+          欢迎使用乐教库（LeJiaoKu.Com）。在使用本平台的资源、搜索、下载、上传等功能前，请仔细阅读本用户协议。
         </p>
         
         <div class="section">

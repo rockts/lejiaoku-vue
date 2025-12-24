@@ -20,15 +20,22 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item">
-            <router-link class="nav-link" to="/">首页</router-link>
-          </li>
-          <li class="nav-item">
-            <router-link class="nav-link" to="/resources">资源列表</router-link>
+            <router-link class="nav-link" to="/posts">资源 </router-link>
           </li>
           <li class="nav-item">
             <router-link class="nav-link" to="/classifications"
-              >资源分类</router-link
-            >
+              >分类
+            </router-link>
+          </li>
+
+          <li class="nav-item">
+            <router-link class="nav-link" to="/">贡献者</router-link>
+          </li>
+
+          <li class="nav-item">
+            <router-link class="nav-link" to="/test-api">
+              <i class="bi bi-wrench"></i> API测试
+            </router-link>
           </li>
         </ul>
 
@@ -77,7 +84,7 @@
               {{ user.name }}
             </router-link>
             <div class="dropdown-menu" aria-labelledby="usersDropdown">
-              <router-link to="/resources/create" class="dropdown-item"
+              <router-link to="/posts/create" class="dropdown-item"
                 >发布文章</router-link
               >
               <router-link to="#" class="dropdown-item">个人中心</router-link>
@@ -99,6 +106,7 @@
 <script>
 import { defineComponent } from "vue";
 import { API_BASE_URL } from "@/app/app.config";
+import HeaderSearch from "./form/HeaderSearch.vue";
 
 export default defineComponent({
   name: "GlobalHeader",
@@ -133,6 +141,8 @@ export default defineComponent({
     this.theme = saved;
     document.documentElement.setAttribute("data-theme", saved);
   },
+
+  components: { HeaderSearch },
 });
 </script>
 
