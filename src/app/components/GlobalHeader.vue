@@ -41,8 +41,9 @@
         <HeaderSearch v-if="!isHomePage" />
 
         <button
-          class="btn btn-outline-secondary btn-theme ml-2"
+          class="btn btn-link btn-theme"
           @click="toggleTheme"
+          title="切换主题"
         >
           <i :class="themeIcon"></i>
         </button>
@@ -72,8 +73,12 @@
         <!-- 已登录：显示用户菜单 -->
         <ul v-if="isAuthenticated && currentUser" class="navbar-nav ms-auto">
           <li class="nav-item">
-            <router-link to="/resources/create" class="nav-link me-2">
-              <i class="bi bi-cloud-upload"></i> 上传资源
+            <router-link
+              to="/resources/create"
+              class="btn btn-upload"
+              title="上传资源"
+            >
+              <i class="bi bi-cloud-upload-fill"></i>
             </router-link>
           </li>
           <li class="nav-item dropdown">
@@ -229,7 +234,47 @@ nav {
   position: relative;
   z-index: 1050;
 }
+上传按钮 */
+.btn-upload {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  margin-right: 0.5rem;
+}
 
+.btn-upload:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+  color: white;
+}
+
+/* 主题切换按钮 */
+.btn-theme {
+  background: none;
+  border: none;
+  color: rgba(0, 0, 0, 0.55);
+  font-size: 1.2rem;
+  padding: 0.5rem;
+  margin: 0 0.5rem;
+  transition: all 0.2s;
+  border-radius: 8px;
+}
+
+.btn-theme:hover {
+  color: rgba(0, 0, 0, 0.9);
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* 
 /* 用户下拉菜单按钮样式 */
 .user-dropdown-btn {
   background: none;
