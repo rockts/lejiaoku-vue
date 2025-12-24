@@ -247,13 +247,24 @@ export default defineComponent({
   margin-right: 0.5rem;
 }
 
-.btn-close {
-  filter: brightness(0) invert(1);
-  opacity: 0.8;
+.close-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s;
 }
 
-.btn-close:hover {
-  opacity: 1;
+.close-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .modal-body {
