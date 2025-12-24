@@ -13,14 +13,23 @@
               <span class="tag">{{ resource.file_format || "文件" }}</span>
             </div>
           </div>
-          <a
-            class="btn btn-primary"
-            :href="downloadUrl"
-            target="_blank"
-            rel="noopener"
-          >
-            下载
-          </a>
+          <div class="action-buttons">
+            <a
+              class="btn btn-primary"
+              :href="downloadUrl"
+              target="_blank"
+              rel="noopener"
+            >
+              下载
+            </a>
+            <button
+              type="button"
+              class="btn btn-outline-secondary ms-2"
+              @click="$router.push(`/resources/${id}/edit`)"
+            >
+              <i class="bi bi-pencil"></i> 编辑
+            </button>
+          </div>
         </div>
       </section>
 
@@ -221,8 +230,14 @@ export default defineComponent({
 .section-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .title {

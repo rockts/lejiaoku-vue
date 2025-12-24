@@ -29,73 +29,87 @@
       <form>
         <!-- 资源标题 -->
         <div class="create-post-title mb-4">
-          <label class="sr-only" for="id_name">资源标题</label>
+          <label class="form-label" for="id_name"
+            >资源标题 <span class="text-danger">*</span></label
+          >
           <input
             v-model="title"
             placeholder="请输入资源标题..."
             type="text"
-            class=""
+            class="form-control"
           />
+          <small v-if="!title" class="text-danger">必填项</small>
         </div>
 
         <!-- 资源文件拖放区 -->
-        <div class="upload-file-zone mb-4">
-          <div
-            :class="['drag-zone', { active: dragZoneActive }]"
-            @dragover.prevent
-            @drop.prevent="onDropFile"
-            @dragenter="dragZoneActive = true"
-            @dragleave="dragZoneActive = false"
-          >
-            <div v-if="file">
-              <div class="file-info">
-                <i
-                  class="bi bi-file-earmark-text"
-                  style="font-size: 48px; color: #007bff"
-                ></i>
-                <p class="mt-3 mb-1 font-weight-bold">{{ file.name }}</p>
-                <p class="text-muted small">{{ formatFileSize(file.size) }}</p>
-                <button
-                  type="button"
-                  class="btn btn-sm btn-outline-danger mt-2"
-                  @click="clearFile"
-                >
-                  <i class="bi bi-trash"></i> 移除文件
-                </button>
+        <div class="upload-file-zone mb-4 card shadow-sm">
+          <div class="card-header bg-white">
+            <h6 class="mb-0">
+              <i class="bi bi-file-earmark-arrow-up"></i> 资源文件
+              <span class="text-danger">*</span>
+            </h6>
+          </div>
+          <div class="card-body">
+            <div
+              :class="['drag-zone', { active: dragZoneActive }]"
+              @dragover.prevent
+              @drop.prevent="onDropFile"
+              @dragenter="dragZoneActive = true"
+              @dragleave="dragZoneActive = false"
+            >
+              <div v-if="file">
+                <div class="file-info">
+                  <i
+                    class="bi bi-file-earmark-text"
+                    style="font-size: 48px; color: #007bff"
+                  ></i>
+                  <p class="mt-3 mb-1 font-weight-bold">{{ file.name }}</p>
+                  <p class="text-muted small">
+                    {{ formatFileSize(file.size) }}
+                  </p>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-danger mt-2"
+                    @click="clearFile"
+                  >
+                    <i class="bi bi-trash"></i> 移除文件
+                  </button>
+                </div>
+              </div>
+              <div v-else>
+                <label for="id_file" class="file-upload-box">
+                  <div class="upload-file-icons">
+                    <i
+                      class="bi bi-cloud-upload"
+                      style="font-size: 48px; color: #6c757d"
+                    ></i>
+                    <p class="mt-3 mb-1">将资源文件拖放到这里</p>
+                    <p class="text-muted small">或点击选择文件</p>
+                  </div>
+                  <p class="text-muted small mt-2">
+                    支持: PDF, Word, Excel, PPT 等文档格式
+                  </p>
+                </label>
               </div>
             </div>
-            <div v-else>
-              <label for="id_file" class="file-upload-box">
-                <div class="upload-file-icons">
-                  <i
-                    class="bi bi-cloud-upload"
-                    style="font-size: 48px; color: #6c757d"
-                  ></i>
-                  <p class="mt-3 mb-1">将资源文件拖放到这里</p>
-                  <p class="text-muted small">或点击选择文件</p>
-                </div>
-                <p class="text-muted small mt-2">
-                  支持: PDF, Word, Excel, PPT 等文档格式
-                </p>
-              </label>
-            </div>
-          </div>
 
-          <!-- 资源文件 input -->
-          <div>
-            <input
-              type="file"
-              ref="file"
-              @change="onChangeFile"
-              id="id_file"
-              accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
-                application/pdf,
-                application/msword,
-                application/vnd.ms-excel,
-                application/vnd.ms-powerpoint,
-                application/vnd.openxmlformats-officedocument.wordprocessingml.document,
-                application/vnd.openxmlformats-officedocument.presentationml.presentation"
-            />
+            <!-- 资源文件 input -->
+            <div>
+              <input
+                type="file"
+                ref="file"
+                @change="onChangeFile"
+                id="id_file"
+                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
+                  application/pdf,
+                  application/msword,
+                  application/vnd.ms-excel,
+                  application/vnd.ms-powerpoint,
+                  application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                  application/vnd.openxmlformats-officedocument.presentationml.presentation"
+              />
+            </div>
+            <small v-if="!file" class="text-danger d-block mt-2">必填项</small>
           </div>
         </div>
 
@@ -297,15 +311,22 @@
           <div class="card-body">
             <div class="row g-3">
               <div class="col-md-6">
-                <label class="form-label small text-muted">资源类型</label>
-                <select class="form-control" v-model="category">
-                  <option value="">选择分类（默认：其他）</option>
+                <label class="form-label small text-muted"
+                  >资源类型 <span class="text-danger">*</span></label
+                >
+                <select
+                  class="form-control"
+                  v-model="category"
+                  :class="{ 'is-invalid': !category && isSubmitting }"
+                >
+                  <option value="">选择分类</option>
                   <option>教材</option>
                   <option>课件</option>
                   <option>教案</option>
                   <option>教辅</option>
                   <option>其他</option>
                 </select>
+                <small v-if="!category" class="text-danger">必填项</small>
               </div>
               <div class="col-md-6">
                 <label class="form-label small text-muted">年级</label>
@@ -375,27 +396,40 @@
         </div>
 
         <!-- 教材结构显示区域（MVP） -->
-        <div class="textbook-structure-section mb-4" v-if="textbookStructure.length > 0 || aiRecognizing || aiRecognized">
+        <div
+          class="textbook-structure-section mb-4"
+          v-if="textbookStructure.length > 0 || aiRecognizing || aiRecognized"
+        >
           <TextbookStructure :structure="textbookStructure" />
-          
+
           <!-- 教材信息展示 -->
           <div class="card shadow-sm mt-3" v-if="textbookInfo.title">
             <div class="card-header bg-white">
-              <h6 class="mb-0">
-                <i class="bi bi-book"></i> 教材信息
-              </h6>
+              <h6 class="mb-0"><i class="bi bi-book"></i> 教材信息</h6>
             </div>
             <div class="card-body">
               <div class="row">
                 <div class="col-md-6">
-                  <p class="mb-1"><strong>书名：</strong>{{ textbookInfo.title }}</p>
-                  <p class="mb-1"><strong>学段：</strong>{{ textbookInfo.stage || '-' }}</p>
-                  <p class="mb-1"><strong>学科：</strong>{{ textbookInfo.subject || '-' }}</p>
+                  <p class="mb-1">
+                    <strong>书名：</strong>{{ textbookInfo.title }}
+                  </p>
+                  <p class="mb-1">
+                    <strong>学段：</strong>{{ textbookInfo.stage || "-" }}
+                  </p>
+                  <p class="mb-1">
+                    <strong>学科：</strong>{{ textbookInfo.subject || "-" }}
+                  </p>
                 </div>
                 <div class="col-md-6">
-                  <p class="mb-1"><strong>版本：</strong>{{ textbookInfo.version || '-' }}</p>
-                  <p class="mb-1"><strong>册次：</strong>{{ textbookInfo.volume || '-' }}</p>
-                  <p class="mb-1"><strong>简介：</strong>{{ textbookInfo.description || '-' }}</p>
+                  <p class="mb-1">
+                    <strong>版本：</strong>{{ textbookInfo.version || "-" }}
+                  </p>
+                  <p class="mb-1">
+                    <strong>册次：</strong>{{ textbookInfo.volume || "-" }}
+                  </p>
+                  <p class="mb-1">
+                    <strong>简介：</strong>{{ textbookInfo.description || "-" }}
+                  </p>
                 </div>
               </div>
             </div>
@@ -407,10 +441,13 @@
             type="button"
             @click="createPost"
             class="btn btn-primary btn-large"
-            :disabled="isSubmitting"
+            :disabled="isSubmitting || !isFormValid"
           >
             {{ isSubmitting ? "提交中..." : "发布资源" }}
           </button>
+          <small v-if="!isFormValid" class="text-danger d-block mt-2">
+            请填写必填项：标题、分类、文件
+          </small>
         </div>
 
         <!-- 成功提示 -->
@@ -561,6 +598,17 @@ export default defineComponent({
       if (!this.textbookVolume) return [];
       return this.textbookCatalog.filter(
         (item) => item.parent_id === this.textbookVolume
+      );
+    },
+
+    // 表单验证
+    isFormValid() {
+      return (
+        this.title &&
+        this.title.trim() &&
+        this.category &&
+        this.category.trim() &&
+        this.file
       );
     },
   },
@@ -832,15 +880,19 @@ export default defineComponent({
           subject: data.textbook_info.subject || this.textbookInfo.subject,
           version: data.textbook_info.version || this.textbookInfo.version,
           volume: data.textbook_info.volume || this.textbookInfo.volume,
-          description: data.textbook_info.description || this.textbookInfo.description,
-          cover_url: data.textbook_info.cover_url || this.textbookInfo.cover_url,
+          description:
+            data.textbook_info.description || this.textbookInfo.description,
+          cover_url:
+            data.textbook_info.cover_url || this.textbookInfo.cover_url,
         };
         console.log("[PostCreate] 教材基本信息更新:", this.textbookInfo);
       }
 
       // 处理教材目录结构
       if (data.textbook_structure) {
-        this.textbookStructure = this.formatTextbookStructure(data.textbook_structure);
+        this.textbookStructure = this.formatTextbookStructure(
+          data.textbook_structure
+        );
         console.log("[PostCreate] 教材结构解析完成:", this.textbookStructure);
       }
 
@@ -1220,21 +1272,35 @@ export default defineComponent({
 
         const resourceId = response.data.id || response.data.insertId;
 
-        // 启动 AI 识别轮询
-        if (resourceId) {
-          this.startAIPolling(resourceId);
-        }
-
-        // 绑定教材（如果有选择）
-        if (resourceId) {
-          await this.bindTextbook(resourceId);
-        }
-
         // 显示成功消息
-        this.successMessage = `✓ 资源上传成功! ID: ${resourceId || "N/A"}`;
+        this.successMessage = `✓ 资源上传成功! ID: ${
+          resourceId || "N/A"
+        }，正在处理教材信息...`;
 
-        // 注：不立即清空表单，等待 AI 识别完成后用户可以修改
-        // 如果用户想上传下一个资源，可以刷新页面
+        // 立即调用 auto-parse 接口
+        if (resourceId) {
+          try {
+            console.log("[PostCreate] 调用 auto-parse 接口...");
+            await apiHttpClient.post(`/api/resources/${resourceId}/auto-parse`);
+            console.log("[PostCreate] auto-parse 调用成功");
+            this.successMessage = `✓ 资源上传成功! 教材信息已自动提取，8秒后跳转到详情页...`;
+          } catch (error) {
+            console.error("[PostCreate] auto-parse 调用失败:", error);
+            this.successMessage = `✓ 资源上传成功! ID: ${resourceId}，教材信息提取失败，5秒后跳转到详情页...`;
+          }
+
+          // 绑定教材（如果有选择）
+          await this.bindTextbook(resourceId);
+
+          // 延迟 8 秒后跳转到详情页
+          setTimeout(() => {
+            console.log(
+              "[PostCreate] 跳转到资源详情页:",
+              `/resources/${resourceId}`
+            );
+            this.$router.push(`/resources/${resourceId}`);
+          }, 8000);
+        }
 
         // 仅清空文件选择（避免重复上传）
         this.file = null;
@@ -1243,11 +1309,6 @@ export default defineComponent({
         // 通知首页刷新资源列表
         console.log("[PostCreate] 触发首页刷新...");
         window.dispatchEvent(new CustomEvent("resource-created"));
-
-        // 3秒后清除成功消息
-        setTimeout(() => {
-          this.successMessage = "";
-        }, 3000);
       } catch (error) {
         console.error("[PostCreate] 创建失败:", error);
         console.error("[PostCreate] 错误详情:", {
@@ -1271,23 +1332,26 @@ export default defineComponent({
       const processNode = (node, level = 0) => {
         const processed = {
           id: node.id || `node_${Date.now()}_${Math.random()}`,
-          name: node.name || node.title || `未命名${level > 0 ? `-${level}` : ''}`,
+          name:
+            node.name || node.title || `未命名${level > 0 ? `-${level}` : ""}`,
           type: node.type || this.getNodeType(level),
           level: level,
           expanded: level === 0, // 默认展开第一层
-          children: []
+          children: [],
         };
 
         if (node.children && Array.isArray(node.children)) {
-          processed.children = node.children.map(child => processNode(child, level + 1));
+          processed.children = node.children.map((child) =>
+            processNode(child, level + 1)
+          );
         }
 
         return processed;
       };
 
       if (Array.isArray(rawStructure)) {
-        return rawStructure.map(item => processNode(item));
-      } else if (rawStructure && typeof rawStructure === 'object') {
+        return rawStructure.map((item) => processNode(item));
+      } else if (rawStructure && typeof rawStructure === "object") {
         return [processNode(rawStructure)];
       }
 
@@ -1296,8 +1360,8 @@ export default defineComponent({
 
     // 根据层级获取节点类型
     getNodeType(level) {
-      const types = ['Unit', 'Lesson', 'Subtopic'];
-      return types[level] || 'Section';
+      const types = ["Unit", "Lesson", "Subtopic"];
+      return types[level] || "Section";
     },
 
     async createFile(file, postId) {

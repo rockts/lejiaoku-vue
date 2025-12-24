@@ -10,6 +10,7 @@ import { RouteRecordRaw } from 'vue-router';
 import PostIndex from './index/PostIndex.vue';
 import PostShow from './show/PostShow.vue';
 import PostCreate from './create/PostCreate.vue';
+import PostEdit from './edit/PostEdit.vue';
 
 /**
  * 定义路由
@@ -30,6 +31,12 @@ const routes: Array<RouteRecordRaw> = [
         path: '/resources/create',
         name: 'resourceCreate',
         component: PostCreate,
+    },
+    {
+        path: '/resources/:id/edit',
+        name: 'resourceEdit',
+        component: PostEdit,
+        props: true,
     },
     // 历史兼容重定向
     {
