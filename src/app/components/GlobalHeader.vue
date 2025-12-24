@@ -83,15 +83,26 @@
               @click="toggleDropdown"
               aria-expanded="false"
             >
-              <i class="bi bi-person-circle me-1"></i
-              ><span class="user-name">{{ currentUser.username }}</span>
+              <i class="bi bi-person-circle user-avatar"></i>
+              <span class="user-name">{{ currentUser.username }}</span>
               <span
                 v-if="currentUser.role === 'admin'"
-                class="badge bg-danger ms-1"
-                >管理员</span
+                class="badge badge-admin ms-1"
               >
+                <i class="bi bi-shield-check me-1"></i>管理员
+              </span>
             </button>
-            <ul class="dropdown-menu" :class="{ show: showUserDropdown }">
+            <ul class="dropdown-menu dropdown-menu-end" :class="{ show: showUserDropdown }">
+              <li class="dropdown-header">
+                <div class="user-info">
+                  <i class="bi bi-person-circle user-avatar-large"></i>
+                  <div>
+                    <div class="user-name-large">{{ currentUser.username }}</div>
+                    <div class="user-email">{{ currentUser.email }}</div>
+                  </div>
+                </div>
+              </li>
+              <li><hr class="dropdown-divider" /></li>
               <li>
                 <router-link to="/me/profile" class="dropdown-item" @click="closeDropdown">
                   <i class="bi bi-person-gear me-2"></i>个人中心
@@ -107,7 +118,7 @@
                 <a
                   href="javascript:void(0)"
                   @click="handleLogout"
-                  class="dropdown-item"
+                  class="dropdown-item text-danger"
                 >
                   <i class="bi bi-box-arrow-right me-2"></i>退出登录
                 </a>
@@ -207,8 +218,19 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.dropdown .dropdown-menu {
+  min-width: 280px;
+  z-index: 1100;
+}
 
-/* 用户下拉菜单样式 */
+nav {
+  box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 5%), inset 0 -1px 0 rgb(0 0 0 / 10%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  position: relative;
+  z-index: 1050;
+}
+
+/* 用户下拉菜单按钮样式 */
 .user-dropdown-btn {
   background: none;
   border: none;
@@ -216,29 +238,105 @@ export default defineComponent({
   text-decoration: none;
   display: flex;
   align-items: center;
+  gap: 0.5rem;
   color: rgba(0, 0, 0, 0.55);
+  transition: all 0.2s;
 }
 
 .user-dropdown-btn:hover {
-  color: rgba(0, 0, 0, 0.7);
+  color: rgba(0, 0, 0, 0.9);
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+}
+
+/* 用户头像 */
+.user-avatar {
+  font-size: 1.8rem;
+  color: #667eea;
 }
 
 .user-name {
   color: inherit;
   font-weight: 500;
+  font-size: 0.95rem;
 }
 
+/* 管理员标签 */
+.badge-admin {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 0.25rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* 下拉菜单 */
 .dropdown-menu {
   position: absolute;
   right: 0;
   left: auto;
-}
-.dropdown .dropdown-menu {
-  min-width: 6rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 0;
+  margin-top: 0.5rem;
+  z-index: 1100;
 }
 
-nav {
-  box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 5%), inset 0 -1px 0 rgb(0 0 0 / 10%);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+/* 用户信息头部 */
+.dropdown-header {
+  padding: 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px 12px 0 0;
+  margin: -0.5rem 0 0 0;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-avatar-large {
+  font-size: 3rem;
+  color: white;
+  opacity: 0.9;
+}
+
+.user-name-large {
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.user-email {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+/* 下拉菜单项 */
+.dropdown-item {
+  padding: 0.6rem 1.5rem;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9ff;
+  color: #667eea;
+}
+
+.dropdown-item.text-danger:hover {
+  background-color: #fff5f5;
+  color: #dc3545;
+}
+
+.dropdown-divider {
+  margin: 0.5rem 0;
 }
 </style>
