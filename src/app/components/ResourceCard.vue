@@ -12,11 +12,11 @@
     <div class="resource-meta">
       <span class="badge category">{{ item.category }}</span>
       <span class="badge format">{{ item.format }}</span>
-      <span class="muted">{{ item.subject }} · {{ item.grade }}</span>
+      <span class="muted">{{ textbookInfo }}</span>
     </div>
-    <!-- 章节信息（可选） -->
-    <div class="resource-chapter" v-if="item.chapterInfo">
-      <i class="bi bi-bookmark"></i> {{ item.chapterInfo }}
+    <!-- 教材信息和单元数 -->
+    <div class="resource-chapter" v-if="unitCount">
+      <i class="bi bi-bookmark"></i> {{ unitCount }}
     </div>
     <div class="resource-actions">
       <button class="btn btn-sm btn-outline-primary" @click.stop="onPreview">
@@ -115,6 +115,19 @@ export default defineComponent({
         return `${API_BASE_URL}${this.item.cover_url}`;
       }
       return null;
+    },
+    textbookInfo() {
+      // 优先使用 catalog_info，fallback 到 auto_meta_result
+      const info = this.item.catalog_info || this.item.auto_meta_result || {};
+      const grade = info.grade || this.item.grade || "-";
+      const volume = info.volume || "";
+      const subject = info.subject || this.item.subject || "-";
+      return `${grade}${volume} · ${subject}`;
+    },
+    unitCount() {
+      // 显示单元数量
+      const structure = this.item.catalog_info?.structure || this.item.auto_meta_result?.structure || [];
+      return structure.length > 0 ? `${structure.length} 个单元` : null;
     },
   },
   methods: {

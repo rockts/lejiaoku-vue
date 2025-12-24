@@ -38,16 +38,12 @@
               <div class="text-muted">
                 <ul class="attr">
                   <li>
-                    <span style="font-weight: bold">年级：</span
-                    >{{ item.grade }}
+                    <span style="font-weight: bold">教材：</span
+                    >{{ textbookInfo }}
                   </li>
-                  <li>
-                    <span style="font-weight: bold">学科：</span
-                    >{{ item.subject }}
-                  </li>
-                  <li>
-                    <span style="font-weight: bold">版本：</span
-                    >{{ item.textbook }}
+                  <li v-if="unitCount">
+                    <span style="font-weight: bold">单元数：</span
+                    >{{ unitCount }}
                   </li>
                 </ul>
               </div>
@@ -161,6 +157,20 @@ export default defineComponent({
         return `${API_BASE_URL}/users/${this.item.user.id}/avatar`;
       }
       return "";
+    },
+    textbookInfo() {
+      // 优先使用 catalog_info，fallback 到 auto_meta_result
+      const info = this.item.catalog_info || this.item.auto_meta_result || {};
+      const grade = info.grade || this.item.grade || "-";
+      const volume = info.volume || "";
+      const subject = info.subject || this.item.subject || "-";
+      const version = info.textbook_version || info.version || this.item.textbook || "";
+      return version ? `${version} · ${grade}${volume} · ${subject}` : `${grade}${volume} · ${subject}`;
+    },
+    unitCount() {
+      // 显示单元数量
+      const structure = this.item.catalog_info?.structure || this.item.auto_meta_result?.structure || [];
+      return structure.length > 0 ? `${structure.length} 个` : null;
     },
   },
 });
