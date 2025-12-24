@@ -164,12 +164,18 @@ export default defineComponent({
       const grade = info.grade || this.item.grade || "-";
       const volume = info.volume || "";
       const subject = info.subject || this.item.subject || "-";
-      const version = info.textbook_version || info.version || this.item.textbook || "";
-      return version ? `${version} · ${grade}${volume} · ${subject}` : `${grade}${volume} · ${subject}`;
+      const version =
+        info.textbook_version || info.version || this.item.textbook || "";
+      return version
+        ? `${version} · ${grade}${volume} · ${subject}`
+        : `${grade}${volume} · ${subject}`;
     },
     unitCount() {
       // 显示单元数量
-      const structure = this.item.catalog_info?.structure || this.item.auto_meta_result?.structure || [];
+      const structure =
+        this.item.catalog_info?.structure ||
+        this.item.auto_meta_result?.structure ||
+        [];
       return structure.length > 0 ? `${structure.length} 个` : null;
     },
   },

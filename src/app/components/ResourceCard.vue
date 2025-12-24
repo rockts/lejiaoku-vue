@@ -126,7 +126,10 @@ export default defineComponent({
     },
     unitCount() {
       // 显示单元数量
-      const structure = this.item.catalog_info?.structure || this.item.auto_meta_result?.structure || [];
+      const structure =
+        this.item.catalog_info?.structure ||
+        this.item.auto_meta_result?.structure ||
+        [];
       return structure.length > 0 ? `${structure.length} 个单元` : null;
     },
   },
