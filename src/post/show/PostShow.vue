@@ -231,12 +231,14 @@ export default defineComponent({
   computed: {
     resourceCoverURL() {
       if (this.resource?.cover_url) {
-        if (this.resource.cover_url.startsWith("http")) return this.resource.cover_url;
+        if (this.resource.cover_url.startsWith("http"))
+          return this.resource.cover_url;
         const m = this.resource.cover_url.match(/\/uploads\/cover\/(.+)$/);
         if (m) return `${API_BASE_URL}/uploads/cover/resized/${m[1]}-large`;
         return `${API_BASE_URL}${this.resource.cover_url}?size=large`;
       }
-      if (this.resource?.cover?.id) return `${API_BASE_URL}/covers/${this.resource.cover.id}?size=large`;
+      if (this.resource?.cover?.id)
+        return `${API_BASE_URL}/covers/${this.resource.cover.id}?size=large`;
       return "";
     },
     coverClass() {

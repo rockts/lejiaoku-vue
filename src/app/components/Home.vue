@@ -256,10 +256,12 @@ export default defineComponent({
   background: linear-gradient(90deg, var(--primary), #2563eb);
   color: #fff;
   border: none;
-  box-shadow: 0 8px 20px rgba(37,99,235,0.12);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.12);
   font-weight: 600;
 }
-.upload-btn i { font-size: 18px; }
+.upload-btn i {
+  font-size: 18px;
+}
 
 .qr-wrapper {
   position: relative;

@@ -71,7 +71,9 @@ export default defineComponent({
         }
         // 如果是上传目录的原始封面，优先使用后端约定的 resized 路径
         // 支持带或不带前导斜杠的路径
-        const m = this.item.cover_url.match(/(?:\/)??uploads\/cover\/(.+)$/) || this.item.cover_url.match(/uploads\/cover\/(.+)$/);
+        const m =
+          this.item.cover_url.match(/(?:\/)??uploads\/cover\/(.+)$/) ||
+          this.item.cover_url.match(/uploads\/cover\/(.+)$/);
         if (m) {
           return `${API_BASE_URL}/uploads/cover/resized/${m[1]}-thumbnail`;
         }
