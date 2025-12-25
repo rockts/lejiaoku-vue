@@ -22,11 +22,9 @@
           />
         </template>
         <template v-else>
-          <img
-            src="@/assets/img/res_cover.png"
-            :alt="item.title"
-            class="default-cover"
-          />
+          <div class="cover-placeholder">
+            <i class="bi bi-file-earmark-text"></i>
+          </div>
         </template>
       </template>
     </div>
@@ -161,20 +159,11 @@ export default defineComponent({
             cv.match(/(?:\/)??uploads\/cover\/(.+)$/) ||
             cv.match(/uploads\/cover\/(.+)$/);
           if (m) {
-            const filename = m[1];
-            const extMatch = filename.match(/^(.+)\.(\w+)$/);
-            if (extMatch) {
-              const name = extMatch[1];
-              const ext = extMatch[2];
-              // 使用代理路径，添加缩略图作为备选
-              candidates.push(
-                `/uploads/cover/resized/${name}-thumbnail.${ext}`
-              );
-            } else {
-              candidates.push(
-                `/uploads/cover/resized/${filename}-thumbnail`
-              );
-            }
+            const filename = m[1]; // 完整文件名，例如 "1766517324895-cover.jpg"
+            // 根据文档，格式应该是：/uploads/cover/resized/{filename}-thumbnail
+            candidates.push(
+              `/uploads/cover/resized/${filename}-thumbnail`
+            );
           }
         }
       }
@@ -339,15 +328,19 @@ export default defineComponent({
   object-fit: contain;
   object-position: center;
 }
-.resource-card .resource-cover i {
-  font-size: 48px;
-  color: var(--muted);
-  opacity: 0.3;
-}
-.resource-card .resource-cover img.default-cover {
+.resource-card .resource-cover .cover-placeholder {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+  border: none;
+}
+
+.resource-card .resource-cover .cover-placeholder i {
+  font-size: 56px;
+  color: #94a3b8;
   opacity: 0.6;
 }
 .resource-title {

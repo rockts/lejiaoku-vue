@@ -22,7 +22,8 @@
 }
 .resource-cover-full {
   width: 100%;
-  height: 240px;
+  max-width: 300px;
+  height: 180px;
   background: #fff;
   border-radius: 8px;
   overflow: hidden;
@@ -31,33 +32,45 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 12px;
-}
-.resource-cover-full img {
-  width: 100%;
-  height: 100%;
-  max-width: 100vw; /* don't exceed viewport to prevent horizontal overflow */
-  display: block;
-  background: #fff;
-  object-position: center;
-}
-.resource-cover-full img.fit-cover { object-fit: cover; }
-.resource-cover-full img.fit-contain { object-fit: contain; }
-.resource-cover-full .placeholder-icon { font-size: 48px; color: var(--muted); opacity: 0.3; }
-
-@media (max-width: 768px) {
-  .resource-cover-full { height: 160px; }
+  margin: 0 auto 12px auto;
 }
 .resource-cover-full img {
   max-width: 100%;
   max-height: 100%;
+  width: auto;
+  height: auto;
   display: block;
   background: #fff;
-  margin: auto;
+  object-position: center;
+  object-fit: contain;
 }
-.resource-cover-full img.fit-cover { object-fit: cover; object-position: center; }
-.resource-cover-full img.fit-contain { object-fit: contain; object-position: center; }
-.resource-cover-full .placeholder-icon { font-size: 48px; color: var(--muted); opacity: 0.3; }
+.resource-cover-full img.fit-cover { object-fit: cover; }
+.resource-cover-full img.fit-contain { object-fit: contain; }
+.resource-cover-full .cover-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+  border: none;
+}
+
+.resource-cover-full .cover-placeholder i {
+  font-size: 64px;
+  color: #94a3b8;
+  opacity: 0.6;
+}
+
+@media (max-width: 768px) {
+  .resource-cover-full { 
+    max-width: 100%;
+    height: 140px; 
+  }
+  .resource-cover-full .cover-placeholder i {
+    font-size: 40px;
+  }
+}
 <template>
   <bread-crumbs />
 
@@ -112,19 +125,19 @@
         </div>
         <!-- 封面展示（宽度100%，高度固定） -->
         <div class="resource-cover-full">
-          <template v-if="resolvedCover && !coverFailed">
+          <template v-if="resourceCoverURL && !coverFailed">
             <img
-              :src="resolvedCover"
+              :src="resourceCoverURL"
               :alt="resource.title"
               @load="onCoverLoad"
-              @error="coverFailed = true"
+              @error="onCoverError"
               :class="coverClass"
-              :style="{ width: '100%', height: '100%', objectFit: coverFit }"
+              :style="{ maxWidth: '100%', maxHeight: '100%', objectFit: coverFit }"
             />
           </template>
           <template v-else>
-            <div class="placeholder-icon">
-              <i class="bi bi-file-earmark"></i>
+            <div class="cover-placeholder">
+              <i class="bi bi-file-earmark-text"></i>
             </div>
           </template>
         </div>
@@ -244,32 +257,45 @@ export default defineComponent({
           this.resource.cover_url.match(/(?:\/)??uploads\/cover\/(.+)$/) ||
           this.resource.cover_url.match(/uploads\/cover\/(.+)$/);
         if (m) {
-          const filename = m[1];
-          const extMatch = filename.match(/^(.+)\.(\w+)$/);
-          if (extMatch) {
-            const name = extMatch[1];
-            const ext = extMatch[2];
-            return `${API_BASE_URL}/uploads/cover/resized/${name}-large.${ext}`;
-          }
-          return `${API_BASE_URL}/uploads/cover/resized/${filename}-large`;
+          const filename = m[1]; // 完整文件名，例如 "1766517324895-cover.jpg"
+          // 根据文档，格式应该是：/uploads/cover/resized/{filename}-thumbnail
+          // 只返回缩略图，不回退到原始大图
+          return `/uploads/cover/resized/${filename}-thumbnail`;
         }
-        return `${API_BASE_URL}${this.resource.cover_url}?size=large`;
+        // 如果不是 uploads/cover 路径，返回空（显示占位符）
+        return "";
       }
       // fallback: 后端可能返回自动生成的封面字段
       if (this.resource?.auto_cover_url) {
         const ac = this.resource.auto_cover_url;
         if (ac.startsWith("http")) return ac;
-        return `${API_BASE_URL}${ac}`;
+        // 只处理 uploads/cover 路径的缩略图
+        const m =
+          ac.match(/(?:\/)??uploads\/cover\/(.+)$/) ||
+          ac.match(/uploads\/cover\/(.+)$/);
+        if (m) {
+          const filename = m[1];
+          return `/uploads/cover/resized/${filename}-thumbnail`;
+        }
+        return "";
       }
 
       // 教材信息中也可能包含封面
       if (this.resource?.textbook_info?.cover_url) {
         const tc = this.resource.textbook_info.cover_url;
         if (tc.startsWith("http")) return tc;
-        return `${API_BASE_URL}${tc}`;
+        // 只处理 uploads/cover 路径的缩略图
+        const m =
+          tc.match(/(?:\/)??uploads\/cover\/(.+)$/) ||
+          tc.match(/uploads\/cover\/(.+)$/);
+        if (m) {
+          const filename = m[1];
+          return `/uploads/cover/resized/${filename}-thumbnail`;
+        }
+        return "";
       }
-      if (this.resource?.cover?.id)
-        return `${API_BASE_URL}/covers/${this.resource.cover.id}?size=large`;
+      if (this.resource?.cover?.id && API_BASE_URL)
+        return `${API_BASE_URL}/covers/${this.resource.cover.id}?size=thumbnail`;
       return "";
     },
     coverClass() {
@@ -366,7 +392,7 @@ export default defineComponent({
         console.log("resource detail:", this.resource);
         console.log("auto_meta_result:", this.resource?.auto_meta_result);
         console.log("catalog_info:", this.resource?.catalog_info);
-        // 尝试解析可用的封面 URL（异步探测），优先使用 resized large
+        // 尝试解析可用的封面 URL（异步探测），优先使用缩略图
         this.resolveCoverUrl();
       } catch (error) {
         console.error("[PostShow] 获取资源详情失败:", error);
@@ -383,52 +409,48 @@ export default defineComponent({
       const candidates = [];
       const cv = this.resource?.cover_url;
       if (cv) {
-        if (cv.startsWith("http")) candidates.push(cv);
-        else {
+        if (cv.startsWith("http")) {
+          candidates.push(cv);
+        } else {
           const m =
             cv.match(/(?:\/)??uploads\/cover\/(.+)$/) ||
             cv.match(/uploads\/cover\/(.+)$/);
           if (m) {
-            const filename = m[1];
-            const extMatch = filename.match(/^(.+)\.(\w+)$/);
-            if (extMatch) {
-              const name = extMatch[1];
-              const ext = extMatch[2];
-              // 优先尝试 thumbnail（缩略），再尝试 large
-              candidates.push(
-                `${API_BASE_URL}/uploads/cover/resized/${name}-thumbnail.${ext}`
-              );
-              candidates.push(
-                `${API_BASE_URL}/uploads/cover/resized/${name}-large.${ext}`
-              );
-            } else {
-              candidates.push(
-                `${API_BASE_URL}/uploads/cover/resized/${filename}-thumbnail`
-              );
-              candidates.push(
-                `${API_BASE_URL}/uploads/cover/resized/${filename}-large`
-              );
-            }
+            const filename = m[1]; // 完整文件名，例如 "1766517324895-cover.jpg"
+            // 根据文档，格式应该是：/uploads/cover/resized/{filename}-thumbnail
+            candidates.push(
+              `/uploads/cover/resized/${filename}-thumbnail`
+            );
           }
-          candidates.push(`${API_BASE_URL}${cv}?size=large`);
+          // 不添加原始大图路径，只使用缩略图
+          // 如果缩略图不存在，显示占位符
         }
       }
-      if (this.resource?.auto_cover_url)
-        candidates.push(
-          this.resource.auto_cover_url.startsWith("http")
+      if (this.resource?.auto_cover_url) {
+        if (this.resource.auto_cover_url.startsWith("http")) {
+          candidates.push(this.resource.auto_cover_url);
+        } else {
+          const path = this.resource.auto_cover_url.startsWith("/")
             ? this.resource.auto_cover_url
-            : `${API_BASE_URL}${this.resource.auto_cover_url}`
-        );
-      if (this.resource?.textbook_info?.cover_url)
-        candidates.push(
-          this.resource.textbook_info.cover_url.startsWith("http")
+            : `/${this.resource.auto_cover_url}`;
+          candidates.push(path);
+        }
+      }
+      if (this.resource?.textbook_info?.cover_url) {
+        if (this.resource.textbook_info.cover_url.startsWith("http")) {
+          candidates.push(this.resource.textbook_info.cover_url);
+        } else {
+          const path = this.resource.textbook_info.cover_url.startsWith("/")
             ? this.resource.textbook_info.cover_url
-            : `${API_BASE_URL}${this.resource.textbook_info.cover_url}`
-        );
-      if (this.resource?.cover?.id)
+            : `/${this.resource.textbook_info.cover_url}`;
+          candidates.push(path);
+        }
+      }
+      if (this.resource?.cover?.id && API_BASE_URL) {
         candidates.push(
-          `${API_BASE_URL}/covers/${this.resource.cover.id}?size=large`
+          `${API_BASE_URL}/covers/${this.resource.cover.id}?size=thumbnail`
         );
+      }
 
       for (const url of candidates) {
         if (!url) continue;
@@ -452,6 +474,24 @@ export default defineComponent({
         img.onerror = () => resolve(false);
         img.src = url;
       });
+    },
+
+    onCoverError(e) {
+      try {
+        const failedUrl = e.target && e.target.src;
+        console.log(
+          "[PostShow] cover load error for",
+          this.resource?.id,
+          failedUrl
+        );
+        // 缩略图加载失败，直接显示占位符，不回退到大图
+      } catch (err) {
+        console.log(
+          "[PostShow] cover load error (no src available) for",
+          this.resource?.id
+        );
+      }
+      this.coverFailed = true;
     },
 
     onCoverLoad(e) {
