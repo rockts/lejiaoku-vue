@@ -41,7 +41,7 @@
               :alt="item.title"
               class="img-fluid img-thumbnail"
               @load="onCoverLoad"
-              @error="coverFailed = true"
+              @error="onCoverError"
               :class="coverClass"
             />
           </template>
@@ -52,7 +52,7 @@
                 :alt="item.title"
                 class="img-fluid img-thumbnail"
                 @load="onCoverLoad"
-                @error="coverFailed = true"
+                @error="onCoverError"
               />
             </template>
             <template v-else>
@@ -215,6 +215,7 @@ export default defineComponent({
       // 如果有直接可拼接的 resourceCoverURL，先让它作为初始展示，避免空白
       if (this.resourceCoverURL) {
         this.resolvedCover = this.resourceCoverURL;
+        console.log('[PostListItem] initial resolvedCover set to resourceCoverURL for', this.item.id, this.resolvedCover);
       }
       const candidates = [];
       const cv = this.item?.cover_url;
@@ -270,6 +271,14 @@ export default defineComponent({
         }
       }
       console.log("[PostListItem] no valid cover found for", this.item.id);
+      this.coverFailed = true;
+    },
+    onCoverError(e) {
+      try {
+        console.log('[PostListItem] cover load error for', this.item.id, e.target && e.target.src);
+      } catch (err) {
+        console.log('[PostListItem] cover load error (no src available) for', this.item.id);
+      }
       this.coverFailed = true;
     },
   },

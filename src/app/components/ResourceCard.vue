@@ -7,7 +7,7 @@
           :src="resolvedCover"
           :alt="item.title"
           @load="onCoverLoad"
-          @error="coverFailed = true"
+          @error="onCoverError"
           :class="coverFitClass"
         />
       </template>
@@ -17,7 +17,7 @@
             :src="coverUrl"
             :alt="item.title"
             @load="onCoverLoad"
-            @error="coverFailed = true"
+            @error="onCoverError"
             :class="coverFitClass"
           />
         </template>
@@ -142,6 +142,11 @@ export default defineComponent({
     async resolveCoverUrl() {
       this.resolvedCover = "";
       this.coverFailed = false;
+      // 先使用计算好的 coverUrl 作为快速展示（如果有），避免首页/卡片空白
+      if (this.coverUrl) {
+        this.resolvedCover = this.coverUrl;
+        console.log('[ResourceCard] initial resolvedCover set to coverUrl for', this.item.id, this.resolvedCover);
+      }
       const candidates = [];
       const cv = this.item?.cover_url;
       if (cv) {
@@ -190,6 +195,15 @@ export default defineComponent({
         }
       }
       console.log("[ResourceCard] no valid cover found for", this.item.id);
+      this.coverFailed = true;
+    },
+
+    onCoverError(e) {
+      try {
+        console.log('[ResourceCard] cover load error for', this.item.id, e.target && e.target.src);
+      } catch (err) {
+        console.log('[ResourceCard] cover load error (no src available) for', this.item.id);
+      }
       this.coverFailed = true;
     },
 
