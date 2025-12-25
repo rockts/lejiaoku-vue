@@ -190,6 +190,11 @@ export default defineComponent({
         if (this.item.cover_url.startsWith("http")) {
           return this.item.cover_url;
         }
+        // 如果是上传目录的原始封面，优先使用后端约定的 resized 路径（thumbnail）
+        const m = this.item.cover_url.match(/\/uploads\/cover\/(.+)$/);
+        if (m) {
+          return `${API_BASE_URL}/uploads/cover/resized/${m[1]}-thumbnail`;
+        }
         return `${API_BASE_URL}${this.item.cover_url}`;
       }
       // 兼容旧数据格式

@@ -103,7 +103,15 @@ export default defineComponent({
   },
   computed: {
     postCoverURL() {
-      return `${API_BASE_URL}/covers/${this.item.cover.id}?size=thumbnail`;
+      // prefer resized upload path when available
+      if (this.item.cover_url) {
+        if (this.item.cover_url.startsWith('http')) return this.item.cover_url;
+        const m = this.item.cover_url.match(/\/uploads\/cover\/(.+)$/);
+        if (m) return `${API_BASE_URL}/uploads/cover/resized/${m[1]}-thumbnail`;
+        return `${API_BASE_URL}${this.item.cover_url}`;
+      }
+      if (this.item.cover?.id) return `${API_BASE_URL}/covers/${this.item.cover.id}?size=thumbnail`;
+      return '';
     },
     userAvatarURL() {
       return `${API_BASE_URL}/users/${this.item.user.id}/avatar`;
