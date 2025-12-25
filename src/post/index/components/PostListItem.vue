@@ -212,6 +212,10 @@ export default defineComponent({
     async resolveCoverUrl() {
       this.resolvedCover = "";
       this.coverFailed = false;
+      // 如果有直接可拼接的 resourceCoverURL，先让它作为初始展示，避免空白
+      if (this.resourceCoverURL) {
+        this.resolvedCover = this.resourceCoverURL;
+      }
       const candidates = [];
       const cv = this.item?.cover_url;
       if (cv) {
@@ -256,6 +260,7 @@ export default defineComponent({
           img.src = url;
         });
         if (ok) {
+          // 优先使用探测成功的候选（可能是缩略图或更合适的尺寸）
           this.resolvedCover = url;
           console.log("[PostListItem] resolved cover for", this.item.id, url);
           return;
