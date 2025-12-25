@@ -1,3 +1,25 @@
+/* 资源详情页封面图片自适应且居中 */
+.cover {
+  width: 150px;
+  height: 200px;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border, #e9ecef);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+.cover img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+  background: #fff;
+  margin: auto;
+}
 <template>
   <bread-crumbs />
 

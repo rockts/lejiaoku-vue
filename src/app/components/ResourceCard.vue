@@ -106,15 +106,13 @@ export default defineComponent({
   transform: translateY(-2px);
 }
 .resource-card .resource-cover {
-  width: 150px;
-  height: 200px;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
   background: #fff;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 12px;
-  border: 1px solid var(--border);
-  position: relative;
-  flex-shrink: 0;
+  margin: auto;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   display: flex;
   align-items: center;
@@ -132,7 +130,10 @@ export default defineComponent({
   background: #fff;
   margin: auto;
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 .resource-card .resource-cover i {
   font-size: 48px;
