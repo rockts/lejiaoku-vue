@@ -37,6 +37,20 @@ apiHttpClient.interceptors.response.use(
     return response;
   },
   (error) => {
+    // 处理 401 未授权错误
+    if (error.response?.status === 401) {
+      console.log('[APIClient] 401 未授权，清除登录态并跳转登录');
+      // 清除本地存储的 token 和用户信息
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_info');
+      localStorage.removeItem('token');
+      // 触发自定义事件，通知 App 组件清除 store 状态
+      window.dispatchEvent(new CustomEvent('auth:logout'));
+      // 跳转到登录页
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    }
     return Promise.reject(error);
   }
 );

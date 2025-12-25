@@ -1,6 +1,6 @@
 <template>
   <div class="container mt-4">
-    <h2>我上传的资源</h2>
+    <h2>{{ isMyResources ? '我上传的资源' : '用户资源' }}</h2>
 
     <div v-if="loading" class="text-center my-5">
       <div class="spinner-border" role="status">
@@ -44,6 +44,17 @@ import { apiHttpClient } from "@/app/app.service";
 export default defineComponent({
   name: "MyResources",
 
+  props: {
+    userId: {
+      type: String,
+      default: null,
+    },
+    isMyResources: {
+      type: Boolean,
+      default: false,
+    },
+  },
+
   data() {
     return {
       resources: [],
@@ -55,11 +66,37 @@ export default defineComponent({
     this.fetchMyResources();
   },
 
+  watch: {
+    userId: {
+      handler(newVal, oldVal) {
+        if (newVal !== oldVal && newVal) {
+          this.fetchMyResources();
+        }
+      },
+      immediate: false,
+    },
+  },
+
   methods: {
     async fetchMyResources() {
       this.loading = true;
       try {
-        const response = await apiHttpClient.get("/api/my/resources");
+        let response;
+        
+        // 判断是否为当前用户
+        const currentUser = this.$store.getters["auth/user"];
+        const isCurrentUser = currentUser && String(currentUser.id) === String(this.userId);
+        
+        if (this.isMyResources || !this.userId || isCurrentUser) {
+          // 获取当前用户的资源
+          response = await apiHttpClient.get("/api/my/resources");
+        } else {
+          // 获取指定用户的资源
+          // 使用查询参数方式
+          response = await apiHttpClient.get("/api/resources", {
+            params: { user_id: this.userId }
+          });
+        }
 
         // 过滤视频资源
         this.resources = response.data.filter((item) => {

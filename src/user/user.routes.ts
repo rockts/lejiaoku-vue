@@ -16,13 +16,27 @@ import UserProfile from './profile/UserProfile.vue';
 const routes: Array<RouteRecordRaw> = [
     {
         path: '/me/profile',
+        name: 'MyProfile',
+        component: UserProfile,
+        props: { isMyProfile: true },
+    },
+    {
+        path: '/users/:userId',
         name: 'UserProfile',
         component: UserProfile,
+        props: true,
     },
     {
         path: '/me/resources',
         name: 'MyResources',
         component: MyResources,
+        props: { isMyResources: true },
+    },
+    {
+        path: '/users/:userId/resources',
+        name: 'UserResources',
+        component: MyResources,
+        props: true,
     },
 ];
 

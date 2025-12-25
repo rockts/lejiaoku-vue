@@ -20,11 +20,11 @@
   <div v-else class="post-create-page">
     <div class="container post-create-page-body">
       <!-- 上传提示 -->
-      <div class="alert alert-info mb-4" role="alert">
-        <i class="bi bi-info-circle me-2"></i>
-        <strong>上传流程：</strong>填写标题和分类 → 选择文件 → 点击发布 →
-        系统自动解析教材信息 → 8秒后跳转到资源详情页
-      </div>
+        <div class="alert alert-info mb-4" role="alert">
+          <i class="bi bi-info-circle me-2"></i>
+          <strong>上传流程：</strong>填写标题和分类 → 选择文件 → 点击发布 →
+          系统自动解析教材信息 → 8秒后跳转到首页
+        </div>
 
       <form>
         <!-- 资源标题 -->
@@ -567,12 +567,20 @@ export default defineComponent({
   },
 
   async created() {
-    // 检查认证状态
-    this.isAuthenticated = this.$store.state.auth?.isAuthenticated || false;
-    console.log("[PostCreate] 认证状态:", this.isAuthenticated);
+    // 检查认证状态（从 localStorage 和 store 双重检查）
+    const token = localStorage.getItem('auth_token');
+    const userInfo = localStorage.getItem('user_info');
+    const storeAuth = this.$store.state.auth?.isAuthenticated;
+    
+    this.isAuthenticated = !!(token && userInfo) || storeAuth || false;
+    console.log("[PostCreate] 认证状态:", this.isAuthenticated, { token: !!token, userInfo: !!userInfo, storeAuth });
 
     if (!this.isAuthenticated) {
       console.log("[PostCreate] 未登录，不加载教材目录");
+      // 如果路由守卫没有拦截，这里再次检查并跳转
+      if (!token || !userInfo) {
+        this.$router.push({ path: '/login', query: { redirect: this.$route.fullPath } });
+      }
       return;
     }
 
@@ -1186,6 +1194,14 @@ export default defineComponent({
     },
 
     async createPost() {
+      // 提交前校验登录态
+      const token = localStorage.getItem('auth_token');
+      if (!token) {
+        notification.error("登录已过期，请重新登录");
+        this.$router.push({ path: '/login', query: { redirect: this.$route.fullPath } });
+        return;
+      }
+
       console.log("[PostCreate] 开始创建资源...");
       console.log("[PostCreate] 当前表单数据:", {
         title: this.title,
@@ -1307,13 +1323,13 @@ export default defineComponent({
             await apiHttpClient.post(`/api/resources/${resourceId}/auto-parse`);
             console.log("[PostCreate] auto-parse 调用成功");
             notification.success(
-              "教材信息已自动提取，8秒后跳转到详情页...",
+              "教材信息已自动提取，8秒后跳转到首页...",
               8000
             );
           } catch (error) {
             console.error("[PostCreate] auto-parse 调用失败:", error);
             notification.warning(
-              `教材信息提取失败，5秒后仍将跳转到详情页`,
+              `教材信息提取失败，5秒后仍将跳转到首页`,
               5000
             );
           }
@@ -1321,13 +1337,12 @@ export default defineComponent({
           // 绑定教材（如果有选择）
           await this.bindTextbook(resourceId);
 
-          // 延迟 8 秒后跳转到详情页
+          // 延迟 8 秒后跳转到首页
           setTimeout(() => {
             console.log(
-              "[PostCreate] 跳转到资源详情页:",
-              `/resources/${resourceId}`
+              "[PostCreate] 跳转到首页"
             );
-            this.$router.push(`/resources/${resourceId}`);
+            this.$router.push('/');
           }, 8000);
         }
 

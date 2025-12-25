@@ -3,6 +3,7 @@ import Home from '@/app/components/Home.vue';
 import About from '@/app/components/About.vue';
 import UserAgreement from '@/app/components/UserAgreement.vue';
 import PrivacyPolicy from '@/app/components/PrivacyPolicy.vue';
+import LoginPage from '@/app/components/LoginPage.vue';
 
 /**
  * 定义路由
@@ -12,6 +13,11 @@ const routes: Array<RouteRecordRaw> = [
         path: '/',
         name: 'Home',
         component: Home,
+    },
+    {
+        path: '/login',
+        name: 'Login',
+        component: LoginPage,
     },
     {
         path: '/about',

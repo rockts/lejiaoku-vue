@@ -17,12 +17,23 @@
       <ResourceList :resources="filteredResources" />
       <div class="cta">
         <div class="cta-title">
-          想上传自己的教学资源？加入我们，成为教师贡献者
+          <template v-if="isAuthenticated">
+            想上传自己的教学资源？加入我们，成为教师贡献者
+          </template>
+          <template v-else>
+            登录后可上传和管理教学资源
+          </template>
         </div>
-        <div class="cta-actions">
-          <router-link to="/resources/create" class="btn upload-btn"
-            ><i class="bi bi-upload me-2"></i> 上传资源</router-link
+        <div class="cta-actions" :class="{ 'justify-center': !isAuthenticated }">
+          <!-- 已登录：显示上传按钮 -->
+          <router-link
+            v-if="isAuthenticated"
+            to="/resources/create"
+            class="btn upload-btn"
           >
+            <i class="bi bi-upload me-2"></i> 上传资源
+          </router-link>
+          <!-- 未登录：不显示上传按钮 -->
           <div
             class="qr-wrapper"
             @mouseenter="showQR = true"
@@ -50,22 +61,28 @@
         </div>
       </div>
     </div>
+    <LoginModal
+      v-model="showLoginModal"
+      @switch-to-register="handleSwitchToRegister"
+    />
   </div>
 </template>
 
 <script>
 import { defineComponent } from "vue";
 import { apiHttpClient } from "@/app/app.service";
+import notification from "@/utils/notification";
 import SearchBar from "./SearchBar.vue";
 import ResourceList from "./ResourceList.vue";
 import CategoryNav from "./CategoryNav.vue";
 import ActiveFilters from "./ActiveFilters.vue";
+import LoginModal from "./LoginModal.vue";
 
 export default defineComponent({
   name: "Home",
   props: ["user"],
 
-  components: { SearchBar, ResourceList, CategoryNav, ActiveFilters },
+  components: { SearchBar, ResourceList, CategoryNav, ActiveFilters, LoginModal },
   data() {
     return {
       filterState: {
@@ -78,7 +95,38 @@ export default defineComponent({
       showQR: false,
       qrError: false,
       qrSrc: process.env.BASE_URL + "qr-contributor.jpg",
+      showLoginModal: false,
     };
+  },
+  computed: {
+    isAuthenticated() {
+      // 检查 localStorage（最可靠的方式）
+      const token = localStorage.getItem('auth_token');
+      const userInfo = localStorage.getItem('user_info');
+      
+      // 只有当 token 和 userInfo 都存在时才认为已登录
+      if (!token || !userInfo) {
+        return false;
+      }
+      
+      // 如果 localStorage 有值，再检查 store 状态（如果 store 已初始化）
+      try {
+        const storeAuth = this.$store?.state?.auth?.isAuthenticated;
+        // 如果 store 显示未登录，以 store 为准（可能刚登出）
+        if (storeAuth === false) {
+          return false;
+        }
+        // 如果 store 显示已登录，返回 true
+        if (storeAuth === true) {
+          return true;
+        }
+      } catch (e) {
+        // store 未初始化，使用 localStorage 的值
+      }
+      
+      // 默认：有 token 和 userInfo 就认为已登录
+      return true;
+    },
   },
 
   watch: {
@@ -88,6 +136,11 @@ export default defineComponent({
   },
 
   async created() {
+    // 确保 auth store 已初始化
+    if (!this.$store.state.auth?.isAuthenticated) {
+      this.$store.dispatch('auth/initAuth');
+    }
+    
     if (this.$route.query.q) {
       this.filterState.keyword = this.$route.query.q;
     }
@@ -224,6 +277,11 @@ export default defineComponent({
         grades: [],
       };
     },
+    handleSwitchToRegister() {
+      this.showLoginModal = false;
+      // 跳转到注册页面（如果存在）或显示提示
+      notification.info("请通过首页右上角注册按钮进行注册");
+    },
   },
 });
 </script>
@@ -245,6 +303,9 @@ export default defineComponent({
   display: flex;
   gap: 12px;
   position: relative;
+}
+.cta-actions.justify-center {
+  justify-content: center;
 }
 
 .upload-btn {

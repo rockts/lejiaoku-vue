@@ -316,11 +316,11 @@ export default defineComponent({
     canEdit() {
       const user = this.$store.state.auth?.user;
       if (!user) return false;
-      // 管理员或资源创建者可以编辑
+      // 根据后端权限规则：admin、editor 或资源创建者可以编辑
       return (
         user.role === "admin" ||
-        user.id === this.resource?.creator_id ||
-        user.username === this.resource?.creator
+        user.role === "editor" ||
+        user.id === this.resource?.user_id
       );
     },
 
@@ -328,12 +328,10 @@ export default defineComponent({
     canDelete() {
       const user = this.$store.state.auth?.user;
       if (!user) return false;
-      // 管理员或资源创建者可以删除
-      return (
-        user.role === "admin" ||
-        user.id === this.resource?.creator_id ||
-        user.username === this.resource?.creator
-      );
+      // admin 永远可以删除
+      if (user.role === "admin") return true;
+      // 非 admin 仅当是资源创建者时可以删除
+      return user.id === this.resource?.user_id;
     },
 
     catalogInfo() {

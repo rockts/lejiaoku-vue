@@ -21,22 +21,32 @@ const router = createRouter({
     routes: [...appRoutes, ...postRoutes, ...userRoutes, ...testRoutes, ...adminRoutes],
 });
 
-// const HAS_LOGINED = false;
-
 /**
- * 导航守卫
+ * 路由守卫
+ * 保护需要登录的路由
  */
-
-// router.beforeEach((to, from, next) => {
-//  console.log('👮‍♀️');
-
-//  if (to.name !== 'UserLogin') {
-//   if (HAS_LOGINED) next();
-//   else next({ name: 'UserLogin' });
-//  } else {
-//   if (HAS_LOGINED) next({ name: 'Home' });
-//   else next();
-//  }
-// });
+router.beforeEach((to, from, next) => {
+  // 需要登录的路由
+  const requiresAuth = ['resourceCreate', 'resourceEdit'];
+  
+  if (requiresAuth.includes(to.name)) {
+    // 检查是否已登录
+    const token = localStorage.getItem('auth_token');
+    const userInfo = localStorage.getItem('user_info');
+    
+    if (!token || !userInfo) {
+      // 未登录，跳转到登录页
+      console.log('[Router] 未登录，跳转到登录页');
+      // 保存目标路由，登录后可以跳转回来
+      next({ 
+        path: '/login',
+        query: { redirect: to.fullPath }
+      });
+      return;
+    }
+  }
+  
+  next();
+});
 
 export default router;

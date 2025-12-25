@@ -1,23 +1,14 @@
 <template>
-  <Teleport to="body">
-    <Transition name="modal">
-      <div v-if="modelValue" class="modal-overlay" @click.self="closeModal">
-        <div class="modal-container">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">
-                <i class="bi bi-box-arrow-in-right"></i> 用户登录
-              </h5>
-              <button
-                type="button"
-                class="close-btn"
-                @click="closeModal"
-                aria-label="Close"
-              >
-                <i class="bi bi-x-lg"></i>
-              </button>
+  <div class="login-page">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-5">
+          <div class="login-card">
+            <div class="login-header">
+              <h2><i class="bi bi-box-arrow-in-right"></i> 用户登录</h2>
+              <p class="text-muted">登录后即可上传和管理资源</p>
             </div>
-            <div class="modal-body">
+            <div class="login-body">
               <form @submit.prevent="handleSubmit">
                 <div class="mb-3">
                   <label class="form-label">用户名/邮箱</label>
@@ -53,8 +44,8 @@
 
                 <div class="d-flex justify-content-between mb-3">
                   <a href="#" class="text-muted small">忘记密码？</a>
-                  <a href="#" @click.prevent="switchToRegister" class="small"
-                    >还没有账号？立即注册</a
+                  <router-link to="/register" class="small"
+                    >还没有账号？立即注册</router-link
                   >
                 </div>
 
@@ -69,41 +60,18 @@
                   ></span>
                   {{ loading ? "登录中..." : "登录" }}
                 </button>
-
-                <div class="text-center mt-4">
-                  <p class="text-muted small mb-2">社交账号登录</p>
-                  <div class="d-flex justify-content-center gap-3">
-                    <button
-                      type="button"
-                      class="btn btn-outline-secondary btn-sm"
-                    >
-                      <img
-                        src="@/assets/img/weixin.png"
-                        style="width: 20px; height: 20px"
-                        alt="微信"
-                      />
-                      微信
-                    </button>
-                    <button
-                      type="button"
-                      class="btn btn-outline-secondary btn-sm"
-                    >
-                      <img
-                        src="@/assets/img/qq.png"
-                        style="width: 20px; height: 20px"
-                        alt="QQ"
-                      />
-                      QQ
-                    </button>
-                  </div>
-                </div>
               </form>
             </div>
           </div>
+          <div class="text-center mt-3">
+            <router-link to="/" class="text-muted small"
+              ><i class="bi bi-arrow-left"></i> 返回首页</router-link
+            >
+          </div>
         </div>
       </div>
-    </Transition>
-  </Teleport>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -112,14 +80,7 @@ import { apiHttpClient } from "@/app/app.service";
 import notification from "@/utils/notification";
 
 export default defineComponent({
-  name: "LoginModal",
-  props: {
-    modelValue: {
-      type: Boolean,
-      required: true,
-    },
-  },
-  emits: ["update:modelValue", "switch-to-register"],
+  name: "LoginPage",
   data() {
     return {
       account: "",
@@ -128,18 +89,6 @@ export default defineComponent({
     };
   },
   methods: {
-    closeModal() {
-      this.$emit("update:modelValue", false);
-      this.resetForm();
-    },
-    switchToRegister() {
-      this.$emit("switch-to-register");
-    },
-    resetForm() {
-      this.account = "";
-      this.password = "";
-      this.loading = false;
-    },
     async handleSubmit() {
       if (!this.account || !this.password) {
         notification.warning("请填写完整信息");
@@ -153,11 +102,11 @@ export default defineComponent({
           ? { email: this.account, password: this.password }
           : { username: this.account, password: this.password };
 
-        console.log("[LoginModal] 登录请求数据:", loginData);
+        console.log("[LoginPage] 登录请求数据:", loginData);
 
         const response = await apiHttpClient.post("/login", loginData);
 
-        console.log("[LoginModal] 登录响应:", response.data);
+        console.log("[LoginPage] 登录响应:", response.data);
 
         // 处理响应数据（兼容不同的响应格式）
         const responseData = response.data;
@@ -165,12 +114,12 @@ export default defineComponent({
         const user = responseData.user || responseData.data?.user;
 
         if (!token || !user) {
-          console.error("[LoginModal] 响应数据格式错误:", responseData);
+          console.error("[LoginPage] 响应数据格式错误:", responseData);
           notification.error("登录响应数据格式错误，请稍后重试");
           return;
         }
 
-        console.log("[LoginModal] 提取的 token 和 user:", { token, user });
+        console.log("[LoginPage] 提取的 token 和 user:", { token, user });
 
         // 保存 token 和用户信息
         localStorage.setItem("token", token);
@@ -182,13 +131,17 @@ export default defineComponent({
         this.$store.commit("auth/setUser", user);
 
         notification.success("登录成功！");
-        this.closeModal();
 
-        // 刷新页面以更新UI状态
-        window.location.reload();
+        // 跳转到目标页面或首页
+        const redirect = this.$route.query.redirect;
+        if (redirect && typeof redirect === "string") {
+          this.$router.push(redirect);
+        } else {
+          this.$router.push("/");
+        }
       } catch (error) {
-        console.error("[LoginModal] 登录失败:", error);
-        console.error("[LoginModal] 错误详情:", {
+        console.error("[LoginPage] 登录失败:", error);
+        console.error("[LoginPage] 错误详情:", {
           message: error.message,
           response: error.response?.data,
           status: error.response?.status,
@@ -207,72 +160,44 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+.login-page {
+  min-height: calc(100vh - 200px);
   display: flex;
   align-items: center;
-  justify-content: center;
-  z-index: 1050;
+  padding: 2rem 0;
 }
 
-.modal-container {
-  width: 90%;
-  max-width: 450px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.modal-content {
+.login-card {
+  background: #fff;
   border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-  border: none;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
-.modal-header {
-  border-bottom: 1px solid #e9ecef;
-  padding: 1.25rem 1.5rem;
+.login-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 12px 12px 0 0;
-}
-
-.modal-title {
   color: white;
-  font-weight: 600;
-  font-size: 1.25rem;
-  margin: 0;
+  padding: 2rem;
+  text-align: center;
 }
 
-.modal-title i {
+.login-header h2 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.login-header h2 i {
   margin-right: 0.5rem;
 }
 
-.close-btn {
-  background: transparent;
-  border: none;
-  color: white;
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+.login-header p {
+  margin: 0.5rem 0 0 0;
+  opacity: 0.9;
 }
 
-.close-btn:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-.modal-body {
-  padding: 2rem 1.5rem;
+.login-body {
+  padding: 2rem;
 }
 
 .form-label {
@@ -322,21 +247,6 @@ export default defineComponent({
   opacity: 0.6;
 }
 
-.btn-outline-secondary {
-  border-radius: 8px;
-  padding: 0.5rem 1rem;
-  transition: all 0.2s;
-}
-
-.btn-outline-secondary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.gap-3 {
-  gap: 0.75rem;
-}
-
 a {
   color: #667eea;
   text-decoration: none;
@@ -347,25 +257,5 @@ a:hover {
   color: #764ba2;
   text-decoration: underline;
 }
-
-/* 动画效果 */
-.modal-enter-active,
-.modal-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.modal-enter-active .modal-container,
-.modal-leave-active .modal-container {
-  transition: transform 0.3s ease;
-}
-
-.modal-enter-from,
-.modal-leave-to {
-  opacity: 0;
-}
-
-.modal-enter-from .modal-container,
-.modal-leave-to .modal-container {
-  transform: scale(0.9);
-}
 </style>
+

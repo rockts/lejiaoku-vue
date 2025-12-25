@@ -20,7 +20,7 @@
             <div class="modal-body">
               <form @submit.prevent="handleSubmit">
                 <div class="mb-3">
-                  <label class="form-label">昵称</label>
+                  <label class="form-label">用户名 <span class="text-danger">*</span></label>
                   <div class="input-group">
                     <span class="input-group-text">
                       <i class="bi bi-person-fill"></i>
@@ -28,15 +28,27 @@
                     <input
                       type="text"
                       class="form-control"
-                      v-model="name"
-                      placeholder="输入昵称"
+                      :class="{ 'is-invalid': usernameError }"
+                      v-model="username"
+                      placeholder="输入用户名"
                       required
+                      @blur="validateUsername"
+                      @input="clearUsernameError"
                     />
+                  </div>
+                  <small class="text-muted d-block mt-1">
+                    用户名将用于登录，注册后不可修改
+                  </small>
+                  <small class="text-muted d-block mt-1">
+                    格式要求：4-20位，以字母开头，可包含字母、数字、下划线(_)或短横线(-)
+                  </small>
+                  <div v-if="usernameError" class="invalid-feedback d-block">
+                    {{ usernameError }}
                   </div>
                 </div>
 
                 <div class="mb-3">
-                  <label class="form-label">邮箱</label>
+                  <label class="form-label">邮箱 <span class="text-muted">(可选)</span></label>
                   <div class="input-group">
                     <span class="input-group-text">
                       <i class="bi bi-envelope-fill"></i>
@@ -45,8 +57,7 @@
                       type="email"
                       class="form-control"
                       v-model="email"
-                      placeholder="输入邮箱"
-                      required
+                      placeholder="输入邮箱（可选）"
                     />
                   </div>
                 </div>
@@ -146,7 +157,7 @@ export default defineComponent({
   emits: ["update:modelValue", "switch-to-login"],
   data() {
     return {
-      name: "",
+      username: "",
       email: "",
       password: "",
       loading: false,
@@ -161,14 +172,42 @@ export default defineComponent({
       this.$emit("switch-to-login");
     },
     resetForm() {
-      this.name = "";
+      this.username = "";
       this.email = "";
       this.password = "";
       this.loading = false;
+      this.usernameError = "";
+    },
+    validateUsername() {
+      if (!this.username) {
+        this.usernameError = "";
+        return true;
+      }
+
+      // 用户名格式验证：4-20位，以字母开头，可包含字母、数字、下划线(_)或短横线(-)
+      const usernameRegex = /^[a-zA-Z][a-zA-Z0-9_-]{3,19}$/;
+      
+      if (!usernameRegex.test(this.username)) {
+        this.usernameError = "用户名格式错误！必须是4-20位，以字母开头，可包含字母、数字、下划线(_)或短横线(-)";
+        return false;
+      }
+
+      this.usernameError = "";
+      return true;
+    },
+    clearUsernameError() {
+      if (this.usernameError) {
+        this.usernameError = "";
+      }
     },
     async handleSubmit() {
-      if (!this.name || !this.email || !this.password) {
-        notification.warning("请填写完整信息");
+      if (!this.username || !this.password) {
+        notification.warning("请填写用户名和密码");
+        return;
+      }
+
+      // 验证用户名格式
+      if (!this.validateUsername()) {
         return;
       }
 
@@ -179,19 +218,42 @@ export default defineComponent({
 
       this.loading = true;
       try {
-        await apiHttpClient.post("/register", {
-          name: this.name,
-          email: this.email,
+        // 根据 API 文档，注册接口支持 username 或 name
+        const registerData = {
+          username: this.username,
           password: this.password,
-        });
+        };
+        
+        // 邮箱是可选的
+        if (this.email) {
+          registerData.email = this.email;
+        }
 
-        notification.success("注册成功！请登录");
-        this.$emit("switch-to-login");
+        const response = await apiHttpClient.post("/register", registerData);
+
+        // API 响应格式：{ success, message, token, user }
+        const { token, user } = response.data;
+
+        // 保存 token 和用户信息
+        localStorage.setItem("token", token);
+        localStorage.setItem("auth_token", token);
+        localStorage.setItem("user_info", JSON.stringify(user));
+
+        // 更新 store
+        this.$store.commit("auth/setToken", token);
+        this.$store.commit("auth/setUser", user);
+
+        notification.success("注册成功！已自动登录");
+
+        // 关闭弹窗
+        this.closeModal();
+
+        // 刷新页面以更新UI状态
+        window.location.reload();
       } catch (error) {
         console.error("[RegisterModal] 注册失败:", error);
-        notification.error(
-          error.response?.data?.message || "注册失败，请稍后重试"
-        );
+        const errorMessage = error.response?.data?.message || error.message || "注册失败，请稍后重试";
+        notification.error(errorMessage);
       } finally {
         this.loading = false;
       }

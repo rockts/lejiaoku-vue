@@ -89,12 +89,18 @@
               aria-expanded="false"
             >
               <i class="bi bi-person-circle user-avatar"></i>
-              <span class="user-name">{{ currentUser.username }}</span>
+              <span class="user-name">{{ currentUser.name || currentUser.username }}</span>
               <span
                 v-if="currentUser.role === 'admin'"
                 class="badge badge-admin ms-1"
               >
                 <i class="bi bi-shield-check me-1"></i>管理员
+              </span>
+              <span
+                v-else-if="currentUser.role === 'editor'"
+                class="badge badge-primary ms-1"
+              >
+                <i class="bi bi-pencil me-1"></i>编辑
               </span>
             </button>
             <ul
@@ -106,16 +112,19 @@
                   <i class="bi bi-person-circle user-avatar-large"></i>
                   <div>
                     <div class="user-name-large">
-                      {{ currentUser.username }}
+                      {{ currentUser.name || currentUser.username }}
                     </div>
-                    <div class="user-email">{{ currentUser.email }}</div>
+                    <div class="user-email">{{ currentUser.email || '未设置邮箱' }}</div>
+                    <div v-if="currentUser.nickname" class="user-nickname text-muted small">
+                      <i class="bi bi-at"></i> {{ currentUser.nickname }}
+                    </div>
                   </div>
                 </div>
               </li>
               <li><hr class="dropdown-divider" /></li>
               <li>
                 <router-link
-                  to="/me/profile"
+                  :to="currentUser ? `/users/${currentUser.id}` : '/me/profile'"
                   class="dropdown-item"
                   @click="closeDropdown"
                 >
@@ -124,7 +133,7 @@
               </li>
               <li>
                 <router-link
-                  to="/me/resources"
+                  :to="currentUser ? `/users/${currentUser.id}/resources` : '/me/resources'"
                   class="dropdown-item"
                   @click="closeDropdown"
                 >
@@ -178,6 +187,7 @@ import RegisterModal from "./RegisterModal.vue";
 export default defineComponent({
   name: "GlobalHeader",
   props: ["user"],
+  emits: ["show-login"],
   data() {
     return {
       theme: "light",
