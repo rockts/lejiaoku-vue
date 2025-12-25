@@ -194,8 +194,15 @@ export default defineComponent({
         const m =
           this.item.cover_url.match(/(?:\/)??uploads\/cover\/(.+)$/) ||
           this.item.cover_url.match(/uploads\/cover\/(.+)$/);
-        if (m) {
-          return `${API_BASE_URL}/uploads/cover/resized/${m[1]}-thumbnail`;
+          if (m) {
+            const filename = m[1];
+            const extMatch = filename.match(/^(.+)\.(\w+)$/);
+            if (extMatch) {
+              const name = extMatch[1];
+              const ext = extMatch[2];
+              return `${API_BASE_URL}/uploads/cover/resized/${name}-thumbnail.${ext}`;
+            }
+            return `${API_BASE_URL}/uploads/cover/resized/${filename}-thumbnail`;
         }
         return `${API_BASE_URL}${this.item.cover_url}`;
       }

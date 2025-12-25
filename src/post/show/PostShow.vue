@@ -239,10 +239,17 @@ export default defineComponent({
         if (this.resource.cover_url.startsWith("http"))
           return this.resource.cover_url;
         // 支持带/不带前导斜杠的路径
-        const m =
-          this.resource.cover_url.match(/(?:\/)??uploads\/cover\/(.+)$/) ||
-          this.resource.cover_url.match(/uploads\/cover\/(.+)$/);
-        if (m) return `${API_BASE_URL}/uploads/cover/resized/${m[1]}-large`;
+          const m = this.resource.cover_url.match(/(?:\/)??uploads\/cover\/(.+)$/) || this.resource.cover_url.match(/uploads\/cover\/(.+)$/);
+          if (m) {
+            const filename = m[1];
+            const extMatch = filename.match(/^(.+)\.(\w+)$/);
+            if (extMatch) {
+              const name = extMatch[1];
+              const ext = extMatch[2];
+              return `${API_BASE_URL}/uploads/cover/resized/${name}-large.${ext}`;
+            }
+            return `${API_BASE_URL}/uploads/cover/resized/${filename}-large`;
+          }
         return `${API_BASE_URL}${this.resource.cover_url}?size=large`;
       }
       // fallback: 后端可能返回自动生成的封面字段
