@@ -22,7 +22,7 @@
 }
 .resource-cover-full {
   width: 100%;
-  height: 300px;
+  height: 240px;
   background: #fff;
   border-radius: 8px;
   overflow: hidden;
@@ -31,6 +31,20 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 12px;
+}
+.resource-cover-full img {
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  background: #fff;
+  margin: auto;
+}
+.resource-cover-full img.fit-cover { object-fit: cover; object-position: center; }
+.resource-cover-full img.fit-contain { object-fit: contain; object-position: center; }
+.resource-cover-full .placeholder-icon { font-size: 48px; color: var(--muted); opacity: 0.3; }
+
+@media (max-width: 768px) {
+  .resource-cover-full { height: 160px; }
 }
 .resource-cover-full img {
   max-width: 100%;
@@ -53,15 +67,15 @@
           <div>
             <h2 class="title">{{ resource.title }}</h2>
             <div class="meta">
-              <span class="badge">{{ resource.category || "未分类" }}</span>
-              <span class="tag">{{ resource.file_format || "文件" }}</span>
-            </div>
-          </div>
-          <div class="action-buttons">
-            <a
-              class="btn btn-primary"
-              :href="downloadUrl"
-              target="_blank"
+            resourceCoverURL() {
+              if (this.resource?.cover_url) {
+                // 如果是完整外部 URL，直接使用（无法加 size 参数）
+                if (this.resource.cover_url.startsWith('http')) return this.resource.cover_url;
+                // 内部路径，追加 size=large 以获取合适分辨率
+                return `${API_BASE_URL}${this.resource.cover_url}?size=large`;
+              }
+              if (this.resource?.cover?.id) return `${API_BASE_URL}/covers/${this.resource.cover.id}?size=large`;
+              return '';
               rel="noopener"
             >
               下载
@@ -206,7 +220,7 @@ export default defineComponent({
       resource: null, // 只读资源数据
       loading: false, // 加载状态
       isDeleting: false, // 删除中状态
-      coverFit: 'cover',
+      coverFit: "cover",
     };
   },
 
@@ -217,14 +231,16 @@ export default defineComponent({
   computed: {
     resourceCoverURL() {
       if (this.resource?.cover_url) {
-        if (this.resource.cover_url.startsWith('http')) return this.resource.cover_url;
+        if (this.resource.cover_url.startsWith("http"))
+          return this.resource.cover_url;
         return `${API_BASE_URL}${this.resource.cover_url}`;
       }
-      if (this.resource?.cover?.id) return `${API_BASE_URL}/covers/${this.resource.cover.id}`;
-      return '';
+      if (this.resource?.cover?.id)
+        return `${API_BASE_URL}/covers/${this.resource.cover.id}`;
+      return "";
     },
     coverClass() {
-      return this.coverFit === 'contain' ? 'fit-contain' : 'fit-cover';
+      return this.coverFit === "contain" ? "fit-contain" : "fit-cover";
     },
     downloadUrl() {
       if (!this.resource?.file_url) return "";
@@ -326,9 +342,9 @@ export default defineComponent({
       try {
         const img = e.target;
         const ratio = img.naturalWidth / img.naturalHeight;
-        this.coverFit = ratio < 0.9 ? 'contain' : 'cover';
+        this.coverFit = ratio < 0.9 ? "contain" : "cover";
       } catch (err) {
-        this.coverFit = 'cover';
+        this.coverFit = "cover";
       }
     },
 
