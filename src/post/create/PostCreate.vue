@@ -1393,20 +1393,6 @@ export default defineComponent({
       const types = ["Unit", "Lesson", "Subtopic"];
       return types[level] || "Section";
     },
-
-    async createFile(file, postId) {
-      const formData = new FormData();
-      formData.append("file", file);
-      try {
-        await apiHttpClient.post(`/files?post=${postId}`, formData, {});
-        this.file = null;
-        if (this.$refs.file) {
-          this.$refs.file.value = "";
-        }
-      } catch (error) {
-        this.errorMessage = error.message;
-      }
-    },
   },
 });
 </script>
