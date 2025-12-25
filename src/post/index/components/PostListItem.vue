@@ -230,13 +230,16 @@ export default defineComponent({
             if (extMatch) {
               const name = extMatch[1];
               const ext = extMatch[2];
+              // 使用 name-thumbnail.ext 这种后端约定的格式
               candidates.push(
                 `${API_BASE_URL}/uploads/cover/resized/${name}-thumbnail.${ext}`
               );
+            } else {
+              // 仅在没有扩展名的情况下，使用 filename-thumbnail
+              candidates.push(
+                `${API_BASE_URL}/uploads/cover/resized/${filename}-thumbnail`
+              );
             }
-            candidates.push(
-              `${API_BASE_URL}/uploads/cover/resized/${filename}-thumbnail`
-            );
           }
           candidates.push(`${API_BASE_URL}${cv}`);
         }
