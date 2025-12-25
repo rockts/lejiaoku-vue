@@ -12,7 +12,18 @@
         />
       </template>
       <template v-else>
-        <i class="bi bi-file-earmark"></i>
+        <template v-if="coverUrl">
+          <img
+            :src="coverUrl"
+            :alt="item.title"
+            @load="onCoverLoad"
+            @error="coverFailed = true"
+            :class="coverFitClass"
+          />
+        </template>
+        <template v-else>
+          <i class="bi bi-file-earmark"></i>
+        </template>
       </template>
     </div>
 
@@ -194,7 +205,7 @@ export default defineComponent({
       }
     },
     onPreview() {
-      this.$router.push(`/posts/${this.item.id}`);
+      this.$router.push(`/resources/${this.item.id}`);
     },
   },
   mounted() {
