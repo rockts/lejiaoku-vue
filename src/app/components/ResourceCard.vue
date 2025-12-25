@@ -5,7 +5,7 @@
       <img :src="coverUrl" :alt="item.title" />
     </div>
     <div class="resource-cover placeholder" v-else>
-      <img src="@/assets/img/catagory.png" alt="默认封面" />
+      <i class="bi bi-file-earmark"></i>
     </div>
 
     <div class="resource-title">{{ item.title }}</div>
