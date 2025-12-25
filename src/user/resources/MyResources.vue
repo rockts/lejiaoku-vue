@@ -109,7 +109,8 @@ export default defineComponent({
         console.log("[MyResources] 获取资源:", this.resources.length);
       } catch (error) {
         console.error("[MyResources] 获取资源失败:", error);
-        alert(
+        const { notification } = await import("@/utils/notification");
+        notification.error(
           "获取资源列表失败: " +
             (error.response?.data?.message || error.message)
         );

@@ -4,6 +4,8 @@ import { RootState } from '../../app/app.store';
 export interface AuthUser {
     id?: string | number;
     username?: string;
+    nickname?: string;
+    name?: string; // 保留以兼容旧数据
     email?: string;
     role: 'user' | 'contributor' | 'editor' | 'admin';
 }
@@ -85,7 +87,10 @@ export const authStoreModule: Module<AuthStoreState, RootState> = {
                     state.token = token;
                     state.user = JSON.parse(userInfo);
                     state.isAuthenticated = true;
-                    console.log('[Auth Store] 身份信息已恢复，用户:', state.user?.username);
+                    console.log('[Auth Store] 身份信息已恢复，用户对象:', state.user);
+                    console.log('[Auth Store] 用户 username:', state.user?.username);
+                    console.log('[Auth Store] 用户 nickname:', state.user?.nickname);
+                    console.log('[Auth Store] 用户 name:', state.user?.name);
                 } catch (error) {
                     console.error('[Auth Store] 恢复身份信息失败:', error);
                     state.token = null;

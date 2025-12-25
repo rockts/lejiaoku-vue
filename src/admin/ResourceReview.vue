@@ -112,7 +112,8 @@ export default defineComponent({
           statusText: error.response?.statusText,
           data: error.response?.data,
         });
-        alert(
+        const { notification } = await import("@/utils/notification");
+        notification.error(
           "获取资源列表失败: " +
             (error.response?.data?.message || error.message)
         );
@@ -122,7 +123,9 @@ export default defineComponent({
     },
 
     async approve(id) {
-      if (!confirm("确定通过该资源？")) return;
+      const { notification } = await import("@/utils/notification");
+      const confirmed = await notification.confirm("确定通过该资源？", "通过审核");
+      if (!confirmed) return;
 
       this.processing = true;
       try {
@@ -132,17 +135,19 @@ export default defineComponent({
         console.log("[ResourceReview] 资源已通过:", id);
         // 从列表中移除
         this.resources = this.resources.filter((r) => r.id !== id);
-        alert("资源已通过审核");
+        notification.success("资源已通过审核");
       } catch (error) {
         console.error("[ResourceReview] 审核失败:", error);
-        alert("操作失败");
+        notification.error("操作失败");
       } finally {
         this.processing = false;
       }
     },
 
     async reject(id) {
-      if (!confirm("确定拒绝该资源？")) return;
+      const { notification } = await import("@/utils/notification");
+      const confirmed = await notification.confirm("确定拒绝该资源？", "拒绝审核");
+      if (!confirmed) return;
 
       this.processing = true;
       try {
@@ -152,10 +157,10 @@ export default defineComponent({
         console.log("[ResourceReview] 资源已拒绝:", id);
         // 从列表中移除
         this.resources = this.resources.filter((r) => r.id !== id);
-        alert("资源已拒绝");
+        notification.success("资源已拒绝");
       } catch (error) {
         console.error("[ResourceReview] 操作失败:", error);
-        alert("操作失败");
+        notification.error("操作失败");
       } finally {
         this.processing = false;
       }

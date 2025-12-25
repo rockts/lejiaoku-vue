@@ -42,9 +42,8 @@ class NotificationManager {
         notification.style.cssText = `
       pointer-events: auto;
       margin-bottom: 12px;
-      padding: 12px 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      padding: 12px 16px;
+      border: 1px solid;
       background: white;
       border-left: 4px solid;
       display: flex;
@@ -54,7 +53,7 @@ class NotificationManager {
       max-width: 500px;
       opacity: 0;
       transform: translateX(400px);
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
       font-size: 14px;
     `;
 
@@ -74,6 +73,7 @@ class NotificationManager {
         };
 
         notification.style.borderLeftColor = colors[type];
+        notification.style.borderColor = colors[type];
 
         const icon = document.createElement('span');
         icon.style.cssText = `
@@ -82,11 +82,11 @@ class NotificationManager {
       justify-content: center;
       width: 20px;
       height: 20px;
-      border-radius: 50%;
       background: ${colors[type]};
       color: white;
       font-weight: bold;
       flex-shrink: 0;
+      font-size: 12px;
     `;
         icon.textContent = icons[type];
 
@@ -169,6 +169,158 @@ class NotificationManager {
 
     info(message: string, duration?: number): void {
         this.show({ message, type: 'info', duration });
+    }
+
+    /**
+     * 显示确认对话框（扁平化设计）
+     * @param message 提示信息
+     * @param title 标题（可选）
+     * @returns Promise<boolean> 用户点击确认返回 true，取消返回 false
+     */
+    confirm(message: string, title: string = '确认操作'): Promise<boolean> {
+        return new Promise((resolve) => {
+            // 创建遮罩层
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.4);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            `;
+
+            // 创建对话框
+            const dialog = document.createElement('div');
+            dialog.style.cssText = `
+                background: white;
+                border: 1px solid #dee2e6;
+                min-width: 400px;
+                max-width: 500px;
+                width: 100%;
+            `;
+
+            // 标题栏
+            const header = document.createElement('div');
+            header.style.cssText = `
+                padding: 1rem 1.25rem;
+                border-bottom: 1px solid #dee2e6;
+                font-weight: 600;
+                font-size: 1rem;
+                color: #212529;
+                background: #f8f9fa;
+            `;
+            header.textContent = title;
+
+            // 内容区域
+            const body = document.createElement('div');
+            body.style.cssText = `
+                padding: 1.5rem 1.25rem;
+                font-size: 0.875rem;
+                color: #495057;
+                line-height: 1.6;
+                white-space: pre-line;
+            `;
+            body.textContent = message;
+
+            // 按钮区域
+            const footer = document.createElement('div');
+            footer.style.cssText = `
+                padding: 0.75rem 1.25rem;
+                border-top: 1px solid #dee2e6;
+                display: flex;
+                justify-content: flex-end;
+                gap: 0.5rem;
+                background: #f8f9fa;
+            `;
+
+            // 取消按钮
+            const cancelBtn = document.createElement('button');
+            cancelBtn.textContent = '取消';
+            cancelBtn.style.cssText = `
+                padding: 0.5rem 1rem;
+                border: 1px solid #ced4da;
+                background: white;
+                color: #495057;
+                font-size: 0.875rem;
+                cursor: pointer;
+                transition: background-color 0.15s ease;
+            `;
+            cancelBtn.onmouseenter = () => {
+                cancelBtn.style.backgroundColor = '#f8f9fa';
+            };
+            cancelBtn.onmouseleave = () => {
+                cancelBtn.style.backgroundColor = 'white';
+            };
+            cancelBtn.onclick = () => {
+                document.body.removeChild(overlay);
+                resolve(false);
+            };
+
+            // 确认按钮
+            const confirmBtn = document.createElement('button');
+            confirmBtn.textContent = '确认';
+            confirmBtn.style.cssText = `
+                padding: 0.5rem 1rem;
+                border: 1px solid #dc3545;
+                background: #dc3545;
+                color: white;
+                font-size: 0.875rem;
+                cursor: pointer;
+                transition: background-color 0.15s ease;
+            `;
+            confirmBtn.onmouseenter = () => {
+                confirmBtn.style.backgroundColor = '#c82333';
+                confirmBtn.style.borderColor = '#c82333';
+            };
+            confirmBtn.onmouseleave = () => {
+                confirmBtn.style.backgroundColor = '#dc3545';
+                confirmBtn.style.borderColor = '#dc3545';
+            };
+            confirmBtn.onclick = () => {
+                document.body.removeChild(overlay);
+                resolve(true);
+            };
+
+            // 组装对话框
+            footer.appendChild(cancelBtn);
+            footer.appendChild(confirmBtn);
+            dialog.appendChild(header);
+            dialog.appendChild(body);
+            dialog.appendChild(footer);
+            overlay.appendChild(dialog);
+
+            // 点击遮罩层关闭
+            overlay.onclick = (e) => {
+                if (e.target === overlay) {
+                    document.body.removeChild(overlay);
+                    resolve(false);
+                }
+            };
+
+            // ESC 键关闭
+            const handleEsc = (e: KeyboardEvent) => {
+                if (e.key === 'Escape') {
+                    document.body.removeChild(overlay);
+                    document.removeEventListener('keydown', handleEsc);
+                    resolve(false);
+                }
+            };
+            document.addEventListener('keydown', handleEsc);
+
+            // 添加到页面
+            document.body.appendChild(overlay);
+
+            // 聚焦确认按钮
+            setTimeout(() => {
+                confirmBtn.focus();
+            }, 100);
+        });
     }
 }
 

@@ -230,7 +230,12 @@ export default defineComponent({
 
   props: {
     id: String,
+    user: {
+      type: Object,
+      default: null,
+    },
   },
+  emits: ['showLogin'],
 
   data() {
     return {
@@ -503,7 +508,12 @@ export default defineComponent({
     },
 
     async handleDelete() {
-      if (!confirm("确定要删除这个资源吗？此操作不可撤销。")) {
+      const { notification } = await import("@/utils/notification");
+      const confirmed = await notification.confirm(
+        "确定要删除这个资源吗？此操作不可撤销。",
+        "删除资源"
+      );
+      if (!confirmed) {
         return;
       }
 
@@ -513,12 +523,13 @@ export default defineComponent({
         console.log("[PostShow] 删除资源，ID:", this.id);
         await apiHttpClient.delete(`/api/resources/${this.id}`);
         console.log("[PostShow] 资源删除成功");
+        notification.success("资源已删除");
         this.$router.push("/resources");
         // 显示成功提示
         this.$store.commit("post/index/setResources", []); // 重置列表
       } catch (error) {
         console.error("[PostShow] 删除失败:", error);
-        alert("删除失败：" + (error.response?.data?.message || error.message));
+        notification.error("删除失败：" + (error.response?.data?.message || error.message));
       } finally {
         this.isDeleting = false;
       }

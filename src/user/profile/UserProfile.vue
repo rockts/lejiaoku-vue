@@ -7,10 +7,11 @@
           <div class="card-body text-center">
             <div class="avatar-container mb-3">
               <img
-                v-if="displayUser?.avatar_url"
+                v-if="avatarDisplayUrl"
                 :src="avatarDisplayUrl"
                 alt="头像"
                 class="avatar-image"
+                @error="handleAvatarError"
               />
               <i
                 v-else
@@ -27,6 +28,9 @@
             </span>
             <span v-else-if="displayUser?.role === 'editor'" class="badge bg-primary">
               编辑
+            </span>
+            <span v-else-if="displayUser?.role === 'contributor'" class="badge bg-success">
+              贡献者
             </span>
             <span v-else class="badge user-badge">普通用户</span>
           </div>
@@ -86,6 +90,7 @@
                 <div class="form-control-plaintext">
                   <span v-if="displayUser?.role === 'admin'" class="badge bg-danger">管理员</span>
                   <span v-else-if="displayUser?.role === 'editor'" class="badge bg-primary">编辑</span>
+                  <span v-else-if="displayUser?.role === 'contributor'" class="badge bg-success">贡献者</span>
                   <span v-else class="badge user-badge">普通用户</span>
                 </div>
               </div>
@@ -151,10 +156,11 @@
                 <div class="avatar-upload-section">
                   <div class="avatar-preview mb-3">
                     <img
-                      v-if="avatarPreviewUrl || displayUser?.avatar_url"
+                      v-if="avatarPreviewUrl || avatarDisplayUrl"
                       :src="avatarPreviewUrl || avatarDisplayUrl"
                       alt="头像预览"
                       class="avatar-preview-image"
+                      @error="handleAvatarError"
                     />
                     <div v-else class="avatar-placeholder">
                       <i class="bi bi-person-circle"></i>
@@ -178,7 +184,7 @@
                       <i class="bi bi-upload me-2"></i>选择图片
                     </button>
                     <button
-                      v-if="avatarPreviewUrl || displayUser?.avatar_url"
+                      v-if="avatarPreviewUrl || avatarDisplayUrl"
                       type="button"
                       class="btn btn-outline-danger"
                       @click="removeAvatar"
@@ -368,20 +374,47 @@ export default defineComponent({
     },
     // 头像显示URL
     avatarDisplayUrl() {
+      // 优先使用预览URL（上传后立即显示）
+      if (this.avatarPreviewUrl) {
+        return this.avatarPreviewUrl;
+      }
+      
       const user = this.displayUser;
+      console.log("[UserProfile] avatarDisplayUrl - user:", user);
+      console.log("[UserProfile] avatarDisplayUrl - user.avatar_url:", user?.avatar_url);
+      
       if (user?.avatar_url) {
-        // 如果是完整URL，直接返回
-        if (user.avatar_url.startsWith("http")) {
-          return user.avatar_url;
+        let url = String(user.avatar_url).trim();
+        
+        // 如果是完整URL，直接返回（添加时间戳防止缓存）
+        if (url.startsWith("http://") || url.startsWith("https://")) {
+          return `${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
         }
+        
         // 如果是相对路径（以/开头），直接使用（通过代理访问）
-        if (user.avatar_url.startsWith("/")) {
-          return user.avatar_url;
+        if (url.startsWith("/")) {
+          // 确保 /api/users/:id/avatar 或 /users/:id/avatar 路径能正确代理
+          // 添加时间戳防止缓存
+          const finalUrl = `${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
+          console.log("[UserProfile] avatarDisplayUrl - 相对路径:", finalUrl);
+          return finalUrl;
         }
+        
         // 其他情况，添加API基础URL
         const API_BASE_URL = process.env.VUE_APP_API_BASE_URL || "";
-        return `${API_BASE_URL}${user.avatar_url}`;
+        const finalUrl = `${API_BASE_URL}${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
+        console.log("[UserProfile] avatarDisplayUrl - 添加基础URL:", finalUrl);
+        return finalUrl;
       }
+      
+      // 如果没有 avatar_url，但用户有 ID，尝试构建默认头像URL
+      if (user?.id) {
+        const defaultAvatarUrl = `/api/users/${user.id}/avatar?t=${Date.now()}`;
+        console.log("[UserProfile] avatarDisplayUrl - 使用默认头像URL:", defaultAvatarUrl);
+        return defaultAvatarUrl;
+      }
+      
+      console.log("[UserProfile] avatarDisplayUrl - 没有头像URL，返回null");
       return null;
     },
   },
@@ -435,6 +468,9 @@ export default defineComponent({
         }
 
         this.profileUser = user;
+        
+        console.log("[UserProfile] fetchUser - 获取到的用户信息:", user);
+        console.log("[UserProfile] fetchUser - user.avatar_url:", user?.avatar_url);
 
         // 只有是自己的资料时才填充表单（可编辑）
         if (this.isCurrentUser) {
@@ -444,6 +480,7 @@ export default defineComponent({
             description: user.description || "",
             avatar_url: user.avatar_url || "",
           };
+          console.log("[UserProfile] fetchUser - profileForm.avatar_url:", this.profileForm.avatar_url);
         }
       } catch (error) {
         console.error("[UserProfile] 获取用户信息失败:", error);
@@ -494,6 +531,21 @@ export default defineComponent({
       }
     },
 
+    handleAvatarError(event) {
+      console.error("[UserProfile] 头像加载失败:", event);
+      console.error("[UserProfile] 尝试加载的URL:", event.target.src);
+      // 如果加载失败，可以尝试其他尺寸或显示默认图标
+      const src = event.target.src;
+      if (src && !src.includes('size=')) {
+        // 如果当前是原始尺寸，尝试加载中等尺寸
+        const mediumUrl = src.replace('/avatar?', '/avatar?size=medium&').replace('/avatar&', '/avatar?size=medium&');
+        if (mediumUrl !== src) {
+          console.log("[UserProfile] 尝试加载中等尺寸头像:", mediumUrl);
+          event.target.src = mediumUrl;
+        }
+      }
+    },
+
     async uploadAvatar() {
       if (!this.avatarFile) {
         return null;
@@ -501,9 +553,9 @@ export default defineComponent({
 
       this.uploadingAvatar = true;
       try {
+        // 根据 API 文档，使用 POST /api/avatar 或 POST /avatar，字段名是 avatar
         const formData = new FormData();
-        formData.append("file", this.avatarFile);
-        formData.append("type", "avatar"); // 标识为头像上传
+        formData.append("avatar", this.avatarFile);
 
         console.log("[UserProfile] 开始上传头像，文件:", {
           name: this.avatarFile.name,
@@ -511,18 +563,12 @@ export default defineComponent({
           type: this.avatarFile.type,
         });
 
-        // 尝试多个可能的上传接口
+        // 尝试两个接口（按 API 文档）
         let response;
         let lastError;
-        
-        // 尝试接口列表（按优先级排序）
         const uploadEndpoints = [
-          "/api/upload/avatar",
-          "/upload/avatar",
-          "/api/upload",
-          "/upload",
-          "/api/files/upload",
-          "/files/upload",
+          "/api/avatar",
+          "/avatar",
         ];
 
         for (const endpoint of uploadEndpoints) {
@@ -555,7 +601,7 @@ export default defineComponent({
               console.warn("[UserProfile] 网络错误，继续尝试下一个接口");
               continue;
             }
-            // 其他错误也继续尝试下一个接口（更宽松的策略）
+            // 其他错误也继续尝试下一个接口
             continue;
           }
         }
@@ -564,7 +610,7 @@ export default defineComponent({
           const errorMsg = lastError?.response?.data?.message || 
                           lastError?.response?.data?.error ||
                           lastError?.message ||
-                          "所有上传接口都失败";
+                          "头像上传失败";
           console.error("[UserProfile] 所有接口都失败，最后错误:", {
             status: lastError?.response?.status,
             message: errorMsg,
@@ -573,23 +619,37 @@ export default defineComponent({
           throw new Error(errorMsg);
         }
 
-        // 返回头像URL（根据后端实际返回的字段调整）
-        const avatarUrl = response.data.url || 
-                         response.data.avatar_url || 
-                         response.data.path || 
-                         response.data.file_url ||
-                         response.data.data?.url ||
-                         response.data.data?.avatar_url ||
-                         response.data.file?.url ||
-                         response.data.file?.path;
+        // 根据 API 文档，成功响应格式：{ success: true, message: "...", data: {...} }
+        // 优先从响应中获取头像URL（后端可能返回实际的文件路径）
+        console.log("[UserProfile] 上传响应数据:", response.data);
         
-        if (!avatarUrl) {
-          console.error("[UserProfile] 上传响应中没有找到URL:", response.data);
-          notification.error("上传成功但未获取到文件URL，请检查后端响应格式");
-          return null;
+        let avatarUrl = null;
+        
+        // 尝试从响应中获取头像URL（多种可能的字段名）
+        if (response.data) {
+          avatarUrl = response.data.url || 
+                     response.data.avatar_url || 
+                     response.data.avatarUrl ||
+                     response.data.data?.url ||
+                     response.data.data?.avatar_url ||
+                     response.data.data?.avatarUrl;
         }
-
-        console.log("[UserProfile] 头像URL:", avatarUrl);
+        
+        // 如果响应中没有URL，尝试构建URL
+        if (!avatarUrl) {
+          const currentUser = this.$store.state.auth.user || this.profileUser;
+          if (currentUser && currentUser.id) {
+            // 使用用户 ID 构建头像 URL（根据 API 文档，使用 /api/users/:userId/avatar）
+            avatarUrl = `/api/users/${currentUser.id}/avatar`;
+            console.log("[UserProfile] 从用户ID构建头像URL:", avatarUrl);
+          } else {
+            console.warn("[UserProfile] 无法获取用户ID，无法构建头像URL");
+            return null;
+          }
+        } else {
+          console.log("[UserProfile] 从响应中获取头像URL:", avatarUrl);
+        }
+        
         return avatarUrl;
       } catch (error) {
         console.error("[UserProfile] 头像上传失败:", error);
@@ -648,14 +708,142 @@ export default defineComponent({
     async updateProfile() {
       this.updating = true;
       try {
-        // 如果有新上传的头像，先上传头像
+        let avatarUrl = null;
+        
+        // 如果有新上传的头像，先尝试上传头像
         if (this.avatarFile) {
-          const avatarUrl = await this.uploadAvatar();
+          avatarUrl = await this.uploadAvatar();
           if (avatarUrl) {
             this.profileForm.avatar_url = avatarUrl;
+            // 上传成功后，需要更新用户资料以保存头像URL
+            try {
+              const updateResponse = await apiHttpClient.patch("/user/profile", {
+                update: {
+                  avatar_url: avatarUrl,
+                },
+              });
+              console.log("[UserProfile] 头像URL已保存到用户资料:", avatarUrl);
+              
+              // 更新本地用户信息
+              const updatedUser = updateResponse.data.user || updateResponse.data;
+              
+              // 无论响应中是否有用户信息，都直接更新 profileUser
+              // 使用对象展开运算符创建新对象，确保 Vue 响应式系统能检测到变化
+              if (this.profileUser) {
+                this.profileUser = { ...this.profileUser, avatar_url: avatarUrl };
+              } else {
+                // 如果没有 profileUser，从 store 获取并创建
+                const currentUser = this.$store.state.auth.user;
+                this.profileUser = currentUser ? { ...currentUser, avatar_url: avatarUrl } : { avatar_url: avatarUrl };
+              }
+              
+              // 更新 profileForm
+              this.profileForm.avatar_url = avatarUrl;
+              
+              // 更新 store 和 localStorage
+              if (updatedUser) {
+                updatedUser.avatar_url = avatarUrl;
+                localStorage.setItem("user_info", JSON.stringify(updatedUser));
+                this.$store.commit("auth/setUser", updatedUser);
+              } else {
+                // 如果响应中没有用户信息，从 store 获取并更新
+                const currentUser = this.$store.state.auth.user;
+                if (currentUser) {
+                  const userWithAvatar = { ...currentUser, avatar_url: avatarUrl };
+                  localStorage.setItem("user_info", JSON.stringify(userWithAvatar));
+                  this.$store.commit("auth/setUser", userWithAvatar);
+                }
+              }
+              
+              console.log("[UserProfile] 更新后的 profileUser:", this.profileUser);
+              console.log("[UserProfile] profileUser.avatar_url:", this.profileUser?.avatar_url);
+              console.log("[UserProfile] displayUser:", this.displayUser);
+              console.log("[UserProfile] displayUser.avatar_url:", this.displayUser?.avatar_url);
+              console.log("[UserProfile] avatarDisplayUrl:", this.avatarDisplayUrl);
+              
+              // 显示成功消息
+              notification.success("头像上传成功！");
+              
+              // 立即重新获取用户信息，确保头像URL从数据库获取并显示
+              await this.fetchUser();
+              
+              // 清除文件选择
+              this.avatarFile = null;
+              // 延迟清除预览，让新头像有时间加载
+              setTimeout(() => {
+                this.avatarPreviewUrl = null;
+              }, 2000);
+              
+              if (this.$refs.avatarFileInput) {
+                this.$refs.avatarFileInput.value = "";
+              }
+              
+              this.updating = false;
+              return; // 头像已上传并保存，直接返回
+            } catch (updateError) {
+              console.error("[UserProfile] 保存头像URL失败:", updateError);
+              notification.error("头像上传成功，但保存到用户资料失败：" + (updateError.response?.data?.message || updateError.message));
+              this.updating = false;
+              return;
+            }
           } else {
-            this.updating = false;
-            return;
+            // 如果所有上传接口都失败，尝试直接通过 PATCH /user/profile 上传
+            console.log("[UserProfile] 所有上传接口失败，尝试通过更新接口直接上传");
+            try {
+              const formData = new FormData();
+              // 尝试多个可能的字段名
+              formData.append("file", this.avatarFile);
+              formData.append("avatar", this.avatarFile);
+              formData.append("avatar_file", this.avatarFile);
+              
+              // 如果有其他字段，也添加到 FormData
+              if (this.profileForm.email) formData.append("email", this.profileForm.email);
+              if (this.profileForm.nickname) formData.append("nickname", this.profileForm.nickname);
+              if (this.profileForm.description) formData.append("description", this.profileForm.description);
+              
+              // 尝试不同的请求格式
+              let uploadResponse;
+              try {
+                // 方式1: 直接发送 FormData
+                uploadResponse = await apiHttpClient.patch("/user/profile", formData, {
+                  headers: {
+                    "Content-Type": "multipart/form-data",
+                  },
+                });
+              } catch (error1) {
+                // 方式2: 使用 update 包装
+                const formData2 = new FormData();
+                formData2.append("file", this.avatarFile);
+                formData2.append("update", JSON.stringify({
+                  avatar_file: "uploading" // 占位符，后端可能需要这个字段
+                }));
+                
+                uploadResponse = await apiHttpClient.patch("/user/profile", formData2, {
+                  headers: {
+                    "Content-Type": "multipart/form-data",
+                  },
+                });
+              }
+              
+              // 从响应中获取头像URL
+              const updatedUser = uploadResponse.data.user || uploadResponse.data;
+              if (updatedUser.avatar_url) {
+                avatarUrl = updatedUser.avatar_url;
+                this.profileForm.avatar_url = avatarUrl;
+                console.log("[UserProfile] 通过更新接口上传头像成功:", avatarUrl);
+              } else {
+                throw new Error("上传成功但未获取到头像URL");
+              }
+            } catch (uploadError) {
+              console.error("[UserProfile] 通过更新接口上传头像也失败:", uploadError);
+              const errorMsg = uploadError.response?.data?.message || 
+                              uploadError.response?.data?.error ||
+                              uploadError.message ||
+                              "头像上传失败，后端可能不支持文件上传";
+              notification.error(errorMsg);
+              this.updating = false;
+              return;
+            }
           }
         }
 
@@ -667,18 +855,31 @@ export default defineComponent({
         if (this.profileForm.description) updateData.description = this.profileForm.description;
         if (this.profileForm.avatar_url) updateData.avatar_url = this.profileForm.avatar_url;
 
-        if (Object.keys(updateData).length === 0) {
+        // 如果头像已经通过上传接口成功上传，且没有其他字段需要更新，则跳过更新接口
+        let updatedUser;
+        if (avatarUrl && Object.keys(updateData).length === 1 && updateData.avatar_url) {
+          console.log("[UserProfile] 头像已上传，无需再次更新");
+          // 从上传响应中获取用户信息（如果之前通过更新接口上传）
+          // 否则需要重新获取用户信息
+          if (!this.profileUser || !this.profileUser.avatar_url) {
+            const userResponse = await apiHttpClient.get("/user");
+            updatedUser = userResponse.data;
+          } else {
+            updatedUser = { ...this.profileUser, avatar_url: avatarUrl };
+          }
+        } else if (Object.keys(updateData).length === 0) {
           notification.warning("请至少填写一个要更新的字段");
           this.updating = false;
           return;
+        } else {
+          // 调用更新接口
+          const response = await apiHttpClient.patch("/user/profile", {
+            update: updateData,
+          });
+          updatedUser = response.data.user || response.data;
         }
 
-        const response = await apiHttpClient.patch("/user/profile", {
-          update: updateData,
-        });
-
         // 更新本地用户信息
-        const updatedUser = response.data.user || response.data;
         localStorage.setItem("user_info", JSON.stringify(updatedUser));
         this.$store.commit("auth/setUser", updatedUser);
 
@@ -791,8 +992,8 @@ export default defineComponent({
   height: 120px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #667eea;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .avatar-icon {
@@ -819,8 +1020,8 @@ export default defineComponent({
   height: 150px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #667eea;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .avatar-placeholder {
@@ -844,12 +1045,44 @@ export default defineComponent({
   gap: 0.5rem;
 }
 
-/* 用户角色标签样式 - 普通用户使用柔和的浅绿色 */
+/* 用户角色标签样式 - 更醒目 */
 .user-badge {
-  background: linear-gradient(135deg, #a8e6cf 0%, #88d8a3 100%);
-  color: #2d5016;
+  background: #28a745;
+  color: white;
   border: none;
-  font-weight: 500;
+  font-weight: 600;
   padding: 0.5em 1em;
+  font-size: 0.875rem;
+  letter-spacing: 0.5px;
+}
+
+/* 所有角色标签统一样式 - 更醒目 */
+.badge.bg-danger,
+.badge.bg-primary,
+.badge.bg-success,
+.badge.user-badge {
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 0.5em 1em;
+  letter-spacing: 0.5px;
+  border: 1px solid transparent;
+}
+
+.badge.bg-danger {
+  background: #dc3545 !important;
+  color: white !important;
+  border-color: #c82333;
+}
+
+.badge.bg-primary {
+  background: #007bff !important;
+  color: white !important;
+  border-color: #0056b3;
+}
+
+.badge.bg-success {
+  background: #28a745 !important;
+  color: white !important;
+  border-color: #1e7e34;
 }
 </style>

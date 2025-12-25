@@ -126,41 +126,41 @@
           </div>
           <div class="card-body">
             <div class="row">
-              <div class="col-md-4">
-                <div v-if="editForm.cover_url" class="mb-3 text-center">
-                  <img
-                    :src="editForm.cover_url"
-                    class="img-thumbnail img-fluid mb-2"
-                    alt="封面"
-                  />
-                  <div>
-                    <a
-                      :href="editForm.cover_url"
-                      target="_blank"
-                      class="btn btn-link btn-sm"
-                      >新窗口预览</a
-                    >
+              <!-- 左侧：当前封面预览 -->
+              <div class="col-md-4 mb-3 mb-md-0">
+                <label class="form-label mb-2">当前封面</label>
+                <div class="cover-preview-box">
+                  <div v-if="editForm.cover_url || coverPreviewUrl" class="cover-preview-content">
+                    <img
+                      :src="coverPreviewUrl || editForm.cover_url"
+                      class="cover-preview-image"
+                      alt="封面预览"
+                      @error="handleCoverImageError"
+                    />
+                    <div class="cover-preview-overlay">
+                      <a
+                        :href="editForm.cover_url || coverPreviewUrl"
+                        target="_blank"
+                        class="btn btn-sm btn-light"
+                        title="新窗口预览"
+                      >
+                        <i class="bi bi-eye"></i>
+                      </a>
+                    </div>
+                  </div>
+                  <div v-else class="cover-preview-empty">
+                    <i class="bi bi-image text-muted"></i>
+                    <p class="text-muted small mb-0 mt-2">暂无封面</p>
                   </div>
                 </div>
-                <div
-                  v-else
-                  class="mb-3 text-center text-muted"
-                  style="
-                    height: 120px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    border: 1px dashed #ccc;
-                    border-radius: 8px;
-                  "
-                >
-                  <span>暂无封面</span>
-                </div>
               </div>
+              
+              <!-- 右侧：上传区域 -->
               <div class="col-md-8">
-                <div class="mb-3">
-                  <label class="form-label">封面图片</label>
-                  
+                <label class="form-label mb-2">上传封面</label>
+                
+                <!-- 统一的上传框 -->
+                <div class="cover-upload-container">
                   <!-- 拖拽上传区域 -->
                   <div
                     :class="['cover-upload-zone', { 'drag-active': coverDragActive }]"
@@ -168,51 +168,43 @@
                     @drop.prevent="onDropCover"
                     @dragenter="coverDragActive = true"
                     @dragleave="coverDragActive = false"
+                    @click="$refs.coverFileInput?.click()"
                   >
-                    <div v-if="coverFile || coverPreviewUrl" class="cover-preview">
+                    <div v-if="coverPreviewUrl" class="cover-upload-preview">
                       <img
-                        :src="coverPreviewUrl || editForm.cover_url"
+                        :src="coverPreviewUrl"
                         alt="封面预览"
-                        class="cover-preview-img"
+                        class="cover-upload-preview-img"
                       />
-                      <div class="cover-preview-actions">
+                      <div class="cover-upload-preview-overlay">
                         <button
                           type="button"
-                          class="btn btn-sm btn-outline-danger"
-                          @click="removeCover"
+                          class="btn btn-sm btn-danger"
+                          @click.stop="removeCover"
+                          title="移除"
                         >
-                          <i class="bi bi-trash"></i> 移除
+                          <i class="bi bi-trash"></i>
                         </button>
                       </div>
                     </div>
                     <div v-else class="cover-upload-placeholder">
-                      <i class="bi bi-cloud-upload display-4 text-muted"></i>
-                      <p class="mt-2 mb-1">将封面图片拖放到这里</p>
-                      <p class="text-muted small">或点击下方按钮选择文件</p>
+                      <i class="bi bi-cloud-upload cover-upload-icon"></i>
+                      <p class="cover-upload-text">拖拽图片到此处</p>
+                      <p class="cover-upload-hint">或点击选择文件</p>
                     </div>
                   </div>
                   
+                  <!-- 隐藏的文件输入 -->
                   <input
                     ref="coverFileInput"
                     type="file"
                     accept="image/*"
-                    class="form-control mt-2"
-                    style="max-width: 300px"
+                    style="display: none"
                     @change="handleCoverUpload"
                   />
                   
-                  <div class="d-flex align-items-center mt-2 mb-2">
-                    <span class="me-2">或输入图片 URL：</span>
-                    <input
-                      v-model="editForm.cover_url"
-                      type="text"
-                      class="form-control"
-                      placeholder="https://example.com/cover.jpg"
-                      style="max-width: 300px"
-                    />
-                  </div>
-                  
-                  <div v-if="uploadingCover" class="mt-2">
+                  <!-- 上传进度 -->
+                  <div v-if="uploadingCover" class="cover-upload-progress">
                     <div class="progress">
                       <div
                         class="progress-bar progress-bar-striped progress-bar-animated"
@@ -221,12 +213,30 @@
                         {{ coverUploadProgress }}%
                       </div>
                     </div>
-                    <small class="text-muted">正在上传封面...</small>
+                    <small class="text-muted d-block mt-1">正在上传封面...</small>
                   </div>
                   
-                  <small class="form-text text-muted d-block mt-2"
-                    >支持 JPG、PNG、GIF 格式，建议尺寸 800x600 像素</small
-                  >
+                  <!-- 分隔线 -->
+                  <div class="cover-upload-divider">
+                    <span>或</span>
+                  </div>
+                  
+                  <!-- URL 输入 -->
+                  <div class="cover-url-input">
+                    <label class="form-label small mb-1">输入图片 URL</label>
+                    <input
+                      v-model="editForm.cover_url"
+                      type="text"
+                      class="form-control form-control-sm"
+                      placeholder="https://example.com/cover.jpg"
+                    />
+                  </div>
+                  
+                  <!-- 提示信息 -->
+                  <small class="form-text text-muted d-block mt-2">
+                    <i class="bi bi-info-circle me-1"></i>
+                    支持 JPG、PNG、GIF 格式，建议尺寸 800x600 像素
+                  </small>
                 </div>
               </div>
             </div>
@@ -299,7 +309,12 @@ export default defineComponent({
       type: [String, Number],
       required: true,
     },
+    user: {
+      type: Object,
+      default: null,
+    },
   },
+  emits: ['showLogin'],
   data() {
     return {
       categories: RESOURCE_CATEGORIES, // 资源分类列表（静态）
@@ -463,78 +478,118 @@ export default defineComponent({
       this.coverUploadProgress = 0;
 
       try {
+        // 根据 API 文档和 PostCreate 的实现，使用 POST /covers?post=${postId}，字段名是 file
         const formData = new FormData();
         formData.append("file", this.coverFile);
-        formData.append("type", "cover");
 
         console.log("[PostEdit] 开始上传封面:", {
           name: this.coverFile.name,
           size: this.coverFile.size,
           type: this.coverFile.type,
+          resourceId: this.id,
         });
 
-        // 尝试多个可能的上传接口
-        let response;
-        const uploadEndpoints = [
-          "/api/upload/cover",
-          "/upload/cover",
-          "/api/upload",
-          "/upload",
-          `/api/resources/${this.id}/cover`,
-          `/covers?post=${this.id}`,
-        ];
-
-        for (const endpoint of uploadEndpoints) {
-          try {
-            console.log("[PostEdit] 尝试上传接口:", endpoint);
-            response = await apiHttpClient.post(endpoint, formData, {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-              onUploadProgress: (progressEvent) => {
-                if (progressEvent.total) {
-                  this.coverUploadProgress = Math.round(
-                    (progressEvent.loaded * 100) / progressEvent.total
-                  );
-                }
-              },
-            });
-            console.log("[PostEdit] 上传成功，响应:", response.data);
-            break;
-          } catch (error) {
-            console.log("[PostEdit] 接口失败:", endpoint, error.response?.status);
-            if (error.response?.status === 404) {
-              continue;
-            }
-            throw error;
+        // 使用与 PostCreate 相同的接口
+        const endpoint = `/covers?post=${this.id}`;
+        
+        try {
+          console.log("[PostEdit] 上传封面到:", endpoint);
+          const response = await apiHttpClient.post(endpoint, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+            onUploadProgress: (progressEvent) => {
+              if (progressEvent.total) {
+                this.coverUploadProgress = Math.round(
+                  (progressEvent.loaded * 100) / progressEvent.total
+                );
+              }
+            },
+          });
+          
+          console.log("[PostEdit] 封面上传成功，响应:", response.data);
+          
+          // 从响应中获取封面URL（如果有）
+          let coverUrl = null;
+          if (response.data) {
+            coverUrl = response.data.url || 
+                      response.data.cover_url || 
+                      response.data.data?.url ||
+                      response.data.data?.cover_url;
           }
+          
+          // 如果响应中没有URL，尝试从资源数据中获取
+          if (!coverUrl && this.resource) {
+            // 重新获取资源数据以获取最新的封面URL
+            await this.fetchResource();
+            coverUrl = this.resource?.cover_url;
+          }
+          
+          // 更新表单中的封面URL
+          if (coverUrl) {
+            this.editForm.cover_url = coverUrl;
+            console.log("[PostEdit] 更新封面URL:", coverUrl);
+          }
+          
+          // 清除预览和文件，使用实际的封面URL
+          this.coverFile = null;
+          this.coverPreviewUrl = null;
+          if (this.$refs.coverFileInput) {
+            this.$refs.coverFileInput.value = "";
+          }
+          
+          // 如果还没有获取到封面URL，重新加载资源数据
+          if (!coverUrl) {
+            await this.fetchResource();
+            coverUrl = this.resource?.cover_url;
+            if (coverUrl) {
+              this.editForm.cover_url = coverUrl;
+            }
+          }
+          
+          // 只有成功获取到封面URL才显示成功消息
+          if (coverUrl) {
+            notification.success("封面上传成功");
+          } else {
+            console.warn("[PostEdit] 封面上传成功但无法获取封面URL");
+            notification.warning("封面上传成功，但无法获取封面URL，请刷新页面查看");
+          }
+          
+        } catch (error) {
+          console.error("[PostEdit] 封面上传失败:", error);
+          
+          let errorMessage = "封面上传失败";
+          if (error.response) {
+            const status = error.response.status;
+            const data = error.response.data;
+            
+            if (status === 401) {
+              errorMessage = "未登录或登录已过期，请重新登录";
+            } else if (status === 403) {
+              errorMessage = "无权限上传封面";
+            } else if (status === 404) {
+              errorMessage = "资源不存在";
+            } else if (status === 413) {
+              errorMessage = "文件太大，请选择较小的图片";
+            } else if (status === 415) {
+              errorMessage = "不支持的图片格式，请使用 JPG、PNG 或 GIF";
+            } else if (data?.message) {
+              errorMessage = data.message;
+            } else if (data?.error) {
+              errorMessage = data.error;
+            } else {
+              errorMessage = `上传失败 (${status})，请重试`;
+            }
+          } else if (error.message) {
+            if (error.message.includes("Network Error") || error.message.includes("timeout")) {
+              errorMessage = "网络连接失败，请检查网络后重试";
+            } else {
+              errorMessage = error.message;
+            }
+          }
+          
+          notification.error(errorMessage);
         }
-
-        if (!response) {
-          throw new Error("所有上传接口都失败");
-        }
-
-        // 获取封面URL
-        const coverUrl =
-          response.data.url ||
-          response.data.cover_url ||
-          response.data.path ||
-          response.data.file_url ||
-          response.data.data?.url ||
-          response.data.data?.cover_url;
-
-        if (coverUrl) {
-          this.editForm.cover_url = coverUrl;
-          notification.success("封面上传成功");
-        } else {
-          console.error("[PostEdit] 上传响应中没有找到URL:", response.data);
-          notification.warning("上传成功但未获取到文件URL");
-        }
-      } catch (error) {
-        console.error("[PostEdit] 封面上传失败:", error);
-        notification.error(
-          error.response?.data?.message || "封面上传失败，请重试"
-        );
       } finally {
         this.uploadingCover = false;
         this.coverUploadProgress = 0;
@@ -559,6 +614,16 @@ export default defineComponent({
       }
     },
 
+    // 处理封面图片加载错误
+    handleCoverImageError(event) {
+      console.error("[PostEdit] 封面图片加载失败:", event.target.src);
+      // 如果加载失败，尝试添加时间戳重新加载
+      const src = event.target.src;
+      if (src && !src.includes('?t=')) {
+        event.target.src = `${src}${src.includes('?') ? '&' : '?'}t=${Date.now()}`;
+      }
+    },
+
     async submitEdit() {
       if (!this.isEditFormValid) {
         notification.warning("请填写必填项：标题、分类");
@@ -567,9 +632,17 @@ export default defineComponent({
 
       // 如果有新上传的封面文件但还没上传完成，先上传
       if (this.coverFile && !this.editForm.cover_url) {
-        await this.uploadCover();
-        // 等待一下确保上传完成
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        try {
+          await this.uploadCover();
+          // 等待一下确保上传完成
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        } catch (error) {
+          // 封面上传失败，但不阻止提交表单（封面是可选的）
+          console.warn("[PostEdit] 封面上传失败，继续提交表单:", error);
+          // 清除封面文件，避免重复尝试
+          this.coverFile = null;
+          this.coverPreviewUrl = null;
+        }
       }
 
       this.isSaving = true;
@@ -637,12 +710,72 @@ export default defineComponent({
   margin-bottom: 8px;
 }
 
-.img-thumbnail {
-  max-height: 200px;
-  object-fit: cover;
+/* 封面预览区域 */
+.cover-preview-box {
+  border: 1px solid #e9ecef;
   border-radius: 8px;
+  background: #f8f9fa;
+  overflow: hidden;
+  min-height: 200px;
 }
 
+.cover-preview-content {
+  position: relative;
+  width: 100%;
+  padding-top: 75%; /* 4:3 比例 */
+  background: #fff;
+}
+
+.cover-preview-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cover-preview-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.cover-preview-content:hover .cover-preview-overlay {
+  opacity: 1;
+}
+
+.cover-preview-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  color: #6c757d;
+}
+
+.cover-preview-empty i {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+/* 上传容器 */
+.cover-upload-container {
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1.5rem;
+  background: #fff;
+}
+
+/* 拖拽上传区域 */
 .cover-upload-zone {
   border: 2px dashed #dee2e6;
   border-radius: 8px;
@@ -655,35 +788,112 @@ export default defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+}
+
+.cover-upload-zone:hover {
+  border-color: #007bff;
+  background: #f0f7ff;
 }
 
 .cover-upload-zone.drag-active {
   border-color: #007bff;
   background: #e7f1ff;
+  border-style: solid;
 }
 
 .cover-upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   color: #6c757d;
 }
 
-.cover-preview {
+.cover-upload-icon {
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+  color: #adb5bd;
+}
+
+.cover-upload-text {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  color: #495057;
+}
+
+.cover-upload-hint {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin-bottom: 0;
+}
+
+.cover-upload-preview {
   position: relative;
-  display: inline-block;
+  width: 100%;
+  height: 100%;
 }
 
-.cover-preview-img {
-  max-width: 100%;
+.cover-upload-preview-img {
+  width: 100%;
   max-height: 300px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  object-fit: contain;
+  border-radius: 4px;
 }
 
-.cover-preview-actions {
+.cover-upload-preview-overlay {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.cover-upload-preview:hover .cover-upload-preview-overlay {
+  opacity: 1;
+}
+
+/* 上传进度 */
+.cover-upload-progress {
   margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e9ecef;
 }
 
 .progress {
   height: 8px;
   border-radius: 4px;
+  background: #e9ecef;
+}
+
+/* 分隔线 */
+.cover-upload-divider {
+  margin: 1.5rem 0;
+  text-align: center;
+  position: relative;
+}
+
+.cover-upload-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #e9ecef;
+}
+
+.cover-upload-divider span {
+  position: relative;
+  background: #fff;
+  padding: 0 1rem;
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+/* URL 输入 */
+.cover-url-input {
+  margin-top: 1rem;
 }
 </style>

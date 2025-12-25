@@ -89,8 +89,15 @@
               @click="toggleDropdown"
               aria-expanded="false"
             >
-              <i class="bi bi-person-circle user-avatar"></i>
-              <span class="user-name">{{ currentUser.name || currentUser.username }}</span>
+              <img
+                v-if="userAvatarUrl"
+                :src="userAvatarUrl"
+                alt="头像"
+                class="user-avatar-img"
+                @error="handleAvatarError"
+              />
+              <i v-else class="bi bi-person-circle user-avatar"></i>
+              <span class="user-name">{{ displayName }}</span>
               <span
                 v-if="isAdmin"
                 class="badge badge-admin ms-1"
@@ -99,9 +106,15 @@
               </span>
               <span
                 v-else-if="currentUser.role === 'editor'"
-                class="badge badge-primary ms-1"
+                class="badge badge-editor ms-1"
               >
                 <i class="bi bi-pencil me-1"></i>编辑
+              </span>
+              <span
+                v-else-if="currentUser.role === 'contributor'"
+                class="badge badge-contributor ms-1"
+              >
+                <i class="bi bi-person-plus me-1"></i>贡献者
               </span>
             </button>
             <ul
@@ -110,10 +123,17 @@
             >
               <li class="dropdown-header">
                 <div class="user-info">
-                  <i class="bi bi-person-circle user-avatar-large"></i>
+                  <img
+                    v-if="userAvatarUrl"
+                    :src="userAvatarUrl"
+                    alt="头像"
+                    class="user-avatar-large-img"
+                    @error="handleAvatarError"
+                  />
+                  <i v-else class="bi bi-person-circle user-avatar-large"></i>
                   <div>
                     <div class="user-name-large">
-                      {{ currentUser.name || currentUser.username }}
+                      {{ displayName }}
                     </div>
                     <div class="user-email">{{ currentUser.email || '未设置邮箱' }}</div>
                     <div v-if="currentUser.nickname" class="user-nickname text-muted small">
@@ -181,6 +201,7 @@
 import { defineComponent } from "vue";
 import { mapGetters } from "vuex";
 import { API_BASE_URL } from "@/app/app.config";
+import { apiHttpClient } from "@/app/app.service";
 import HeaderSearch from "./form/HeaderSearch.vue";
 import LoginModal from "./LoginModal.vue";
 import RegisterModal from "./RegisterModal.vue";
@@ -217,8 +238,74 @@ export default defineComponent({
       return this.isAdmin;
     },
 
-    userAvatarURL() {
-      return `${API_BASE_URL}/users/${this.user?.id}/avatar`;
+    // 显示名称：直接显示 nickname（昵称），如果没有则显示 username
+    displayName() {
+      // 如果 store 中没有 currentUser，尝试从 localStorage 读取
+      let user = this.currentUser;
+      if (!user) {
+        try {
+          const userInfo = localStorage.getItem('user_info');
+          if (userInfo) {
+            user = JSON.parse(userInfo);
+            console.log("[GlobalHeader] 从 localStorage 读取用户数据:", user);
+          }
+        } catch (e) {
+          console.error("[GlobalHeader] 读取 localStorage 失败:", e);
+        }
+      }
+      
+      if (!user) {
+        console.log("[GlobalHeader] displayName - 没有用户数据，返回 '用户'");
+        return '用户';
+      }
+      
+      console.log("[GlobalHeader] displayName - 用户数据:", user);
+      console.log("[GlobalHeader] displayName - nickname:", user.nickname);
+      console.log("[GlobalHeader] displayName - username:", user.username);
+      
+      // 直接显示 nickname（昵称），与后台用户管理页面一致
+      if (user.nickname !== undefined && user.nickname !== null && user.nickname !== '') {
+        console.log("[GlobalHeader] displayName - 使用 nickname:", user.nickname);
+        return String(user.nickname);
+      }
+      
+      // 如果没有 nickname，显示 username
+      if (user.username !== undefined && user.username !== null && user.username !== '') {
+        console.log("[GlobalHeader] displayName - 使用 username:", user.username);
+        return String(user.username);
+      }
+      
+      // 最后显示 '用户'
+      console.log("[GlobalHeader] displayName - nickname 和 username 都不存在，返回 '用户'");
+      return '用户';
+    },
+
+    // 用户头像URL
+    userAvatarUrl() {
+      const user = this.currentUser;
+      if (!user || !user.id) {
+        return null;
+      }
+      
+      // 如果用户有 avatar_url，使用它
+      if (user.avatar_url) {
+        let url = String(user.avatar_url).trim();
+        // 如果是完整URL，直接返回
+        if (url.startsWith("http://") || url.startsWith("https://")) {
+          return `${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
+        }
+        // 如果是相对路径，直接使用
+        if (url.startsWith("/")) {
+          return `${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
+        }
+        // 其他情况，添加API基础URL
+        const baseURL = API_BASE_URL || "";
+        return `${baseURL}${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
+      }
+      
+      // 如果没有 avatar_url，使用默认头像URL
+      const baseURL = API_BASE_URL || "";
+      return `${baseURL}/api/users/${user.id}/avatar?t=${Date.now()}`;
     },
 
     themeIcon() {
@@ -229,11 +316,35 @@ export default defineComponent({
       return this.$route.path === "/";
     },
   },
+  mounted() {
+    // 组件挂载时，如果已登录但 currentUser 为空，尝试刷新用户数据
+    if (this.isAuthenticated && !this.currentUser) {
+      this.refreshUserData();
+    }
+  },
   methods: {
     handleLogout() {
       console.log("[GlobalHeader] 执行退出登录");
       this.$store.dispatch("auth/logout");
       this.$router.push("/");
+    },
+    
+    // 刷新用户数据
+    async refreshUserData() {
+      if (!this.isAuthenticated) {
+        return;
+      }
+      try {
+        const response = await apiHttpClient.get("/user");
+        const userData = response.data;
+        if (userData && userData.id) {
+          this.$store.commit("auth/setUser", userData);
+          localStorage.setItem("user_info", JSON.stringify(userData));
+          console.log("[GlobalHeader] 用户数据已刷新:", userData);
+        }
+      } catch (error) {
+        console.error("[GlobalHeader] 刷新用户数据失败:", error);
+      }
     },
 
     toggleTheme() {
@@ -249,6 +360,12 @@ export default defineComponent({
 
     closeDropdown() {
       this.showUserDropdown = false;
+    },
+
+    handleAvatarError(event) {
+      console.error("[GlobalHeader] 头像加载失败:", event.target.src);
+      // 如果加载失败，隐藏图片，显示默认图标
+      event.target.style.display = 'none';
     },
   },
   created() {
@@ -338,22 +455,50 @@ nav {
   color: #667eea;
 }
 
+.user-avatar-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: none;
+  margin-right: 0.5rem;
+}
+
 .user-name {
   color: inherit;
   font-weight: 500;
   font-size: 0.95rem;
 }
 
-/* 管理员标签 */
-.badge-admin {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 0.25rem 0.6rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 500;
+/* 角色标签样式 - 扁平化设计，更醒目 */
+.badge-admin,
+.badge-editor,
+.badge-contributor {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
+  letter-spacing: 0.5px;
+  border: 1px solid transparent;
+}
+
+.badge-admin {
+  background: #dc3545;
+  color: white;
+  border-color: #c82333;
+}
+
+.badge-editor {
+  background: #007bff;
+  color: white;
+  border-color: #0056b3;
+}
+
+.badge-contributor {
+  background: #28a745;
+  color: white;
+  border-color: #1e7e34;
 }
 
 /* 下拉菜单 */
@@ -388,6 +533,15 @@ nav {
   font-size: 3rem;
   color: white;
   opacity: 0.9;
+}
+
+.user-avatar-large-img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
 }
 
 .user-name-large {
