@@ -257,21 +257,22 @@ export default defineComponent({
         try {
           // 输出前 5 条资源的关键封面字段，方便排查前端封面逻辑
           console.debug(
-            '[PostList] sample resources (id, cover_url, cover.id, auto_cover_url, textbook_info):',
+            "[PostList] sample resources (id, cover_url, cover.id, auto_cover_url, textbook_info):",
             JSON.stringify(
               response.data.slice(0, 5).map((r) => ({
                 id: r.id,
                 cover_url: r.cover_url,
                 cover_id: r.cover && r.cover.id,
                 auto_cover_url: r.auto_cover_url,
-                textbook_info_cover: r.textbook_info && r.textbook_info.cover_url,
+                textbook_info_cover:
+                  r.textbook_info && r.textbook_info.cover_url,
               })),
               null,
               2
             )
           );
         } catch (err) {
-          console.debug('[PostList] sample logging failed', err);
+          console.debug("[PostList] sample logging failed", err);
         }
 
         // 从响应中获取总数
