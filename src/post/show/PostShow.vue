@@ -118,6 +118,7 @@
               :alt="resource.title"
               @load="onCoverLoad"
               :class="coverClass"
+              :style="{ width: '100%', height: '100%', objectFit: coverFit }"
             />
           </template>
           <template v-else>
