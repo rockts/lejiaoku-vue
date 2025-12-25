@@ -67,15 +67,15 @@
           <div>
             <h2 class="title">{{ resource.title }}</h2>
             <div class="meta">
-            resourceCoverURL() {
-              if (this.resource?.cover_url) {
-                // 如果是完整外部 URL，直接使用（无法加 size 参数）
-                if (this.resource.cover_url.startsWith('http')) return this.resource.cover_url;
-                // 内部路径，追加 size=large 以获取合适分辨率
-                return `${API_BASE_URL}${this.resource.cover_url}?size=large`;
-              }
-              if (this.resource?.cover?.id) return `${API_BASE_URL}/covers/${this.resource.cover.id}?size=large`;
-              return '';
+              <span class="badge">{{ resource.category || "未分类" }}</span>
+              <span class="tag">{{ resource.file_format || "文件" }}</span>
+            </div>
+          </div>
+          <div class="action-buttons">
+            <a
+              class="btn btn-primary"
+              :href="downloadUrl"
+              target="_blank"
               rel="noopener"
             >
               下载
@@ -231,12 +231,11 @@ export default defineComponent({
   computed: {
     resourceCoverURL() {
       if (this.resource?.cover_url) {
-        if (this.resource.cover_url.startsWith("http"))
-          return this.resource.cover_url;
-        return `${API_BASE_URL}${this.resource.cover_url}`;
+        if (this.resource.cover_url.startsWith("http")) return this.resource.cover_url;
+        return `${API_BASE_URL}${this.resource.cover_url}?size=large`;
       }
       if (this.resource?.cover?.id)
-        return `${API_BASE_URL}/covers/${this.resource.cover.id}`;
+        return `${API_BASE_URL}/covers/${this.resource.cover.id}?size=large`;
       return "";
     },
     coverClass() {
