@@ -112,9 +112,9 @@
         </div>
         <!-- 封面展示（宽度100%，高度固定） -->
         <div class="resource-cover-full">
-          <template v-if="resourceCoverURL && !coverFailed">
+          <template v-if="resolvedCover && !coverFailed">
             <img
-              :src="resourceCoverURL"
+              :src="resolvedCover"
               :alt="resource.title"
               @load="onCoverLoad"
               @error="coverFailed = true"
@@ -226,6 +226,7 @@ export default defineComponent({
       isDeleting: false, // 删除中状态
       coverFit: "cover",
       coverFailed: false,
+      resolvedCover: "",
     };
   },
 
@@ -363,11 +364,65 @@ export default defineComponent({
         console.log("resource detail:", this.resource);
         console.log("auto_meta_result:", this.resource?.auto_meta_result);
         console.log("catalog_info:", this.resource?.catalog_info);
+        // 尝试解析可用的封面 URL（异步探测），优先使用 resized large
+        this.resolveCoverUrl();
       } catch (error) {
         console.error("[PostShow] 获取资源详情失败:", error);
       } finally {
         this.loading = false;
       }
+    },
+
+    // 异步探测候选封面 URL，返回第一个能成功加载的 URL
+    async resolveCoverUrl() {
+      this.resolvedCover = "";
+      this.coverFailed = false;
+
+      const candidates = [];
+      const cv = this.resource?.cover_url;
+      if (cv) {
+        if (cv.startsWith("http")) candidates.push(cv);
+        else {
+          const m = cv.match(/(?:\/)??uploads\/cover\/(.+)$/) || cv.match(/uploads\/cover\/(.+)$/);
+          if (m) {
+            const filename = m[1];
+            const extMatch = filename.match(/^(.+)\.(\w+)$/);
+            if (extMatch) {
+              const name = extMatch[1];
+              const ext = extMatch[2];
+              candidates.push(`${API_BASE_URL}/uploads/cover/resized/${name}-large.${ext}`);
+            }
+            candidates.push(`${API_BASE_URL}/uploads/cover/resized/${filename}-large`);
+          }
+          candidates.push(`${API_BASE_URL}${cv}?size=large`);
+        }
+      }
+      if (this.resource?.auto_cover_url) candidates.push(this.resource.auto_cover_url.startsWith('http') ? this.resource.auto_cover_url : `${API_BASE_URL}${this.resource.auto_cover_url}`);
+      if (this.resource?.textbook_info?.cover_url) candidates.push(this.resource.textbook_info.cover_url.startsWith('http') ? this.resource.textbook_info.cover_url : `${API_BASE_URL}${this.resource.textbook_info.cover_url}`);
+      if (this.resource?.cover?.id) candidates.push(`${API_BASE_URL}/covers/${this.resource.cover.id}?size=large`);
+
+      for (const url of candidates) {
+        if (!url) continue;
+        // probe
+        const ok = await this.probeImage(url);
+        if (ok) {
+          this.resolvedCover = url;
+          this.coverFailed = false;
+          return;
+        }
+      }
+
+      this.coverFailed = true;
+      this.resolvedCover = "";
+    },
+
+    probeImage(url) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+        img.src = url;
+      });
     },
 
     onCoverLoad(e) {
