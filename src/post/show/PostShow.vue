@@ -112,11 +112,12 @@
         </div>
         <!-- 封面展示（宽度100%，高度固定） -->
         <div class="resource-cover-full">
-          <template v-if="resource.cover_url || resource.cover?.id">
+          <template v-if="resourceCoverURL && !coverFailed">
             <img
               :src="resourceCoverURL"
               :alt="resource.title"
               @load="onCoverLoad"
+              @error="coverFailed = true"
               :class="coverClass"
               :style="{ width: '100%', height: '100%', objectFit: coverFit }"
             />
@@ -224,6 +225,7 @@ export default defineComponent({
       loading: false, // 加载状态
       isDeleting: false, // 删除中状态
       coverFit: "cover",
+      coverFailed: false,
     };
   },
 
@@ -242,6 +244,19 @@ export default defineComponent({
           this.resource.cover_url.match(/uploads\/cover\/(.+)$/);
         if (m) return `${API_BASE_URL}/uploads/cover/resized/${m[1]}-large`;
         return `${API_BASE_URL}${this.resource.cover_url}?size=large`;
+      }
+      // fallback: 后端可能返回自动生成的封面字段
+      if (this.resource?.auto_cover_url) {
+        const ac = this.resource.auto_cover_url;
+        if (ac.startsWith("http")) return ac;
+        return `${API_BASE_URL}${ac}`;
+      }
+
+      // 教材信息中也可能包含封面
+      if (this.resource?.textbook_info?.cover_url) {
+        const tc = this.resource.textbook_info.cover_url;
+        if (tc.startsWith("http")) return tc;
+        return `${API_BASE_URL}${tc}`;
       }
       if (this.resource?.cover?.id)
         return `${API_BASE_URL}/covers/${this.resource.cover.id}?size=large`;
@@ -334,6 +349,8 @@ export default defineComponent({
           `/api/resources/${resourceId}`
         );
         this.resource = response.data;
+        // reset cover failed flag when new resource loaded
+        this.coverFailed = false;
 
         // 详细日志输出
         console.log("resource detail:", this.resource);
