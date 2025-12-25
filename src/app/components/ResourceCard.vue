@@ -12,7 +12,7 @@
         />
       </template>
       <template v-else>
-        <template v-if="coverUrl">
+        <template v-if="coverUrl && !coverFailed">
           <img
             :src="coverUrl"
             :alt="item.title"
@@ -22,7 +22,11 @@
           />
         </template>
         <template v-else>
-          <i class="bi bi-file-earmark"></i>
+          <img
+            src="@/assets/img/res_cover.png"
+            :alt="item.title"
+            class="default-cover"
+          />
         </template>
       </template>
     </div>
@@ -93,26 +97,16 @@ export default defineComponent({
     coverUrl() {
       // 如果后端返回了 cover_url，拼接完整 URL
       if (this.item.cover_url) {
-        // 如果是完整URL，直接返回；如果是相对路径，拼接 API_BASE_URL
+        // 如果是完整URL，直接返回
         if (this.item.cover_url.startsWith("http")) {
           return this.item.cover_url;
         }
-        // 如果是上传目录的原始封面，优先使用后端约定的 resized 路径
-        // 支持带或不带前导斜杠的路径
-        const m =
-          this.item.cover_url.match(/(?:\/)??uploads\/cover\/(.+)$/) ||
-          this.item.cover_url.match(/uploads\/cover\/(.+)$/);
-        if (m) {
-          const filename = m[1];
-          const extMatch = filename.match(/^(.+)\.(\w+)$/);
-          if (extMatch) {
-            const name = extMatch[1];
-            const ext = extMatch[2];
-            return `${API_BASE_URL}/uploads/cover/resized/${name}-thumbnail.${ext}`;
-          }
-          return `${API_BASE_URL}/uploads/cover/resized/${filename}-thumbnail`;
-        }
-        return `${API_BASE_URL}${this.item.cover_url}`;
+        // 优先返回原始封面路径（更可靠），缩略图可能不存在
+        // 确保路径以 / 开头（使用代理）
+        const path = this.item.cover_url.startsWith("/")
+          ? this.item.cover_url
+          : `/${this.item.cover_url}`;
+        return path;
       }
       return null;
     },
@@ -140,7 +134,6 @@ export default defineComponent({
   },
   methods: {
     async resolveCoverUrl() {
-      this.resolvedCover = "";
       this.coverFailed = false;
       // 先使用计算好的 coverUrl 作为快速展示（如果有），避免首页/卡片空白
       if (this.coverUrl) {
@@ -150,12 +143,20 @@ export default defineComponent({
           this.item.id,
           this.resolvedCover
         );
+      } else {
+        this.resolvedCover = "";
       }
       const candidates = [];
       const cv = this.item?.cover_url;
       if (cv) {
-        if (cv.startsWith("http")) candidates.push(cv);
-        else {
+        if (cv.startsWith("http")) {
+          candidates.push(cv);
+        } else {
+          // 确保路径以 / 开头（使用代理）
+          const path = cv.startsWith("/") ? cv : `/${cv}`;
+          // 先尝试原始封面（更可靠），再尝试缩略图
+          candidates.push(path);
+          
           const m =
             cv.match(/(?:\/)??uploads\/cover\/(.+)$/) ||
             cv.match(/uploads\/cover\/(.+)$/);
@@ -165,24 +166,26 @@ export default defineComponent({
             if (extMatch) {
               const name = extMatch[1];
               const ext = extMatch[2];
-              // 使用 name-thumbnail.ext 这种后端约定的格式
+              // 使用代理路径，添加缩略图作为备选
               candidates.push(
-                `${API_BASE_URL}/uploads/cover/resized/${name}-thumbnail.${ext}`
+                `/uploads/cover/resized/${name}-thumbnail.${ext}`
               );
             } else {
-              // 仅在没有扩展名的情况下，使用 filename-thumbnail
               candidates.push(
-                `${API_BASE_URL}/uploads/cover/resized/${filename}-thumbnail`
+                `/uploads/cover/resized/${filename}-thumbnail`
               );
             }
           }
-          candidates.push(`${API_BASE_URL}${cv}`);
         }
       }
-      if (this.item?.cover?.id)
-        candidates.push(
-          `${API_BASE_URL}/covers/${this.item.cover.id}?size=thumbnail`
-        );
+      if (this.item?.cover?.id) {
+        // 使用 API 路径（需要 API_BASE_URL）
+        if (API_BASE_URL) {
+          candidates.push(
+            `${API_BASE_URL}/covers/${this.item.cover.id}?size=thumbnail`
+          );
+        }
+      }
 
       console.log(
         "[ResourceCard] probe candidates for",
@@ -205,7 +208,11 @@ export default defineComponent({
         if (this.item.cover_url.startsWith("http")) {
           this.resolvedCover = this.item.cover_url;
         } else {
-          this.resolvedCover = `${API_BASE_URL}${this.item.cover_url}`;
+          // 使用代理路径
+          const path = this.item.cover_url.startsWith("/")
+            ? this.item.cover_url
+            : `/${this.item.cover_url}`;
+          this.resolvedCover = path;
         }
         console.log(
           "[ResourceCard] fallback to raw cover_url for",
@@ -221,11 +228,30 @@ export default defineComponent({
 
     onCoverError(e) {
       try {
+        const failedUrl = e.target && e.target.src;
         console.log(
           "[ResourceCard] cover load error for",
           this.item.id,
-          e.target && e.target.src
+          failedUrl
         );
+        
+        // 如果失败的是缩略图，尝试回退到原始封面
+        if (failedUrl && failedUrl.includes("/resized/") && this.item.cover_url) {
+          const originalPath = this.item.cover_url.startsWith("/")
+            ? this.item.cover_url
+            : `/${this.item.cover_url}`;
+          // 避免重复尝试
+          if (this.resolvedCover !== originalPath) {
+            console.log(
+              "[ResourceCard] retrying with original cover for",
+              this.item.id,
+              originalPath
+            );
+            this.resolvedCover = originalPath;
+            this.coverFailed = false;
+            return;
+          }
+        }
       } catch (err) {
         console.log(
           "[ResourceCard] cover load error (no src available) for",
@@ -317,6 +343,12 @@ export default defineComponent({
   font-size: 48px;
   color: var(--muted);
   opacity: 0.3;
+}
+.resource-card .resource-cover img.default-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.6;
 }
 .resource-title {
   font-size: 16px;
