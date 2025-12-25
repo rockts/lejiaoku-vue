@@ -24,11 +24,11 @@ export default defineComponent({
   data() {
     return {
       categories: [
-        { value: "教材", label: "教材", icon: "📘" },
-        { value: "课件", label: "课件", icon: "🎞" },
-        { value: "教案", label: "教案", icon: "✏️" },
-        { value: "习题", label: "习题", icon: "❓" },
-        { value: "其他", label: "其他", icon: "🧩" },
+        { value: "教材", label: "教材", icon: '<i class="bi bi-book"></i>' },
+        { value: "课件", label: "课件", icon: '<i class="bi bi-file-earmark-play"></i>' },
+        { value: "教案", label: "教案", icon: '<i class="bi bi-file-earmark-text"></i>' },
+        { value: "习题", label: "习题", icon: '<i class="bi bi-question-circle"></i>' },
+        { value: "其他", label: "其他", icon: '<i class="bi bi-puzzle"></i>' },
       ],
     };
   },
@@ -53,19 +53,19 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 16px 24px;
-  background: rgba(var(--surface-rgb), 0.85);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  transition: all 160ms ease;
+  gap: 6px;
+  padding: 12px 20px;
+  background: rgba(var(--surface-rgb), 0.95);
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 10px;
+  transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
   cursor: pointer;
   min-width: 100px;
 }
 .category-item:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(79, 140, 255, 0.18);
-  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(16, 24, 40, 0.06);
+  border-color: rgba(59,130,246,0.15);
 }
 .category-item.active {
   background: var(--primary);
@@ -73,10 +73,17 @@ export default defineComponent({
   border-color: var(--primary);
 }
 .category-icon {
-  font-size: 28px;
+  font-size: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.03);
 }
 .category-label {
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 600;
 }
 </style>

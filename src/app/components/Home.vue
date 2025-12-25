@@ -20,8 +20,8 @@
           想上传自己的教学资源？加入我们，成为教师贡献者
         </div>
         <div class="cta-actions">
-          <router-link to="/resources/create" class="btn btn-primary"
-            >上传资源</router-link
+          <router-link to="/resources/create" class="btn upload-btn"
+            ><i class="bi bi-upload me-2"></i> 上传资源</router-link
           >
           <div
             class="qr-wrapper"
@@ -246,6 +246,20 @@ export default defineComponent({
   gap: 12px;
   position: relative;
 }
+
+.upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, var(--primary), #2563eb);
+  color: #fff;
+  border: none;
+  box-shadow: 0 8px 20px rgba(37,99,235,0.12);
+  font-weight: 600;
+}
+.upload-btn i { font-size: 18px; }
 
 .qr-wrapper {
   position: relative;
