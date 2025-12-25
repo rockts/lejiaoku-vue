@@ -26,6 +26,7 @@
   background: #fff;
   border-radius: 8px;
   overflow: hidden;
+  box-sizing: border-box;
   border: 1px solid var(--border, #e9ecef);
   display: flex;
   align-items: center;
@@ -35,6 +36,7 @@
 .resource-cover-full img {
   width: 100%;
   height: 100%;
+  max-width: 100vw; /* don't exceed viewport to prevent horizontal overflow */
   display: block;
   background: #fff;
   object-position: center;
@@ -231,9 +233,12 @@ export default defineComponent({
   computed: {
     resourceCoverURL() {
       if (this.resource?.cover_url) {
-        if (this.resource.cover_url.startsWith("http")) return this.resource.cover_url;
+        if (this.resource.cover_url.startsWith("http"))
+          return this.resource.cover_url;
         // 支持带/不带前导斜杠的路径
-        const m = this.resource.cover_url.match(/(?:\/)??uploads\/cover\/(.+)$/) || this.resource.cover_url.match(/uploads\/cover\/(.+)$/);
+        const m =
+          this.resource.cover_url.match(/(?:\/)??uploads\/cover\/(.+)$/) ||
+          this.resource.cover_url.match(/uploads\/cover\/(.+)$/);
         if (m) return `${API_BASE_URL}/uploads/cover/resized/${m[1]}-large`;
         return `${API_BASE_URL}${this.resource.cover_url}?size=large`;
       }
