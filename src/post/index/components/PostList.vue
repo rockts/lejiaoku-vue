@@ -254,6 +254,25 @@ export default defineComponent({
         const response = await apiHttpClient.get("/api/resources", { params });
         console.log("[PostList] 过滤结果:", response.data);
         console.log("[PostList] 响应头:", response.headers);
+        try {
+          // 输出前 5 条资源的关键封面字段，方便排查前端封面逻辑
+          console.debug(
+            '[PostList] sample resources (id, cover_url, cover.id, auto_cover_url, textbook_info):',
+            JSON.stringify(
+              response.data.slice(0, 5).map((r) => ({
+                id: r.id,
+                cover_url: r.cover_url,
+                cover_id: r.cover && r.cover.id,
+                auto_cover_url: r.auto_cover_url,
+                textbook_info_cover: r.textbook_info && r.textbook_info.cover_url,
+              })),
+              null,
+              2
+            )
+          );
+        } catch (err) {
+          console.debug('[PostList] sample logging failed', err);
+        }
 
         // 从响应中获取总数
         const totalCount =

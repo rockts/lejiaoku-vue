@@ -174,6 +174,7 @@ export default defineComponent({
     };
   },
   mounted() {
+    console.debug('[PostListItem] mounted for', this.item?.id, 'title:', this.item?.title);
     this.resolveCoverUrl();
   },
   methods: {
