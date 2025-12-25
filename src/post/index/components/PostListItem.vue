@@ -25,6 +25,11 @@
   background: #fff;
   margin: auto;
 }
+.cover i {
+  font-size: 48px;
+  color: var(--muted);
+  opacity: 0.3;
+}
 <template>
   <div class="card">
     <div class="container">
@@ -41,13 +46,18 @@
             />
           </template>
           <template v-else>
-            <img
-              :src="resourceCoverURL"
-              :alt="item.title"
-              class="img-fluid img-thumbnail"
-              @load="onCoverLoad"
-              @error="coverFailed = true"
-            />
+            <template v-if="resourceCoverURL">
+              <img
+                :src="resourceCoverURL"
+                :alt="item.title"
+                class="img-fluid img-thumbnail"
+                @load="onCoverLoad"
+                @error="coverFailed = true"
+              />
+            </template>
+            <template v-else>
+              <i class="bi bi-file-earmark"></i>
+            </template>
           </template>
         </div>
         <div class="col-md-8">
@@ -174,7 +184,12 @@ export default defineComponent({
     };
   },
   mounted() {
-    console.debug('[PostListItem] mounted for', this.item?.id, 'title:', this.item?.title);
+    console.debug(
+      "[PostListItem] mounted for",
+      this.item?.id,
+      "title:",
+      this.item?.title
+    );
     this.resolveCoverUrl();
   },
   methods: {
@@ -227,7 +242,11 @@ export default defineComponent({
           `${API_BASE_URL}/covers/${this.item.cover.id}?size=thumbnail`
         );
 
-      console.debug('[PostListItem] probe candidates for', this.item.id, candidates);
+      console.debug(
+        "[PostListItem] probe candidates for",
+        this.item.id,
+        candidates
+      );
       for (const url of candidates) {
         if (!url) continue;
         const ok = await new Promise((resolve) => {
@@ -238,11 +257,11 @@ export default defineComponent({
         });
         if (ok) {
           this.resolvedCover = url;
-          console.debug('[PostListItem] resolved cover for', this.item.id, url);
+          console.debug("[PostListItem] resolved cover for", this.item.id, url);
           return;
         }
       }
-      console.debug('[PostListItem] no valid cover found for', this.item.id);
+      console.debug("[PostListItem] no valid cover found for", this.item.id);
       this.coverFailed = true;
     },
   },
