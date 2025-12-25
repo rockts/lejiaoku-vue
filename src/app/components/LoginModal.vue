@@ -171,15 +171,58 @@ export default defineComponent({
         }
 
         console.log("[LoginModal] 提取的 token 和 user:", { token, user });
+        console.log("[LoginModal] 用户 ID:", user?.id);
+        console.log("[LoginModal] 用户 nickname:", user?.nickname);
+        console.log("[LoginModal] 用户 username:", user?.username);
 
-        // 保存 token 和用户信息
+        // 检查是否是切换用户
+        const currentUserId = this.$store.state.auth.user?.id;
+        const newUserId = user?.id;
+        const isUserSwitch = currentUserId && String(currentUserId) !== String(newUserId);
+        
+        if (isUserSwitch) {
+          console.log("[LoginModal] 检测到用户切换，清除旧数据");
+          // 切换用户时，先清除旧数据
+          localStorage.removeItem("token");
+          localStorage.removeItem("auth_token");
+          localStorage.removeItem("user_info");
+          // 清除 store
+          this.$store.commit("auth/logout");
+        }
+
+        // 先保存 token（用于后续 API 调用）
         localStorage.setItem("token", token);
         localStorage.setItem("auth_token", token);
-        localStorage.setItem("user_info", JSON.stringify(user));
-
-        // 更新 store
         this.$store.commit("auth/setToken", token);
-        this.$store.commit("auth/setUser", user);
+
+        // 登录成功后，立即从 /user 接口获取完整的用户信息（包含 nickname）
+        try {
+          console.log("[LoginModal] 获取完整用户信息...");
+          const userResponse = await apiHttpClient.get("/user");
+          const fullUserData = userResponse.data;
+          console.log("[LoginModal] 完整用户信息:", fullUserData);
+          console.log("[LoginModal] 完整用户信息 nickname:", fullUserData?.nickname);
+          console.log("[LoginModal] 完整用户信息 username:", fullUserData?.username);
+          console.log("[LoginModal] 完整用户信息 avatar_url:", fullUserData?.avatar_url);
+
+          // 使用完整的用户信息
+          if (fullUserData && fullUserData.id) {
+            // 保存完整的用户信息到 localStorage 和 store
+            localStorage.setItem("user_info", JSON.stringify(fullUserData));
+            this.$store.commit("auth/setUser", fullUserData);
+            console.log("[LoginModal] 已保存完整用户信息");
+          } else {
+            // 如果获取失败，使用登录接口返回的用户数据
+            console.warn("[LoginModal] 获取完整用户信息失败，使用登录接口返回的数据");
+            localStorage.setItem("user_info", JSON.stringify(user));
+            this.$store.commit("auth/setUser", user);
+          }
+        } catch (error) {
+          console.error("[LoginModal] 获取完整用户信息失败:", error);
+          // 如果获取失败，使用登录接口返回的用户数据
+          localStorage.setItem("user_info", JSON.stringify(user));
+          this.$store.commit("auth/setUser", user);
+        }
 
         notification.success("登录成功！");
         this.closeModal();

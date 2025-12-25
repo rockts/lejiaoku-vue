@@ -46,35 +46,76 @@ export default defineComponent({
         const response = await apiHttpClient.get("/user");
         const userData = response.data;
         console.log("[App] 从 /user 接口获取的用户数据:", userData);
+        console.log("[App] userData.id:", userData?.id);
+        console.log("[App] userData.nickname:", userData?.nickname);
+        console.log("[App] userData.username:", userData?.username);
+        
         // 确保至少包含 id 和 role
         if (userData && userData.id && userData.role) {
-          // 如果新数据中没有 nickname 或 username，保留 store 中的旧数据
           const currentStoreUser = this.$store.state.auth.user;
-          if (currentStoreUser) {
-            // 合并数据：优先使用新数据，如果新数据缺少字段则使用旧数据
-            const mergedUserData = {
-              ...currentStoreUser,
-              ...userData,
-              // 确保 nickname 和 username 不被覆盖为空
-              nickname: userData.nickname !== undefined && userData.nickname !== null && userData.nickname !== '' 
-                ? userData.nickname 
-                : currentStoreUser.nickname,
-              username: userData.username !== undefined && userData.username !== null && userData.username !== '' 
-                ? userData.username 
-                : currentStoreUser.username,
-            };
-            console.log("[App] 合并后的用户数据:", mergedUserData);
-            // 更新 store
-            this.$store.commit("auth/setUser", mergedUserData);
-            // 更新 localStorage
-            localStorage.setItem("user_info", JSON.stringify(mergedUserData));
-            this.user = mergedUserData;
-          } else {
-            // 如果 store 中没有数据，直接使用新数据
-            this.$store.commit("auth/setUser", userData);
-            localStorage.setItem("user_info", JSON.stringify(userData));
-            this.user = userData;
+          console.log("[App] 当前 store 中的用户数据:", currentStoreUser);
+          console.log("[App] currentStoreUser.id:", currentStoreUser?.id);
+          
+          // 检查是否是同一个用户
+          const isSameUser = currentStoreUser && String(currentStoreUser.id) === String(userData.id);
+          console.log("[App] 是否是同一个用户:", isSameUser);
+          
+          // 完全使用后端返回的数据（后端数据是最新的，包含最新的 nickname）
+          // 但对于 avatar_url，如果后端返回 null，保留旧数据中的 avatar_url（如果存在）
+          
+          // 尝试从 localStorage 读取原始数据中的 avatar_url（作为最后的备选）
+          let storedAvatarUrl = null;
+          try {
+            const storedUserInfo = localStorage.getItem('user_info');
+            if (storedUserInfo) {
+              const parsedStoredUser = JSON.parse(storedUserInfo);
+              if (parsedStoredUser.avatar_url && String(parsedStoredUser.avatar_url).trim() !== '') {
+                storedAvatarUrl = String(parsedStoredUser.avatar_url).trim();
+              }
+            }
+          } catch (e) {
+            console.error("[App] 读取 localStorage 中的 avatar_url 失败:", e);
           }
+          
+          const mergedUserData = {
+            ...userData,
+            // 确保字段存在
+            nickname: userData.nickname || '',
+            username: userData.username || '',
+            name: userData.name || '',
+            // avatar_url: 优先级：后端数据 > store 数据 > localStorage 数据 > null
+            avatar_url: (userData.avatar_url !== undefined && userData.avatar_url !== null && String(userData.avatar_url).trim() !== '') 
+              ? String(userData.avatar_url).trim()
+              : (currentStoreUser?.avatar_url && String(currentStoreUser.avatar_url).trim() !== '' 
+                  ? String(currentStoreUser.avatar_url).trim() 
+                  : (storedAvatarUrl || null)),
+          };
+          
+          console.log("[App] userData.avatar_url:", userData?.avatar_url);
+          console.log("[App] currentStoreUser.avatar_url:", currentStoreUser?.avatar_url);
+          console.log("[App] storedAvatarUrl (from localStorage):", storedAvatarUrl);
+          console.log("[App] mergedUserData.avatar_url:", mergedUserData.avatar_url);
+          
+          if (!isSameUser) {
+            // 不同用户（切换用户）：清除旧数据
+            console.log("[App] 检测到用户切换，清除旧数据并使用新用户数据");
+            localStorage.removeItem("token");
+            localStorage.removeItem("auth_token");
+            localStorage.removeItem("user_info");
+          }
+          
+          // 保存最新的用户数据到 localStorage 和 store
+          localStorage.setItem("token", token);
+          localStorage.setItem("auth_token", token);
+          localStorage.setItem("user_info", JSON.stringify(mergedUserData));
+          
+          console.log("[App] 保存的用户数据:", mergedUserData);
+          console.log("[App] 保存的 nickname:", mergedUserData.nickname);
+          console.log("[App] 保存的 username:", mergedUserData.username);
+          
+          // 更新 store
+          this.$store.commit("auth/setUser", mergedUserData);
+          this.user = mergedUserData;
         }
       } catch (error) {
         console.log("获取用户信息失败:", error);

@@ -386,7 +386,7 @@ export default defineComponent({
       
       const user = this.displayUser;
       
-      if (user?.avatar_url) {
+      if (user?.avatar_url && String(user.avatar_url).trim() !== '') {
         // 如果用户有头像URL，重置错误标志
         if (this.avatarLoadError) {
           this.avatarLoadError = false;
@@ -411,7 +411,15 @@ export default defineComponent({
         return finalUrl;
       }
       
-      // 如果没有 avatar_url，返回 null 以显示默认图标
+      // 如果没有 avatar_url，尝试使用默认的头像路径（即使后端没有返回 avatar_url，也可能有头像文件）
+      // 根据 API 文档，头像访问路径是 /api/users/:userId/avatar
+      if (user?.id) {
+        const defaultAvatarUrl = `/api/users/${user.id}/avatar?t=${Date.now()}`;
+        console.log("[UserProfile] avatarDisplayUrl - 使用默认头像路径:", defaultAvatarUrl);
+        return defaultAvatarUrl;
+      }
+      
+      // 如果都没有，返回 null 以显示默认图标
       // 重置错误标志
       this.avatarLoadError = false;
       return null;
@@ -873,8 +881,33 @@ export default defineComponent({
         }
 
         // 更新本地用户信息
-        localStorage.setItem("user_info", JSON.stringify(updatedUser));
-        this.$store.commit("auth/setUser", updatedUser);
+        // 合并数据，确保 nickname 和 username 不被覆盖
+        const currentStoreUser = this.$store.state.auth.user;
+        const mergedUserData = {
+          ...updatedUser, // 先使用后端返回的数据
+          ...currentStoreUser, // 然后用旧数据覆盖，保留旧数据中的字段
+          // 如果后端返回了 nickname，使用后端的；否则保留旧数据
+          nickname: (updatedUser.nickname !== undefined && updatedUser.nickname !== null && String(updatedUser.nickname).trim() !== '') 
+            ? String(updatedUser.nickname).trim()
+            : (currentStoreUser?.nickname || ''),
+          // 如果后端返回了 username，使用后端的；否则保留旧数据
+          username: (updatedUser.username !== undefined && updatedUser.username !== null && String(updatedUser.username).trim() !== '') 
+            ? String(updatedUser.username).trim()
+            : (currentStoreUser?.username || ''),
+          // 确保其他字段使用后端返回的最新值
+          email: updatedUser.email || currentStoreUser?.email || '',
+          description: updatedUser.description || currentStoreUser?.description || '',
+          avatar_url: updatedUser.avatar_url || currentStoreUser?.avatar_url || '',
+        };
+        
+        console.log("[UserProfile] 更新后的合并数据:", mergedUserData);
+        console.log("[UserProfile] 合并后的 nickname:", mergedUserData.nickname);
+        
+        localStorage.setItem("user_info", JSON.stringify(mergedUserData));
+        this.$store.commit("auth/setUser", mergedUserData);
+        
+        // 更新 profileUser 以反映最新数据
+        this.profileUser = mergedUserData;
 
         // 清除预览和文件
         this.avatarFile = null;

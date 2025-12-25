@@ -85,12 +85,21 @@ export const authStoreModule: Module<AuthStoreState, RootState> = {
             if (token && userInfo) {
                 try {
                     state.token = token;
-                    state.user = JSON.parse(userInfo);
+                    const parsedUser = JSON.parse(userInfo);
+                    console.log('[Auth Store] 从 localStorage 解析的用户数据:', parsedUser);
+                    console.log('[Auth Store] parsedUser.nickname:', parsedUser.nickname);
+                    console.log('[Auth Store] parsedUser.username:', parsedUser.username);
+                    console.log('[Auth Store] parsedUser.avatar_url:', parsedUser.avatar_url);
+                    
+                    // 直接使用解析后的用户数据，不进行任何转换
+                    // 确保所有字段都被保留（包括 avatar_url）
+                    state.user = parsedUser;
                     state.isAuthenticated = true;
                     console.log('[Auth Store] 身份信息已恢复，用户对象:', state.user);
                     console.log('[Auth Store] 用户 username:', state.user?.username);
                     console.log('[Auth Store] 用户 nickname:', state.user?.nickname);
                     console.log('[Auth Store] 用户 name:', state.user?.name);
+                    console.log('[Auth Store] 用户 avatar_url:', state.user?.avatar_url);
                 } catch (error) {
                     console.error('[Auth Store] 恢复身份信息失败:', error);
                     state.token = null;

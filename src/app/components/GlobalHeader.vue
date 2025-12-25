@@ -243,45 +243,41 @@ export default defineComponent({
       return this.isAdmin;
     },
 
-    // 显示名称：直接显示 nickname（昵称），如果没有则显示 username
+    // 显示名称：优先显示 nickname（昵称），如果没有则显示 username
     displayName() {
-      // 如果 store 中没有 currentUser，尝试从 localStorage 读取
-      let user = this.currentUser;
-      if (!user) {
-        try {
-          const userInfo = localStorage.getItem('user_info');
-          if (userInfo) {
-            user = JSON.parse(userInfo);
-            console.log("[GlobalHeader] 从 localStorage 读取用户数据:", user);
-          }
-        } catch (e) {
-          console.error("[GlobalHeader] 读取 localStorage 失败:", e);
-        }
-      }
+      // 只从 store 读取（确保数据是最新的，不读取 localStorage 中的旧数据）
+      const user = this.currentUser;
       
       if (!user) {
-        console.log("[GlobalHeader] displayName - 没有用户数据，返回 '用户'");
+        console.log("[GlobalHeader] displayName - store 中没有用户数据");
         return '用户';
       }
       
-      console.log("[GlobalHeader] displayName - 用户数据:", user);
-      console.log("[GlobalHeader] displayName - nickname:", user.nickname);
-      console.log("[GlobalHeader] displayName - username:", user.username);
+      console.log("[GlobalHeader] displayName - 用户 ID:", user.id);
+      console.log("[GlobalHeader] displayName - user.nickname:", user.nickname);
+      console.log("[GlobalHeader] displayName - user.username:", user.username);
+      console.log("[GlobalHeader] displayName - user.name:", user.name);
       
-      // 直接显示 nickname（昵称），与后台用户管理页面一致
-      if (user.nickname !== undefined && user.nickname !== null && user.nickname !== '') {
+      // 优先显示 nickname（昵称）
+      if (user.nickname !== undefined && user.nickname !== null && String(user.nickname).trim() !== '') {
         console.log("[GlobalHeader] displayName - 使用 nickname:", user.nickname);
-        return String(user.nickname);
+        return String(user.nickname).trim();
       }
       
       // 如果没有 nickname，显示 username
-      if (user.username !== undefined && user.username !== null && user.username !== '') {
+      if (user.username !== undefined && user.username !== null && String(user.username).trim() !== '') {
         console.log("[GlobalHeader] displayName - 使用 username:", user.username);
-        return String(user.username);
+        return String(user.username).trim();
+      }
+      
+      // 兼容 name 字段（旧数据）
+      if (user.name !== undefined && user.name !== null && String(user.name).trim() !== '') {
+        console.log("[GlobalHeader] displayName - 使用 name:", user.name);
+        return String(user.name).trim();
       }
       
       // 最后显示 '用户'
-      console.log("[GlobalHeader] displayName - nickname 和 username 都不存在，返回 '用户'");
+      console.log("[GlobalHeader] displayName - 没有找到名称，返回 '用户'");
       return '用户';
     },
 
@@ -293,8 +289,11 @@ export default defineComponent({
         return null;
       }
       
+      console.log("[GlobalHeader] userAvatarUrl - 用户 ID:", user.id);
+      console.log("[GlobalHeader] userAvatarUrl - user.avatar_url:", user.avatar_url);
+      
       // 如果用户有 avatar_url，重置错误标志并返回URL
-      if (user.avatar_url) {
+      if (user.avatar_url && String(user.avatar_url).trim() !== '') {
         // 如果之前有错误，但用户现在有头像URL，重置错误标志
         if (this.avatarError) {
           this.avatarError = false;
@@ -314,7 +313,15 @@ export default defineComponent({
         return `${baseURL}${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
       }
       
-      // 如果没有 avatar_url，返回 null 以显示默认图标
+      // 如果没有 avatar_url，尝试使用默认的头像路径（即使后端没有返回 avatar_url，也可能有头像文件）
+      // 根据 API 文档，头像访问路径是 /api/users/:userId/avatar
+      if (user.id) {
+        const defaultAvatarUrl = `/api/users/${user.id}/avatar?t=${Date.now()}`;
+        console.log("[GlobalHeader] userAvatarUrl - 使用默认头像路径:", defaultAvatarUrl);
+        return defaultAvatarUrl;
+      }
+      
+      // 如果都没有，返回 null 以显示默认图标
       this.avatarError = false; // 重置错误标志
       return null;
     },
@@ -327,10 +334,57 @@ export default defineComponent({
       return this.$route.path === "/";
     },
   },
+  watch: {
+    // 监听 currentUser 的变化，特别是用户 ID 的变化
+    'currentUser.id'(newId, oldId) {
+      console.log("[GlobalHeader] 检测到用户 ID 变化:", { oldId, newId });
+      if (oldId && newId && String(oldId) !== String(newId)) {
+        console.log("[GlobalHeader] 用户切换，强制刷新数据");
+        // 用户切换，强制刷新数据
+        this.refreshUserData();
+      }
+    },
+    // 监听 currentUser 对象的变化
+    currentUser: {
+      handler(newUser, oldUser) {
+        if (newUser && oldUser && String(newUser.id) !== String(oldUser.id)) {
+          console.log("[GlobalHeader] 检测到用户切换（通过对象监听）:", { 
+            oldUserId: oldUser.id, 
+            newUserId: newUser.id,
+            oldNickname: oldUser.nickname,
+            newNickname: newUser.nickname
+          });
+        }
+      },
+      deep: true,
+      immediate: true
+    }
+  },
   mounted() {
     // 组件挂载时，如果已登录但 currentUser 为空，尝试刷新用户数据
     if (this.isAuthenticated && !this.currentUser) {
       this.refreshUserData();
+    }
+    
+    // 检查 localStorage 和 store 中的用户 ID 是否一致
+    try {
+      const storedUserInfo = localStorage.getItem('user_info');
+      if (storedUserInfo) {
+        const parsedStoredUser = JSON.parse(storedUserInfo);
+        const storeUserId = this.currentUser?.id;
+        const storedUserId = parsedStoredUser?.id;
+        
+        console.log("[GlobalHeader] mounted - localStorage 用户 ID:", storedUserId);
+        console.log("[GlobalHeader] mounted - store 用户 ID:", storeUserId);
+        
+        if (storeUserId && storedUserId && String(storeUserId) !== String(storedUserId)) {
+          console.log("[GlobalHeader] 检测到 localStorage 和 store 中的用户 ID 不一致，同步数据");
+          // 使用 localStorage 中的数据更新 store
+          this.$store.commit("auth/setUser", parsedStoredUser);
+        }
+      }
+    } catch (e) {
+      console.error("[GlobalHeader] 检查用户数据失败:", e);
     }
   },
   methods: {
@@ -349,9 +403,54 @@ export default defineComponent({
         const response = await apiHttpClient.get("/user");
         const userData = response.data;
         if (userData && userData.id) {
-          this.$store.commit("auth/setUser", userData);
-          localStorage.setItem("user_info", JSON.stringify(userData));
-          console.log("[GlobalHeader] 用户数据已刷新:", userData);
+          const currentUser = this.$store.state.auth.user;
+          // 检查是否是同一个用户
+          const isSameUser = currentUser && String(currentUser.id) === String(userData.id);
+          
+          let mergedUserData;
+          
+          if (isSameUser) {
+            // 同一个用户：如果后端不返回某些字段，保留旧数据中的这些字段
+            mergedUserData = {
+              ...userData,
+              nickname: (userData.nickname !== undefined && userData.nickname !== null && String(userData.nickname).trim() !== '') 
+                ? String(userData.nickname).trim()
+                : (currentUser?.nickname && String(currentUser.nickname).trim() !== '' 
+                    ? String(currentUser.nickname).trim() 
+                    : ''),
+              username: (userData.username !== undefined && userData.username !== null && String(userData.username).trim() !== '') 
+                ? String(userData.username).trim()
+                : (currentUser?.username && String(currentUser.username).trim() !== '' 
+                    ? String(currentUser.username).trim() 
+                    : ''),
+              name: userData.name || currentUser?.name || '',
+              // avatar_url: 如果后端返回了有效值，使用后端数据；如果后端返回 null/undefined，保留旧数据
+              avatar_url: (userData.avatar_url !== undefined && userData.avatar_url !== null && String(userData.avatar_url).trim() !== '') 
+                ? String(userData.avatar_url).trim()
+                : (currentUser?.avatar_url && String(currentUser.avatar_url).trim() !== '' 
+                    ? String(currentUser.avatar_url).trim() 
+                    : null),
+            };
+          } else {
+            // 不同用户：完全使用新用户的数据
+            mergedUserData = {
+              ...userData,
+              nickname: userData.nickname || '',
+              username: userData.username || '',
+              name: userData.name || '',
+              // 确保 avatar_url 字段被保留
+              avatar_url: userData.avatar_url || null,
+            };
+          }
+          
+          console.log("[GlobalHeader] userData.avatar_url:", userData?.avatar_url);
+          console.log("[GlobalHeader] currentUser.avatar_url:", currentUser?.avatar_url);
+          console.log("[GlobalHeader] 刷新后的 avatar_url:", mergedUserData.avatar_url);
+          
+          this.$store.commit("auth/setUser", mergedUserData);
+          localStorage.setItem("user_info", JSON.stringify(mergedUserData));
+          console.log("[GlobalHeader] 用户数据已刷新:", mergedUserData);
+          console.log("[GlobalHeader] 刷新后的 nickname:", mergedUserData.nickname);
         }
       } catch (error) {
         console.error("[GlobalHeader] 刷新用户数据失败:", error);

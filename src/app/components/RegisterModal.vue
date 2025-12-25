@@ -234,22 +234,51 @@ export default defineComponent({
         // API 响应格式：{ success, message, token, user }
         const { token, user } = response.data;
 
-        // 保存 token 和用户信息
+        console.log("[RegisterModal] 注册响应 user:", user);
+        console.log("[RegisterModal] 用户 nickname:", user?.nickname);
+
+        // 先保存 token（用于后续 API 调用）
         localStorage.setItem("token", token);
         localStorage.setItem("auth_token", token);
-        localStorage.setItem("user_info", JSON.stringify(user));
-
-        // 更新 store
         this.$store.commit("auth/setToken", token);
-        this.$store.commit("auth/setUser", user);
 
-        notification.success("注册成功！已自动登录");
+        // 注册成功后，立即从 /user 接口获取完整的用户信息（包含 nickname）
+        try {
+          console.log("[RegisterModal] 获取完整用户信息...");
+          const userResponse = await apiHttpClient.get("/user");
+          const fullUserData = userResponse.data;
+          console.log("[RegisterModal] 完整用户信息:", fullUserData);
+          console.log("[RegisterModal] 完整用户信息 nickname:", fullUserData?.nickname);
+
+          // 使用完整的用户信息
+          if (fullUserData && fullUserData.id) {
+            // 保存完整的用户信息到 localStorage 和 store
+            localStorage.setItem("user_info", JSON.stringify(fullUserData));
+            this.$store.commit("auth/setUser", fullUserData);
+            console.log("[RegisterModal] 已保存完整用户信息");
+          } else {
+            // 如果获取失败，使用注册接口返回的用户数据
+            console.warn("[RegisterModal] 获取完整用户信息失败，使用注册接口返回的数据");
+            localStorage.setItem("user_info", JSON.stringify(user));
+            this.$store.commit("auth/setUser", user);
+          }
+        } catch (error) {
+          console.error("[RegisterModal] 获取完整用户信息失败:", error);
+          // 如果获取失败，使用注册接口返回的用户数据
+          localStorage.setItem("user_info", JSON.stringify(user));
+          this.$store.commit("auth/setUser", user);
+        }
+
+        // 显示成功提示（显示时间稍长一些，确保用户能看到）
+        notification.success("🎉 注册成功！已自动登录", 5000);
 
         // 关闭弹窗
         this.closeModal();
 
-        // 刷新页面以更新UI状态
-        window.location.reload();
+        // 延迟刷新页面，确保用户能看到成功提示
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
       } catch (error) {
         console.error("[RegisterModal] 注册失败:", error);
         const errorMessage = error.response?.data?.message || error.message || "注册失败，请稍后重试";
