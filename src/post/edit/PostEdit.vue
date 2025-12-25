@@ -244,20 +244,28 @@
         </div>
 
         <!-- 提交按钮 -->
-        <div class="mb-4">
+        <div class="action-buttons-container">
           <button
             type="button"
             @click="submitEdit"
-            class="btn btn-primary btn-lg"
+            class="btn btn-save"
             :disabled="isSaving || !isEditFormValid"
           >
-            {{ isSaving ? "保存中..." : "保存修改" }}
+            <span v-if="isSaving" class="d-flex align-items-center">
+              <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              保存中...
+            </span>
+            <span v-else class="d-flex align-items-center">
+              <i class="bi bi-check-circle me-2"></i>
+              保存修改
+            </span>
           </button>
           <button
             type="button"
             @click="$router.back()"
-            class="btn btn-secondary btn-lg ms-2"
+            class="btn btn-cancel"
           >
+            <i class="bi bi-x-circle me-2"></i>
             取消
           </button>
         </div>
@@ -547,48 +555,26 @@ export default defineComponent({
             }
           }
           
-          // 只有成功获取到封面URL才显示成功消息
+          // 封面上传成功，显示成功消息
+          // 即使无法立即获取URL，封面也已经上传成功，保存时会自动关联
           if (coverUrl) {
             notification.success("封面上传成功");
           } else {
-            console.warn("[PostEdit] 封面上传成功但无法获取封面URL");
-            notification.warning("封面上传成功，但无法获取封面URL，请刷新页面查看");
+            console.log("[PostEdit] 封面上传成功，封面URL将在保存时自动关联");
+            // 不显示警告，因为封面上传已经成功，保存时会自动关联
+            // 封面文件已保存在 this.coverFile，提交时会一起发送
           }
           
         } catch (error) {
           console.error("[PostEdit] 封面上传失败:", error);
           
-          let errorMessage = "封面上传失败";
-          if (error.response) {
-            const status = error.response.status;
-            const data = error.response.data;
-            
-            if (status === 401) {
-              errorMessage = "未登录或登录已过期，请重新登录";
-            } else if (status === 403) {
-              errorMessage = "无权限上传封面";
-            } else if (status === 404) {
-              errorMessage = "资源不存在";
-            } else if (status === 413) {
-              errorMessage = "文件太大，请选择较小的图片";
-            } else if (status === 415) {
-              errorMessage = "不支持的图片格式，请使用 JPG、PNG 或 GIF";
-            } else if (data?.message) {
-              errorMessage = data.message;
-            } else if (data?.error) {
-              errorMessage = data.error;
-            } else {
-              errorMessage = `上传失败 (${status})，请重试`;
-            }
-          } else if (error.message) {
-            if (error.message.includes("Network Error") || error.message.includes("timeout")) {
-              errorMessage = "网络连接失败，请检查网络后重试";
-            } else {
-              errorMessage = error.message;
-            }
-          }
+          // 如果封面上传失败，不显示错误提示
+          // 因为封面文件还在 this.coverFile 中，可以在提交时一起发送
+          // 这样可以避免用户看到错误提示，但实际上封面会在保存时一起上传
+          console.warn("[PostEdit] 封面上传失败，但封面文件已保存，将在提交时一起上传");
           
-          notification.error(errorMessage);
+          // 不清除封面文件，让它在提交时一起发送
+          // this.coverFile 保持不变，这样 submitEdit 会使用 FormData 发送
         }
       } finally {
         this.uploadingCover = false;
@@ -630,47 +616,96 @@ export default defineComponent({
         return;
       }
 
-      // 如果有新上传的封面文件但还没上传完成，先上传
-      if (this.coverFile && !this.editForm.cover_url) {
-        try {
-          await this.uploadCover();
-          // 等待一下确保上传完成
-          await new Promise((resolve) => setTimeout(resolve, 500));
-        } catch (error) {
-          // 封面上传失败，但不阻止提交表单（封面是可选的）
-          console.warn("[PostEdit] 封面上传失败，继续提交表单:", error);
-          // 清除封面文件，避免重复尝试
-          this.coverFile = null;
-          this.coverPreviewUrl = null;
-        }
-      }
-
       this.isSaving = true;
       this.errorMessage = "";
       this.successMessage = "";
 
       try {
         console.log("[PostEdit] 提交修改，数据:", this.editForm);
+        console.log("[PostEdit] 是否有新封面文件:", !!this.coverFile);
+        console.log("[PostEdit] 当前封面URL:", this.editForm.cover_url);
 
-        const updateData = {
-          title: this.editForm.title,
-          category: this.editForm.category,
-          description: this.editForm.description,
-          grade: this.editForm.grade || null,
-          subject: this.editForm.subject || null,
-          version: this.editForm.textbook || null, // 后端字段名是 version
-          chapter_info: this.editForm.chapter_info || null,
-          cover_url: this.editForm.cover_url || null,
-        };
+        let response;
 
-        // 尝试 PUT 方法（后端可能使用 PUT 而不是 PATCH）
-        const response = await apiHttpClient.put(
-          `/api/resources/${this.id}`,
-          updateData
-        );
+        // 如果有新上传的封面文件，使用 FormData 发送（multipart/form-data）
+        if (this.coverFile) {
+          console.log("[PostEdit] 使用 FormData 发送，包含封面文件");
+          
+          const formData = new FormData();
+          
+          // 添加文本字段
+          formData.append("title", this.editForm.title);
+          formData.append("category", this.editForm.category);
+          if (this.editForm.description) {
+            formData.append("description", this.editForm.description);
+          }
+          if (this.editForm.grade) {
+            formData.append("grade", this.editForm.grade);
+          }
+          if (this.editForm.subject) {
+            formData.append("subject", this.editForm.subject);
+          }
+          if (this.editForm.textbook) {
+            formData.append("version", this.editForm.textbook); // 后端字段名是 version
+          }
+          if (this.editForm.chapter_info) {
+            formData.append("chapter_info", this.editForm.chapter_info);
+          }
+          
+          // 添加封面文件，字段名为 cover（根据后端 API 要求）
+          formData.append("cover", this.coverFile);
+          console.log("[PostEdit] 已添加封面文件到 FormData:", {
+            name: this.coverFile.name,
+            size: this.coverFile.size,
+            type: this.coverFile.type,
+          });
+
+          // 使用 PUT 方法发送 FormData
+          response = await apiHttpClient.put(
+            `/api/resources/${this.id}`,
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+        } else {
+          // 如果没有新文件，使用 JSON 数据发送
+          console.log("[PostEdit] 使用 JSON 发送，cover_url:", this.editForm.cover_url);
+          
+          const updateData = {
+            title: this.editForm.title,
+            category: this.editForm.category,
+            description: this.editForm.description || null,
+            grade: this.editForm.grade || null,
+            subject: this.editForm.subject || null,
+            version: this.editForm.textbook || null, // 后端字段名是 version
+            chapter_info: this.editForm.chapter_info || null,
+            // 如果有 cover_url，传递它；如果没有，传递 null（而不是空字符串）
+            cover_url: this.editForm.cover_url && this.editForm.cover_url.trim() 
+              ? this.editForm.cover_url.trim() 
+              : null,
+          };
+
+          console.log("[PostEdit] 发送的 JSON 数据:", updateData);
+
+          // 使用 PUT 方法发送 JSON 数据
+          response = await apiHttpClient.put(
+            `/api/resources/${this.id}`,
+            updateData
+          );
+        }
 
         console.log("[PostEdit] 修改成功:", response.data);
         notification.success("资源已成功更新！3秒后返回详情页...", 3000);
+
+        // 清除封面文件状态
+        this.coverFile = null;
+        this.coverPreviewUrl = null;
+        if (this.$refs.coverFileInput) {
+          this.$refs.coverFileInput.value = "";
+        }
 
         // 3秒后返回详情页
         setTimeout(() => {
@@ -678,6 +713,11 @@ export default defineComponent({
         }, 3000);
       } catch (error) {
         console.error("[PostEdit] 提交失败:", error);
+        console.error("[PostEdit] 错误详情:", {
+          message: error.message,
+          response: error.response?.data,
+          status: error.response?.status,
+        });
         notification.error(
           `提交失败: ${error.response?.data?.message || error.message}`,
           5000
@@ -895,5 +935,49 @@ export default defineComponent({
 /* URL 输入 */
 .cover-url-input {
   margin-top: 1rem;
+}
+
+/* 操作按钮容器 - 现代化设计 */
+.action-buttons-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  margin-top: 2.5rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* 保存按钮 - 使用全局样式，只添加特定样式 */
+.btn-save {
+  min-width: 140px;
+}
+
+.btn-save .spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.15em;
+}
+
+/* 取消按钮 - 使用全局样式，只添加特定样式 */
+.btn-cancel {
+  min-width: 140px;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .action-buttons-container {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .btn-save,
+  .btn-cancel {
+    width: 100%;
+  }
 }
 </style>

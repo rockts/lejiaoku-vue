@@ -82,22 +82,24 @@
               <i class="bi bi-cloud-upload-fill"></i>
             </router-link>
           </li>
-          <li class="nav-item dropdown">
-            <button
-              class="nav-link dropdown-toggle btn btn-link user-dropdown-btn"
-              type="button"
-              @click="toggleDropdown"
-              aria-expanded="false"
-            >
-              <img
-                v-if="userAvatarUrl"
-                :src="userAvatarUrl"
-                alt="头像"
-                class="user-avatar-img"
-                @error="handleAvatarError"
-              />
-              <i v-else class="bi bi-person-circle user-avatar"></i>
-              <span class="user-name">{{ displayName }}</span>
+                     <li class="nav-item dropdown">
+                       <button
+                         class="nav-link dropdown-toggle btn btn-link user-dropdown-btn"
+                         type="button"
+                         @click="toggleDropdown"
+                         aria-expanded="false"
+                       >
+                         <div class="user-avatar-wrapper">
+                           <img
+                             v-if="userAvatarUrl && !avatarError"
+                             :src="userAvatarUrl"
+                             alt="头像"
+                             class="user-avatar-img"
+                             @error="handleAvatarError"
+                           />
+                           <i v-else class="bi bi-person-circle user-avatar-icon"></i>
+                         </div>
+                         <span class="user-name">{{ displayName }}</span>
               <span
                 v-if="isAdmin"
                 class="badge badge-admin ms-1"
@@ -123,14 +125,16 @@
             >
               <li class="dropdown-header">
                 <div class="user-info">
-                  <img
-                    v-if="userAvatarUrl"
-                    :src="userAvatarUrl"
-                    alt="头像"
-                    class="user-avatar-large-img"
-                    @error="handleAvatarError"
-                  />
-                  <i v-else class="bi bi-person-circle user-avatar-large"></i>
+                  <div class="user-avatar-large-wrapper">
+                    <img
+                      v-if="userAvatarUrl && !avatarError"
+                      :src="userAvatarUrl"
+                      alt="头像"
+                      class="user-avatar-large-img"
+                      @error="handleAvatarError"
+                    />
+                    <i v-else class="bi bi-person-circle user-avatar-large-icon"></i>
+                  </div>
                   <div>
                     <div class="user-name-large">
                       {{ displayName }}
@@ -210,14 +214,15 @@ export default defineComponent({
   name: "GlobalHeader",
   props: ["user"],
   emits: ["show-login"],
-  data() {
-    return {
-      theme: "light",
-      showLoginModal: false,
-      showRegisterModal: false,
-      showUserDropdown: false,
-    };
-  },
+             data() {
+               return {
+                 theme: "light",
+                 showLoginModal: false,
+                 showRegisterModal: false,
+                 showUserDropdown: false,
+                 avatarError: false, // 头像加载错误标志
+               };
+             },
   computed: {
     ...mapGetters({
       isAuthenticated: "auth/isAuthenticated",
@@ -284,11 +289,17 @@ export default defineComponent({
     userAvatarUrl() {
       const user = this.currentUser;
       if (!user || !user.id) {
+        this.avatarError = false; // 重置错误标志
         return null;
       }
       
-      // 如果用户有 avatar_url，使用它
+      // 如果用户有 avatar_url，重置错误标志并返回URL
       if (user.avatar_url) {
+        // 如果之前有错误，但用户现在有头像URL，重置错误标志
+        if (this.avatarError) {
+          this.avatarError = false;
+        }
+        
         let url = String(user.avatar_url).trim();
         // 如果是完整URL，直接返回
         if (url.startsWith("http://") || url.startsWith("https://")) {
@@ -303,9 +314,9 @@ export default defineComponent({
         return `${baseURL}${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
       }
       
-      // 如果没有 avatar_url，使用默认头像URL
-      const baseURL = API_BASE_URL || "";
-      return `${baseURL}/api/users/${user.id}/avatar?t=${Date.now()}`;
+      // 如果没有 avatar_url，返回 null 以显示默认图标
+      this.avatarError = false; // 重置错误标志
+      return null;
     },
 
     themeIcon() {
@@ -364,8 +375,12 @@ export default defineComponent({
 
     handleAvatarError(event) {
       console.error("[GlobalHeader] 头像加载失败:", event.target.src);
-      // 如果加载失败，隐藏图片，显示默认图标
-      event.target.style.display = 'none';
+      // 标记头像加载失败，显示默认图标
+      this.avatarError = true;
+      // 隐藏图片
+      if (event.target) {
+        event.target.style.display = 'none';
+      }
     },
   },
   created() {
@@ -389,9 +404,9 @@ nav {
   position: relative;
   z-index: 1050;
 }
-/* 上传按钮 */
+/* 上传按钮 - 使用主题蓝色 */
 .btn-upload {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--primary);
   color: white;
   border: none;
   border-radius: 50%;
@@ -402,13 +417,14 @@ nav {
   justify-content: center;
   font-size: 1.2rem;
   transition: all 0.3s;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 2px 8px rgba(79, 140, 255, 0.3);
   margin-right: 0.5rem;
 }
 
 .btn-upload:hover {
+  background: #3d7ae8;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+  box-shadow: 0 4px 12px rgba(79, 140, 255, 0.4);
   color: white;
 }
 
@@ -449,19 +465,35 @@ nav {
   border-radius: 8px;
 }
 
-/* 用户头像 */
-.user-avatar {
-  font-size: 1.8rem;
-  color: #667eea;
+/* 用户头像容器 */
+.user-avatar-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
 }
 
+/* 用户头像图片 */
 .user-avatar-img {
   width: 32px;
   height: 32px;
   border-radius: 50%;
   object-fit: cover;
-  border: none;
-  margin-right: 0.5rem;
+  border: 1px solid #e9ecef;
+  display: block;
+}
+
+/* 用户头像默认图标 */
+.user-avatar-icon {
+  font-size: 2rem;
+  color: var(--primary, #4f8cff);
+  display: block;
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+  text-align: center;
 }
 
 .user-name {
@@ -517,7 +549,7 @@ nav {
 /* 用户信息头部 */
 .dropdown-header {
   padding: 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--primary);
   color: white;
   border-radius: 12px 12px 0 0;
   margin: -0.5rem 0 0 0;
@@ -529,19 +561,36 @@ nav {
   gap: 1rem;
 }
 
-.user-avatar-large {
-  font-size: 3rem;
-  color: white;
-  opacity: 0.9;
+/* 下拉菜单头像容器 */
+.user-avatar-large-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
 }
 
+/* 下拉菜单大头像图片 */
 .user-avatar-large-img {
   width: 60px;
   height: 60px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  flex-shrink: 0;
+  display: block;
+}
+
+/* 下拉菜单大头像默认图标 */
+.user-avatar-large-icon {
+  font-size: 3.5rem;
+  color: rgba(255, 255, 255, 0.95);
+  display: block;
+  width: 60px;
+  height: 60px;
+  line-height: 60px;
+  text-align: center;
 }
 
 .user-name-large {
@@ -565,7 +614,7 @@ nav {
 
 .dropdown-item:hover {
   background-color: #f8f9ff;
-  color: #667eea;
+  color: var(--primary);
 }
 
 .dropdown-item.text-danger:hover {

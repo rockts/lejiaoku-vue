@@ -6,17 +6,19 @@
         <div class="card">
           <div class="card-body text-center">
             <div class="avatar-container mb-3">
-              <img
-                v-if="avatarDisplayUrl"
-                :src="avatarDisplayUrl"
-                alt="头像"
-                class="avatar-image"
-                @error="handleAvatarError"
-              />
-              <i
-                v-else
-                class="bi bi-person-circle avatar-icon"
-              ></i>
+              <div class="avatar-wrapper">
+                <img
+                  v-if="avatarDisplayUrl && !avatarLoadError"
+                  :src="avatarDisplayUrl"
+                  alt="头像"
+                  class="avatar-image"
+                  @error="handleAvatarError"
+                />
+                <i
+                  v-else
+                  class="bi bi-person-circle avatar-icon"
+                ></i>
+              </div>
             </div>
             <h5 class="mt-3">{{ displayUser?.username || displayUser?.name || '未知用户' }}</h5>
             <p class="text-muted small mb-2">{{ displayUser?.email || '未设置邮箱' }}</p>
@@ -344,6 +346,7 @@ export default defineComponent({
       uploadingAvatar: false,
       avatarFile: null,
       avatarPreviewUrl: null,
+      avatarLoadError: false, // 头像加载错误标志
       profileUser: null, // 当前查看的用户信息
       profileForm: {
         email: "",
@@ -376,14 +379,19 @@ export default defineComponent({
     avatarDisplayUrl() {
       // 优先使用预览URL（上传后立即显示）
       if (this.avatarPreviewUrl) {
+        // 有预览URL时，重置错误标志
+        this.avatarLoadError = false;
         return this.avatarPreviewUrl;
       }
       
       const user = this.displayUser;
-      console.log("[UserProfile] avatarDisplayUrl - user:", user);
-      console.log("[UserProfile] avatarDisplayUrl - user.avatar_url:", user?.avatar_url);
       
       if (user?.avatar_url) {
+        // 如果用户有头像URL，重置错误标志
+        if (this.avatarLoadError) {
+          this.avatarLoadError = false;
+        }
+        
         let url = String(user.avatar_url).trim();
         
         // 如果是完整URL，直接返回（添加时间戳防止缓存）
@@ -393,28 +401,19 @@ export default defineComponent({
         
         // 如果是相对路径（以/开头），直接使用（通过代理访问）
         if (url.startsWith("/")) {
-          // 确保 /api/users/:id/avatar 或 /users/:id/avatar 路径能正确代理
-          // 添加时间戳防止缓存
           const finalUrl = `${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
-          console.log("[UserProfile] avatarDisplayUrl - 相对路径:", finalUrl);
           return finalUrl;
         }
         
         // 其他情况，添加API基础URL
         const API_BASE_URL = process.env.VUE_APP_API_BASE_URL || "";
         const finalUrl = `${API_BASE_URL}${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
-        console.log("[UserProfile] avatarDisplayUrl - 添加基础URL:", finalUrl);
         return finalUrl;
       }
       
-      // 如果没有 avatar_url，但用户有 ID，尝试构建默认头像URL
-      if (user?.id) {
-        const defaultAvatarUrl = `/api/users/${user.id}/avatar?t=${Date.now()}`;
-        console.log("[UserProfile] avatarDisplayUrl - 使用默认头像URL:", defaultAvatarUrl);
-        return defaultAvatarUrl;
-      }
-      
-      console.log("[UserProfile] avatarDisplayUrl - 没有头像URL，返回null");
+      // 如果没有 avatar_url，返回 null 以显示默认图标
+      // 重置错误标志
+      this.avatarLoadError = false;
       return null;
     },
   },
@@ -469,8 +468,8 @@ export default defineComponent({
 
         this.profileUser = user;
         
-        console.log("[UserProfile] fetchUser - 获取到的用户信息:", user);
-        console.log("[UserProfile] fetchUser - user.avatar_url:", user?.avatar_url);
+        // 重置头像加载错误标志
+        this.avatarLoadError = false;
 
         // 只有是自己的资料时才填充表单（可编辑）
         if (this.isCurrentUser) {
@@ -480,7 +479,6 @@ export default defineComponent({
             description: user.description || "",
             avatar_url: user.avatar_url || "",
           };
-          console.log("[UserProfile] fetchUser - profileForm.avatar_url:", this.profileForm.avatar_url);
         }
       } catch (error) {
         console.error("[UserProfile] 获取用户信息失败:", error);
@@ -532,17 +530,12 @@ export default defineComponent({
     },
 
     handleAvatarError(event) {
-      console.error("[UserProfile] 头像加载失败:", event);
-      console.error("[UserProfile] 尝试加载的URL:", event.target.src);
-      // 如果加载失败，可以尝试其他尺寸或显示默认图标
-      const src = event.target.src;
-      if (src && !src.includes('size=')) {
-        // 如果当前是原始尺寸，尝试加载中等尺寸
-        const mediumUrl = src.replace('/avatar?', '/avatar?size=medium&').replace('/avatar&', '/avatar?size=medium&');
-        if (mediumUrl !== src) {
-          console.log("[UserProfile] 尝试加载中等尺寸头像:", mediumUrl);
-          event.target.src = mediumUrl;
-        }
+      console.error("[UserProfile] 头像加载失败:", event.target.src);
+      // 标记头像加载失败，显示默认图标
+      this.avatarLoadError = true;
+      // 隐藏图片
+      if (event.target) {
+        event.target.style.display = 'none';
       }
     },
 
@@ -960,31 +953,32 @@ export default defineComponent({
 }
 
 .card-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--primary);
   color: white;
   border-radius: 8px 8px 0 0;
 }
 
 .list-group-item.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-color: #667eea;
+  background: var(--primary);
+  border-color: var(--primary);
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
-}
-
-.btn-primary:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
+/* 按钮样式已移至全局 app.css */
 
 /* 头像样式 */
 .avatar-container {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.avatar-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 120px;
 }
 
 .avatar-image {
@@ -994,11 +988,20 @@ export default defineComponent({
   object-fit: cover;
   border: none;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: block;
 }
 
 .avatar-icon {
-  font-size: 5rem;
-  color: #667eea;
+  font-size: 6rem;
+  color: var(--primary, #4f8cff); /* 使用主题蓝色 */
+  display: block;
+  width: 120px;
+  height: 120px;
+  line-height: 120px;
+  text-align: center;
+  background: linear-gradient(135deg, #f0f4ff 0%, #e8f0ff 100%); /* 浅蓝色背景 */
+  border-radius: 50%;
+  border: 2px solid rgba(79, 140, 255, 0.2); /* 浅蓝色边框 */
 }
 
 .avatar-upload-section {

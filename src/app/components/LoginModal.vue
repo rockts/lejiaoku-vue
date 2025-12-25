@@ -236,7 +236,7 @@ export default defineComponent({
 .modal-header {
   border-bottom: 1px solid #e9ecef;
   padding: 1.25rem 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--primary);
   border-radius: 12px 12px 0 0;
 }
 
@@ -305,22 +305,7 @@ export default defineComponent({
   border-color: #80bdff;
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
-  padding: 0.75rem;
-  font-weight: 500;
-  transition: transform 0.2s;
-}
-
-.btn-primary:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.btn-primary:disabled {
-  opacity: 0.6;
-}
+/* 按钮样式已移至全局 app.css */
 
 .btn-outline-secondary {
   border-radius: 8px;
