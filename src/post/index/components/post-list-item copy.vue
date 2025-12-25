@@ -1,7 +1,7 @@
 /* 列表页卡片封面自适应且居中 */
 .cover {
   width: 100%;
-  height: 160px;
+  height: 220px;
   background: #fff;
   border-radius: 8px;
   overflow: hidden;

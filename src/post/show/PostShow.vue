@@ -20,6 +20,28 @@
   background: #fff;
   margin: auto;
 }
+.resource-cover-full {
+  width: 100%;
+  height: 300px;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border, #e9ecef);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+.resource-cover-full img {
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  background: #fff;
+  margin: auto;
+}
+.resource-cover-full img.fit-cover { object-fit: cover; object-position: center; }
+.resource-cover-full img.fit-contain { object-fit: contain; object-position: center; }
+.resource-cover-full .placeholder-icon { font-size: 48px; color: var(--muted); opacity: 0.3; }
 <template>
   <bread-crumbs />
 
@@ -71,6 +93,22 @@
               <span v-else> <i class="bi bi-trash"></i> 删除 </span>
             </button>
           </div>
+        </div>
+        <!-- 封面展示（宽度100%，高度固定） -->
+        <div class="resource-cover-full">
+          <template v-if="resource.cover_url || resource.cover?.id">
+            <img
+              :src="resourceCoverURL"
+              :alt="resource.title"
+              @load="onCoverLoad"
+              :class="coverClass"
+            />
+          </template>
+          <template v-else>
+            <div class="placeholder-icon">
+              <i class="bi bi-file-earmark"></i>
+            </div>
+          </template>
         </div>
       </section>
 
@@ -168,6 +206,7 @@ export default defineComponent({
       resource: null, // 只读资源数据
       loading: false, // 加载状态
       isDeleting: false, // 删除中状态
+      coverFit: 'cover',
     };
   },
 
@@ -176,6 +215,17 @@ export default defineComponent({
   },
 
   computed: {
+    resourceCoverURL() {
+      if (this.resource?.cover_url) {
+        if (this.resource.cover_url.startsWith('http')) return this.resource.cover_url;
+        return `${API_BASE_URL}${this.resource.cover_url}`;
+      }
+      if (this.resource?.cover?.id) return `${API_BASE_URL}/covers/${this.resource.cover.id}`;
+      return '';
+    },
+    coverClass() {
+      return this.coverFit === 'contain' ? 'fit-contain' : 'fit-cover';
+    },
     downloadUrl() {
       if (!this.resource?.file_url) return "";
       if (this.resource.file_url.startsWith("http"))
@@ -269,6 +319,16 @@ export default defineComponent({
         console.error("[PostShow] 获取资源详情失败:", error);
       } finally {
         this.loading = false;
+      }
+    },
+
+    onCoverLoad(e) {
+      try {
+        const img = e.target;
+        const ratio = img.naturalWidth / img.naturalHeight;
+        this.coverFit = ratio < 0.9 ? 'contain' : 'cover';
+      } catch (err) {
+        this.coverFit = 'cover';
       }
     },
 

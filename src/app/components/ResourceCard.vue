@@ -133,7 +133,7 @@ export default defineComponent({
 }
 .resource-card .resource-cover {
   width: 100%;
-  height: 160px;
+  height: 220px;
   background: #fff;
   border-radius: 8px;
   overflow: hidden;

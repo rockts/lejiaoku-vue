@@ -1,7 +1,7 @@
 /* 列表页卡片封面自适应且居中 */
 .cover {
   width: 100%;
-  height: 160px;
+  height: 220px;
   background: #fff;
   border-radius: 8px;
   overflow: hidden;
@@ -163,7 +163,7 @@ export default defineComponent({
   },
   data() {
     return {
-      coverFit: 'cover',
+      coverFit: "cover",
     };
   },
   methods: {
@@ -174,15 +174,15 @@ export default defineComponent({
       try {
         const img = e.target;
         const ratio = img.naturalWidth / img.naturalHeight;
-        this.coverFit = ratio < 0.9 ? 'contain' : 'cover';
+        this.coverFit = ratio < 0.9 ? "contain" : "cover";
       } catch (err) {
-        this.coverFit = 'cover';
+        this.coverFit = "cover";
       }
     },
   },
   computed: {
     coverClass() {
-      return this.coverFit === 'contain' ? 'fit-contain' : 'fit-cover';
+      return this.coverFit === "contain" ? "fit-contain" : "fit-cover";
     },
     resourceCoverURL() {
       if (this.item.cover_url) {
