@@ -3,7 +3,12 @@
     <!-- 封面图 -->
     <div class="resource-cover">
       <template v-if="coverUrl">
-        <img :src="coverUrl" :alt="item.title" />
+        <img
+          :src="coverUrl"
+          :alt="item.title"
+          @load="onCoverLoad"
+          :class="coverFitClass"
+        />
       </template>
       <template v-else>
         <i class="bi bi-file-earmark"></i>
@@ -45,7 +50,18 @@ import { API_BASE_URL } from "@/app/app.config";
 export default defineComponent({
   name: "ResourceCard",
   props: { item: { type: Object, required: true } },
+  data() {
+    return {
+      coverFit: "cover",
+    };
+  },
   computed: {
+    coverFitClass() {
+      return {
+        "fit-contain": this.coverFit === "contain",
+        "fit-cover": this.coverFit === "cover",
+      };
+    },
     coverUrl() {
       // 如果后端返回了 cover_url，拼接完整 URL
       if (this.item.cover_url) {
@@ -80,6 +96,16 @@ export default defineComponent({
     },
   },
   methods: {
+    onCoverLoad(e) {
+      try {
+        const img = e.target;
+        const ratio = img.naturalWidth / img.naturalHeight;
+        // 纵向偏高（如书籍封面），使用 contain；否则使用 cover
+        this.coverFit = ratio < 0.9 ? "contain" : "cover";
+      } catch (err) {
+        this.coverFit = "cover";
+      }
+    },
     onPreview() {
       this.$router.push(`/posts/${this.item.id}`);
     },
@@ -106,34 +132,35 @@ export default defineComponent({
   transform: translateY(-2px);
 }
 .resource-card .resource-cover {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  object-position: center;
-  display: block;
+  width: 100%;
+  height: 160px;
   background: #fff;
-  margin: auto;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   display: flex;
   align-items: center;
   justify-content: center;
-  /* 保证图片始终居中 */
   text-align: center;
   position: relative;
 }
 .resource-card .resource-cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
+  max-width: 100%;
+  max-height: 100%;
   display: block;
   background: #fff;
   margin: auto;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  position: static;
+}
+.resource-card .resource-cover img.fit-cover {
+  object-fit: cover;
+  object-position: center;
+}
+.resource-card .resource-cover img.fit-contain {
+  object-fit: contain;
+  object-position: center;
 }
 .resource-card .resource-cover i {
   font-size: 48px;

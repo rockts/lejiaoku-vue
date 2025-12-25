@@ -1,7 +1,7 @@
 /* 列表页卡片封面自适应且居中 */
 .cover {
-  width: 150px;
-  height: 200px;
+  width: 100%;
+  height: 160px;
   background: #fff;
   border-radius: 8px;
   overflow: hidden;
@@ -14,12 +14,12 @@
 .cover img {
   max-width: 100%;
   max-height: 100%;
-  object-fit: contain;
-  object-position: center;
   display: block;
   background: #fff;
   margin: auto;
 }
+.fit-cover { object-fit: cover; object-position: center; }
+.fit-contain { object-fit: contain; object-position: center; }
 <template>
 
     <div class="card">

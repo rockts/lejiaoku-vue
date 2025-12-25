@@ -1,7 +1,7 @@
 /* 列表页卡片封面自适应且居中 */
 .cover {
-  width: 150px;
-  height: 200px;
+  width: 100%;
+  height: 160px;
   background: #fff;
   border-radius: 8px;
   overflow: hidden;
@@ -14,8 +14,13 @@
 .cover img {
   max-width: 100%;
   max-height: 100%;
+  display: block;
+  background: #fff;
+  margin: auto;
   object-fit: contain;
   object-position: center;
+.fit-cover { object-fit: cover; object-position: center; }
+.fit-contain { object-fit: contain; object-position: center; }
   display: block;
   background: #fff;
   margin: auto;
@@ -29,6 +34,8 @@
             :src="resourceCoverURL"
             :alt="item.title"
             class="img-fluid img-thumbnail"
+            @load="onCoverLoad"
+            :class="coverClass"
           />
         </div>
         <div v-else class="col-md-4 cover">
@@ -154,12 +161,29 @@ export default defineComponent({
   props: {
     item: Object,
   },
+  data() {
+    return {
+      coverFit: 'cover',
+    };
+  },
   methods: {
     moment(...args) {
       return moment(...args);
     },
+    onCoverLoad(e) {
+      try {
+        const img = e.target;
+        const ratio = img.naturalWidth / img.naturalHeight;
+        this.coverFit = ratio < 0.9 ? 'contain' : 'cover';
+      } catch (err) {
+        this.coverFit = 'cover';
+      }
+    },
   },
   computed: {
+    coverClass() {
+      return this.coverFit === 'contain' ? 'fit-contain' : 'fit-cover';
+    },
     resourceCoverURL() {
       if (this.item.cover_url) {
         // 如果是完整URL，直接返回；如果是相对路径，拼接 API_BASE_URL
