@@ -6,7 +6,8 @@ import { API_BASE_URL } from './app.config';
  */
 
 export const apiHttpClient = axios.create({
-  baseURL: API_BASE_URL,
+  // 如果 API_BASE_URL 未设置，使用空字符串（相对路径），通过代理转发
+  baseURL: API_BASE_URL || '',
 });
 
 /**
@@ -20,6 +21,10 @@ apiHttpClient.interceptors.request.use(
       config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;
       console.log('[APIClient] 已添加 Authorization 头');
+    }
+    // 确保 API 请求设置正确的 Accept 头，以便代理能正确识别
+    if (!config.headers.Accept) {
+      config.headers.Accept = 'application/json';
     }
     return config;
   },
@@ -50,6 +55,12 @@ apiHttpClient.interceptors.response.use(
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }
+    }
+    // 处理 403 无权限错误
+    else if (error.response?.status === 403) {
+      console.log('[APIClient] 403 无权限');
+      const { notification } = require('@/utils/notification');
+      notification.error('无权限');
     }
     return Promise.reject(error);
   }

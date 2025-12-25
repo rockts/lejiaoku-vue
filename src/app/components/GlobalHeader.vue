@@ -27,13 +27,13 @@
             <router-link class="nav-link" to="/">贡献者</router-link>
           </li>
 
-          <!-- API测试：仅管理员可见 -->
+          <!-- 管理后台：仅管理员可见 -->
           <li
-            v-if="isAuthenticated && currentUser?.role === 'admin'"
+            v-if="canAccessAdmin"
             class="nav-item"
           >
-            <router-link class="nav-link" to="/test-api">
-              <i class="bi bi-wrench"></i> API测试
+            <router-link class="nav-link" to="/admin">
+              <i class="bi bi-shield-check"></i> 管理后台
             </router-link>
           </li>
         </ul>
@@ -72,7 +72,8 @@
 
         <!-- 已登录：显示用户菜单 -->
         <ul v-if="isAuthenticated && currentUser" class="navbar-nav ms-auto">
-          <li class="nav-item">
+          <!-- 上传资源按钮：contributor / editor / admin 显示 -->
+          <li v-if="canUpload" class="nav-item">
             <router-link
               to="/resources/create"
               class="btn btn-upload"
@@ -91,7 +92,7 @@
               <i class="bi bi-person-circle user-avatar"></i>
               <span class="user-name">{{ currentUser.name || currentUser.username }}</span>
               <span
-                v-if="currentUser.role === 'admin'"
+                v-if="isAdmin"
                 class="badge badge-admin ms-1"
               >
                 <i class="bi bi-shield-check me-1"></i>管理员
@@ -200,7 +201,21 @@ export default defineComponent({
     ...mapGetters({
       isAuthenticated: "auth/isAuthenticated",
       currentUser: "auth/user",
+      isUser: "auth/isUser",
+      isContributor: "auth/isContributor",
+      isEditor: "auth/isEditor",
+      isAdmin: "auth/isAdmin",
     }),
+
+    // 是否可以上传资源：contributor / editor / admin
+    canUpload() {
+      return this.isContributor || this.isEditor || this.isAdmin;
+    },
+
+    // 是否可以访问管理后台：admin
+    canAccessAdmin() {
+      return this.isAdmin;
+    },
 
     userAvatarURL() {
       return `${API_BASE_URL}/users/${this.user?.id}/avatar`;

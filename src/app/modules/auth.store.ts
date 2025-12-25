@@ -3,8 +3,9 @@ import { RootState } from '../../app/app.store';
 
 export interface AuthUser {
     id?: string | number;
-    username: string;
-    role: 'user' | 'admin' | 'editor';
+    username?: string;
+    email?: string;
+    role: 'user' | 'contributor' | 'editor' | 'admin';
 }
 
 export interface AuthStoreState {
@@ -35,10 +36,24 @@ export const authStoreModule: Module<AuthStoreState, RootState> = {
             return state.isAuthenticated;
         },
 
+        // 统一权限判断方法
+        isUser(state) {
+            return state.user?.role === 'user';
+        },
+
+        isContributor(state) {
+            return state.user?.role === 'contributor';
+        },
+
+        isEditor(state) {
+            return state.user?.role === 'editor';
+        },
+
         isAdmin(state) {
             return state.user?.role === 'admin';
         },
 
+        // 兼容旧代码
         username(state) {
             return state.user?.username || '';
         },

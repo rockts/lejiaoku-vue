@@ -100,32 +100,36 @@ export default defineComponent({
   },
   computed: {
     isAuthenticated() {
-      // 检查 localStorage（最可靠的方式）
-      const token = localStorage.getItem('auth_token');
-      const userInfo = localStorage.getItem('user_info');
-      
-      // 只有当 token 和 userInfo 都存在时才认为已登录
-      if (!token || !userInfo) {
-        return false;
-      }
-      
-      // 如果 localStorage 有值，再检查 store 状态（如果 store 已初始化）
       try {
-        const storeAuth = this.$store?.state?.auth?.isAuthenticated;
-        // 如果 store 显示未登录，以 store 为准（可能刚登出）
-        if (storeAuth === false) {
+        // 检查 localStorage（最可靠的方式）
+        const token = localStorage.getItem('auth_token');
+        const userInfo = localStorage.getItem('user_info');
+        
+        // 只有当 token 和 userInfo 都存在时才认为已登录
+        if (!token || !userInfo) {
           return false;
         }
-        // 如果 store 显示已登录，返回 true
-        if (storeAuth === true) {
-          return true;
+        
+        // 如果 localStorage 有值，再检查 store 状态（如果 store 已初始化）
+        if (this.$store && this.$store.state && this.$store.state.auth) {
+          const storeAuth = this.$store.state.auth.isAuthenticated;
+          // 如果 store 显示未登录，以 store 为准（可能刚登出）
+          if (storeAuth === false) {
+            return false;
+          }
+          // 如果 store 显示已登录，返回 true
+          if (storeAuth === true) {
+            return true;
+          }
         }
+        
+        // 默认：有 token 和 userInfo 就认为已登录
+        return true;
       } catch (e) {
-        // store 未初始化，使用 localStorage 的值
+        // 如果出错，返回 false
+        console.error('[Home] isAuthenticated computed error:', e);
+        return false;
       }
-      
-      // 默认：有 token 和 userInfo 就认为已登录
-      return true;
     },
   },
 

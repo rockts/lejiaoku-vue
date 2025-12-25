@@ -88,14 +88,13 @@ export default defineComponent({
         const isCurrentUser = currentUser && String(currentUser.id) === String(this.userId);
         
         if (this.isMyResources || !this.userId || isCurrentUser) {
-          // 获取当前用户的资源
-          response = await apiHttpClient.get("/api/my/resources");
+          // 获取当前用户的资源（需要登录，返回所有状态）
+          // GET /my/resources
+          response = await apiHttpClient.get("/my/resources");
         } else {
-          // 获取指定用户的资源
-          // 使用查询参数方式
-          response = await apiHttpClient.get("/api/resources", {
-            params: { user_id: this.userId }
-          });
+          // 获取指定用户的资源（公开访问，只返回已审核的资源）
+          // GET /users/:userId/resources
+          response = await apiHttpClient.get(`/users/${this.userId}/resources`);
         }
 
         // 过滤视频资源

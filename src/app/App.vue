@@ -39,12 +39,24 @@ export default defineComponent({
       this.$store.dispatch('auth/logout');
     });
     
-    try {
-      const response = await apiHttpClient.get("/user");
-      this.user = response.data;
-    } catch (error) {
-      console.log("获取用户信息失败:", error);
-      this.user = null;
+    // 如果已登录，从后端获取最新用户信息并更新 store
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      try {
+        const response = await apiHttpClient.get("/user");
+        const userData = response.data;
+        // 确保至少包含 id 和 role
+        if (userData && userData.id && userData.role) {
+          // 更新 store
+          this.$store.commit("auth/setUser", userData);
+          // 更新 localStorage
+          localStorage.setItem("user_info", JSON.stringify(userData));
+          this.user = userData;
+        }
+      } catch (error) {
+        console.log("获取用户信息失败:", error);
+        this.user = null;
+      }
     }
   },
 

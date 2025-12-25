@@ -9,7 +9,6 @@ import { createRouter, createWebHistory } from 'vue-router';
 import appRoutes from './app.routes';
 import postRoutes from '@/post/post.routes';
 import userRoutes from '@/user/user.routes';
-import testRoutes from '@/test/test.routes';
 import adminRoutes from '@/admin/admin.routes';
 
 /**
@@ -17,8 +16,8 @@ import adminRoutes from '@/admin/admin.routes';
  */
 
 const router = createRouter({
-    history: createWebHistory(),
-    routes: [...appRoutes, ...postRoutes, ...userRoutes, ...testRoutes, ...adminRoutes],
+  history: createWebHistory(),
+  routes: [...appRoutes, ...postRoutes, ...userRoutes, ...adminRoutes],
 });
 
 /**
@@ -28,24 +27,67 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   // 需要登录的路由
   const requiresAuth = ['resourceCreate', 'resourceEdit'];
-  
-  if (requiresAuth.includes(to.name)) {
-    // 检查是否已登录
-    const token = localStorage.getItem('auth_token');
-    const userInfo = localStorage.getItem('user_info');
-    
-    if (!token || !userInfo) {
+
+  // 需要 admin 权限的路由
+  const requiresAdmin = to.path.startsWith('/admin');
+
+  // user 角色受限的路由
+  const restrictedForUser = ['resourceCreate'];
+
+  // 获取用户信息（从 store 或 localStorage）
+  const token = localStorage.getItem('auth_token');
+  const userInfo = localStorage.getItem('user_info');
+  let user = null;
+
+  if (userInfo) {
+    try {
+      user = JSON.parse(userInfo);
+    } catch (error) {
+      console.error('[Router] 解析用户信息失败:', error);
+    }
+  }
+
+  // 检查登录状态
+  if (to.name && requiresAuth.includes(to.name as string)) {
+    if (!token || !userInfo || !user) {
       // 未登录，跳转到登录页
       console.log('[Router] 未登录，跳转到登录页');
-      // 保存目标路由，登录后可以跳转回来
-      next({ 
+      next({
         path: '/login',
         query: { redirect: to.fullPath }
       });
       return;
     }
+
+    // 检查 user 角色访问受限路由
+    if (user.role === 'user' && restrictedForUser.includes(to.name as string)) {
+      console.log('[Router] user 角色无权限访问，跳转首页');
+      const { notification } = require('@/utils/notification');
+      notification.warning('无权限');
+      next({ path: '/' });
+      return;
+    }
   }
-  
+
+  // 检查 admin 权限
+  if (requiresAdmin) {
+    // 未登录，跳转首页
+    if (!token || !userInfo || !user) {
+      console.log('[Router] 未登录，跳转首页');
+      next({ path: '/' });
+      return;
+    }
+
+    // 检查是否为 admin
+    if (user.role !== 'admin') {
+      console.log('[Router] 非 admin 用户，跳转首页');
+      const { notification } = require('@/utils/notification');
+      notification.warning('无权限');
+      next({ path: '/' });
+      return;
+    }
+  }
+
   next();
 });
 

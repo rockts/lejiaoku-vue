@@ -515,12 +515,14 @@ export default defineComponent({
         let response;
         let lastError;
         
-        // 尝试接口列表
+        // 尝试接口列表（按优先级排序）
         const uploadEndpoints = [
           "/api/upload/avatar",
           "/upload/avatar",
           "/api/upload",
           "/upload",
+          "/api/files/upload",
+          "/files/upload",
         ];
 
         for (const endpoint of uploadEndpoints) {
@@ -534,19 +536,41 @@ export default defineComponent({
             console.log("[UserProfile] 上传成功，响应:", response.data);
             break; // 成功则跳出循环
           } catch (error) {
-            console.log("[UserProfile] 接口失败:", endpoint, error.response?.status);
+            console.log("[UserProfile] 接口失败:", endpoint, {
+              status: error.response?.status,
+              message: error.response?.data?.message || error.message,
+              data: error.response?.data,
+            });
             lastError = error;
-            // 如果是 404，继续尝试下一个接口
-            if (error.response?.status === 404) {
+            // 如果是 404 或 405，继续尝试下一个接口
+            if (error.response?.status === 404 || error.response?.status === 405) {
               continue;
             }
-            // 其他错误直接抛出
-            throw error;
+            // 如果是 401 或 403，说明是权限问题，直接抛出
+            if (error.response?.status === 401 || error.response?.status === 403) {
+              throw error;
+            }
+            // 如果是网络错误（没有 response），也继续尝试
+            if (!error.response) {
+              console.warn("[UserProfile] 网络错误，继续尝试下一个接口");
+              continue;
+            }
+            // 其他错误也继续尝试下一个接口（更宽松的策略）
+            continue;
           }
         }
 
         if (!response) {
-          throw lastError || new Error("所有上传接口都失败");
+          const errorMsg = lastError?.response?.data?.message || 
+                          lastError?.response?.data?.error ||
+                          lastError?.message ||
+                          "所有上传接口都失败";
+          console.error("[UserProfile] 所有接口都失败，最后错误:", {
+            status: lastError?.response?.status,
+            message: errorMsg,
+            data: lastError?.response?.data,
+          });
+          throw new Error(errorMsg);
         }
 
         // 返回头像URL（根据后端实际返回的字段调整）
@@ -555,7 +579,9 @@ export default defineComponent({
                          response.data.path || 
                          response.data.file_url ||
                          response.data.data?.url ||
-                         response.data.data?.avatar_url;
+                         response.data.data?.avatar_url ||
+                         response.data.file?.url ||
+                         response.data.file?.path;
         
         if (!avatarUrl) {
           console.error("[UserProfile] 上传响应中没有找到URL:", response.data);
@@ -571,12 +597,48 @@ export default defineComponent({
           message: error.message,
           response: error.response?.data,
           status: error.response?.status,
+          url: error.config?.url,
         });
-        notification.error(
-          error.response?.data?.message || 
-          error.response?.data?.error ||
-          "头像上传失败，请检查网络连接或联系管理员"
-        );
+        
+        // 根据错误类型显示更详细的错误信息
+        let errorMessage = "头像上传失败";
+        
+        if (error.response) {
+          // 有响应，说明请求已发送但服务器返回错误
+          const status = error.response.status;
+          const data = error.response.data;
+          
+          if (status === 401) {
+            errorMessage = "未登录或登录已过期，请重新登录";
+          } else if (status === 403) {
+            errorMessage = "无权限上传头像";
+          } else if (status === 413) {
+            errorMessage = "文件太大，请选择小于 5MB 的图片";
+          } else if (status === 415) {
+            errorMessage = "不支持的图片格式，请使用 JPG、PNG 或 GIF";
+          } else if (status === 404) {
+            errorMessage = "上传接口不存在，请联系管理员";
+          } else if (data?.message) {
+            errorMessage = data.message;
+          } else if (data?.error) {
+            errorMessage = data.error;
+          } else {
+            errorMessage = `上传失败 (${status})，请重试或联系管理员`;
+          }
+        } else if (error.message) {
+          // 网络错误或其他错误
+          if (error.message.includes("Network Error") || error.message.includes("timeout")) {
+            errorMessage = "网络连接失败，请检查网络后重试";
+          } else if (error.message.includes("所有上传接口都失败")) {
+            errorMessage = "所有上传接口都失败，请检查后端服务是否正常运行";
+          } else {
+            errorMessage = error.message;
+          }
+        } else {
+          errorMessage = "头像上传失败，请检查网络连接或联系管理员";
+        }
+        
+        notification.error(errorMessage);
         return null;
       } finally {
         this.uploadingAvatar = false;

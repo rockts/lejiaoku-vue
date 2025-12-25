@@ -313,25 +313,25 @@ export default defineComponent({
     },
 
     // 检查当前用户是否可以编辑
+    // user: 不显示编辑
+    // editor / admin: 显示编辑
     canEdit() {
-      const user = this.$store.state.auth?.user;
+      const user = this.$store.getters["auth/user"];
       if (!user) return false;
-      // 根据后端权限规则：admin、editor 或资源创建者可以编辑
-      return (
-        user.role === "admin" ||
-        user.role === "editor" ||
-        user.id === this.resource?.user_id
-      );
+      // user 角色不能编辑
+      if (user.role === "user") return false;
+      // editor 和 admin 可以编辑
+      return user.role === "editor" || user.role === "admin";
     },
 
     // 检查当前用户是否可以删除
+    // user: 不显示删除
+    // admin: 显示删除
     canDelete() {
-      const user = this.$store.state.auth?.user;
+      const user = this.$store.getters["auth/user"];
       if (!user) return false;
-      // admin 永远可以删除
-      if (user.role === "admin") return true;
-      // 非 admin 仅当是资源创建者时可以删除
-      return user.id === this.resource?.user_id;
+      // 只有 admin 可以删除
+      return user.role === "admin";
     },
 
     catalogInfo() {
