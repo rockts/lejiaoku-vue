@@ -242,7 +242,7 @@ export default defineComponent({
           `${API_BASE_URL}/covers/${this.item.cover.id}?size=thumbnail`
         );
 
-      console.debug(
+      console.log(
         "[PostListItem] probe candidates for",
         this.item.id,
         candidates
@@ -257,11 +257,11 @@ export default defineComponent({
         });
         if (ok) {
           this.resolvedCover = url;
-          console.debug("[PostListItem] resolved cover for", this.item.id, url);
+          console.log("[PostListItem] resolved cover for", this.item.id, url);
           return;
         }
       }
-      console.debug("[PostListItem] no valid cover found for", this.item.id);
+      console.log("[PostListItem] no valid cover found for", this.item.id);
       this.coverFailed = true;
     },
   },

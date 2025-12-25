@@ -172,17 +172,21 @@ export default defineComponent({
           `${API_BASE_URL}/covers/${this.item.cover.id}?size=thumbnail`
         );
 
-      console.debug('[ResourceCard] probe candidates for', this.item.id, candidates);
+      console.log(
+        "[ResourceCard] probe candidates for",
+        this.item.id,
+        candidates
+      );
       for (const url of candidates) {
         if (!url) continue;
         const ok = await this.probeImage(url);
         if (ok) {
           this.resolvedCover = url;
-          console.debug('[ResourceCard] resolved cover for', this.item.id, url);
+          console.log("[ResourceCard] resolved cover for", this.item.id, url);
           return;
         }
       }
-      console.debug('[ResourceCard] no valid cover found for', this.item.id);
+      console.log("[ResourceCard] no valid cover found for", this.item.id);
       this.coverFailed = true;
     },
 
