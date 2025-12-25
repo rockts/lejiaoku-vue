@@ -33,14 +33,14 @@
   margin-bottom: 12px;
 }
 .resource-cover-full img {
-  max-width: 100%;
-  max-height: 100%;
+  width: 100%;
+  height: 100%;
   display: block;
   background: #fff;
-  margin: auto;
+  object-position: center;
 }
-.resource-cover-full img.fit-cover { object-fit: cover; object-position: center; }
-.resource-cover-full img.fit-contain { object-fit: contain; object-position: center; }
+.resource-cover-full img.fit-cover { object-fit: cover; }
+.resource-cover-full img.fit-contain { object-fit: contain; }
 .resource-cover-full .placeholder-icon { font-size: 48px; color: var(--muted); opacity: 0.3; }
 
 @media (max-width: 768px) {
