@@ -59,18 +59,18 @@ export default defineComponent({
     };
   },
   watch: {
-    'item.cover_url': {
+    "item.cover_url": {
       handler() {
         this.resolveCoverUrl();
       },
       immediate: true,
     },
-    'item.cover.id': {
+    "item.cover.id": {
       handler() {
         this.resolveCoverUrl();
       },
       immediate: true,
-    }
+    },
   },
   computed: {
     coverFitClass() {
@@ -89,17 +89,17 @@ export default defineComponent({
         // 如果是上传目录的原始封面，优先使用后端约定的 resized 路径
         // 支持带或不带前导斜杠的路径
         const m =
-            this.item.cover_url.match(/(?:\/)??uploads\/cover\/(.+)$/) ||
-            this.item.cover_url.match(/uploads\/cover\/(.+)$/);
-          if (m) {
-            const filename = m[1];
-            const extMatch = filename.match(/^(.+)\.(\w+)$/);
-            if (extMatch) {
-              const name = extMatch[1];
-              const ext = extMatch[2];
-              return `${API_BASE_URL}/uploads/cover/resized/${name}-thumbnail.${ext}`;
-            }
-            return `${API_BASE_URL}/uploads/cover/resized/${filename}-thumbnail`;
+          this.item.cover_url.match(/(?:\/)??uploads\/cover\/(.+)$/) ||
+          this.item.cover_url.match(/uploads\/cover\/(.+)$/);
+        if (m) {
+          const filename = m[1];
+          const extMatch = filename.match(/^(.+)\.(\w+)$/);
+          if (extMatch) {
+            const name = extMatch[1];
+            const ext = extMatch[2];
+            return `${API_BASE_URL}/uploads/cover/resized/${name}-thumbnail.${ext}`;
+          }
+          return `${API_BASE_URL}/uploads/cover/resized/${filename}-thumbnail`;
         }
         return `${API_BASE_URL}${this.item.cover_url}`;
       }
@@ -128,33 +128,38 @@ export default defineComponent({
     },
   },
   methods: {
-    mounted() {
-      // when component mounts, try to resolve the actual cover URL
-      this.resolveCoverUrl();
-    },
     async resolveCoverUrl() {
       this.resolvedCover = "";
       this.coverFailed = false;
       const candidates = [];
       const cv = this.item?.cover_url;
       if (cv) {
-        if (cv.startsWith('http')) candidates.push(cv);
+        if (cv.startsWith("http")) candidates.push(cv);
         else {
-          const m = cv.match(/(?:\/)??uploads\/cover\/(.+)$/) || cv.match(/uploads\/cover\/(.+)$/);
+          const m =
+            cv.match(/(?:\/)??uploads\/cover\/(.+)$/) ||
+            cv.match(/uploads\/cover\/(.+)$/);
           if (m) {
             const filename = m[1];
             const extMatch = filename.match(/^(.+)\.(\w+)$/);
             if (extMatch) {
               const name = extMatch[1];
               const ext = extMatch[2];
-              candidates.push(`${API_BASE_URL}/uploads/cover/resized/${name}-thumbnail.${ext}`);
+              candidates.push(
+                `${API_BASE_URL}/uploads/cover/resized/${name}-thumbnail.${ext}`
+              );
             }
-            candidates.push(`${API_BASE_URL}/uploads/cover/resized/${filename}-thumbnail`);
+            candidates.push(
+              `${API_BASE_URL}/uploads/cover/resized/${filename}-thumbnail`
+            );
           }
           candidates.push(`${API_BASE_URL}${cv}`);
         }
       }
-      if (this.item?.cover?.id) candidates.push(`${API_BASE_URL}/covers/${this.item.cover.id}?size=thumbnail`);
+      if (this.item?.cover?.id)
+        candidates.push(
+          `${API_BASE_URL}/covers/${this.item.cover.id}?size=thumbnail`
+        );
 
       for (const url of candidates) {
         if (!url) continue;
@@ -188,6 +193,10 @@ export default defineComponent({
     onPreview() {
       this.$router.push(`/posts/${this.item.id}`);
     },
+  },
+  mounted() {
+    // when component mounts, try to resolve the actual cover URL
+    this.resolveCoverUrl();
   },
 });
 </script>

@@ -240,17 +240,19 @@ export default defineComponent({
         if (this.resource.cover_url.startsWith("http"))
           return this.resource.cover_url;
         // 支持带/不带前导斜杠的路径
-          const m = this.resource.cover_url.match(/(?:\/)??uploads\/cover\/(.+)$/) || this.resource.cover_url.match(/uploads\/cover\/(.+)$/);
-          if (m) {
-            const filename = m[1];
-            const extMatch = filename.match(/^(.+)\.(\w+)$/);
-            if (extMatch) {
-              const name = extMatch[1];
-              const ext = extMatch[2];
-              return `${API_BASE_URL}/uploads/cover/resized/${name}-large.${ext}`;
-            }
-            return `${API_BASE_URL}/uploads/cover/resized/${filename}-large`;
+        const m =
+          this.resource.cover_url.match(/(?:\/)??uploads\/cover\/(.+)$/) ||
+          this.resource.cover_url.match(/uploads\/cover\/(.+)$/);
+        if (m) {
+          const filename = m[1];
+          const extMatch = filename.match(/^(.+)\.(\w+)$/);
+          if (extMatch) {
+            const name = extMatch[1];
+            const ext = extMatch[2];
+            return `${API_BASE_URL}/uploads/cover/resized/${name}-large.${ext}`;
           }
+          return `${API_BASE_URL}/uploads/cover/resized/${filename}-large`;
+        }
         return `${API_BASE_URL}${this.resource.cover_url}?size=large`;
       }
       // fallback: 后端可能返回自动生成的封面字段
@@ -383,23 +385,50 @@ export default defineComponent({
       if (cv) {
         if (cv.startsWith("http")) candidates.push(cv);
         else {
-          const m = cv.match(/(?:\/)??uploads\/cover\/(.+)$/) || cv.match(/uploads\/cover\/(.+)$/);
+          const m =
+            cv.match(/(?:\/)??uploads\/cover\/(.+)$/) ||
+            cv.match(/uploads\/cover\/(.+)$/);
           if (m) {
             const filename = m[1];
             const extMatch = filename.match(/^(.+)\.(\w+)$/);
             if (extMatch) {
               const name = extMatch[1];
               const ext = extMatch[2];
-              candidates.push(`${API_BASE_URL}/uploads/cover/resized/${name}-large.${ext}`);
+              // 优先尝试 thumbnail（缩略），再尝试 large
+              candidates.push(
+                `${API_BASE_URL}/uploads/cover/resized/${name}-thumbnail.${ext}`
+              );
+              candidates.push(
+                `${API_BASE_URL}/uploads/cover/resized/${name}-large.${ext}`
+              );
+            } else {
+              candidates.push(
+                `${API_BASE_URL}/uploads/cover/resized/${filename}-thumbnail`
+              );
+              candidates.push(
+                `${API_BASE_URL}/uploads/cover/resized/${filename}-large`
+              );
             }
-            candidates.push(`${API_BASE_URL}/uploads/cover/resized/${filename}-large`);
           }
           candidates.push(`${API_BASE_URL}${cv}?size=large`);
         }
       }
-      if (this.resource?.auto_cover_url) candidates.push(this.resource.auto_cover_url.startsWith('http') ? this.resource.auto_cover_url : `${API_BASE_URL}${this.resource.auto_cover_url}`);
-      if (this.resource?.textbook_info?.cover_url) candidates.push(this.resource.textbook_info.cover_url.startsWith('http') ? this.resource.textbook_info.cover_url : `${API_BASE_URL}${this.resource.textbook_info.cover_url}`);
-      if (this.resource?.cover?.id) candidates.push(`${API_BASE_URL}/covers/${this.resource.cover.id}?size=large`);
+      if (this.resource?.auto_cover_url)
+        candidates.push(
+          this.resource.auto_cover_url.startsWith("http")
+            ? this.resource.auto_cover_url
+            : `${API_BASE_URL}${this.resource.auto_cover_url}`
+        );
+      if (this.resource?.textbook_info?.cover_url)
+        candidates.push(
+          this.resource.textbook_info.cover_url.startsWith("http")
+            ? this.resource.textbook_info.cover_url
+            : `${API_BASE_URL}${this.resource.textbook_info.cover_url}`
+        );
+      if (this.resource?.cover?.id)
+        candidates.push(
+          `${API_BASE_URL}/covers/${this.resource.cover.id}?size=large`
+        );
 
       for (const url of candidates) {
         if (!url) continue;
