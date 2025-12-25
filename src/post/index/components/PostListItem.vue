@@ -29,33 +29,26 @@
   <div class="card">
     <div class="container">
       <div class="row">
-                <div class="col-md-4 cover">
-                    <template v-if="resolvedCover && !coverFailed">
-                      <img
-                        :src="resolvedCover"
-                        :alt="item.title"
-                        class="img-fluid img-thumbnail"
-                        @load="onCoverLoad"
-                        @error="coverFailed = true"
-                        :class="coverClass"
-                      />
-                    </template>
-                    <template v-else>
-                      <img
-                        :src="resourceCoverURL"
-                        :alt="item.title"
-                        class="img-fluid img-thumbnail"
-                        @load="onCoverLoad"
-                        @error="coverFailed = true"
-                      />
-                    </template>
-                </div>
-        <div v-else class="col-md-4 cover">
-          <img
-            src="@/assets/img/catagory.png"
-            alt="默认封面"
-            class="img-fluid img-thumbnail"
-          />
+        <div class="col-md-4 cover">
+          <template v-if="resolvedCover && !coverFailed">
+            <img
+              :src="resolvedCover"
+              :alt="item.title"
+              class="img-fluid img-thumbnail"
+              @load="onCoverLoad"
+              @error="coverFailed = true"
+              :class="coverClass"
+            />
+          </template>
+          <template v-else>
+            <img
+              :src="resourceCoverURL"
+              :alt="item.title"
+              class="img-fluid img-thumbnail"
+              @load="onCoverLoad"
+              @error="coverFailed = true"
+            />
+          </template>
         </div>
         <div class="col-md-8">
           <div class="card-body">
@@ -196,34 +189,44 @@ export default defineComponent({
         this.coverFit = "cover";
       }
     },
-        // auto-resolve cover when component mounts or props change
-        resolvedCoverComputed() {
-          return this.resolvedCover;
-        },
+    // auto-resolve cover when component mounts or props change
+    resolvedCoverComputed() {
+      return this.resolvedCover;
+    },
     async resolveCoverUrl() {
       this.resolvedCover = "";
       this.coverFailed = false;
       const candidates = [];
       const cv = this.item?.cover_url;
       if (cv) {
-        if (cv.startsWith('http')) candidates.push(cv);
+        if (cv.startsWith("http")) candidates.push(cv);
         else {
-          const m = cv.match(/(?:\/)??uploads\/cover\/(.+)$/) || cv.match(/uploads\/cover\/(.+)$/);
+          const m =
+            cv.match(/(?:\/)??uploads\/cover\/(.+)$/) ||
+            cv.match(/uploads\/cover\/(.+)$/);
           if (m) {
             const filename = m[1];
             const extMatch = filename.match(/^(.+)\.(\w+)$/);
             if (extMatch) {
               const name = extMatch[1];
               const ext = extMatch[2];
-              candidates.push(`${API_BASE_URL}/uploads/cover/resized/${name}-thumbnail.${ext}`);
+              candidates.push(
+                `${API_BASE_URL}/uploads/cover/resized/${name}-thumbnail.${ext}`
+              );
             }
-            candidates.push(`${API_BASE_URL}/uploads/cover/resized/${filename}-thumbnail`);
+            candidates.push(
+              `${API_BASE_URL}/uploads/cover/resized/${filename}-thumbnail`
+            );
           }
           candidates.push(`${API_BASE_URL}${cv}`);
         }
       }
-      if (this.item?.cover?.id) candidates.push(`${API_BASE_URL}/covers/${this.item.cover.id}?size=thumbnail`);
+      if (this.item?.cover?.id)
+        candidates.push(
+          `${API_BASE_URL}/covers/${this.item.cover.id}?size=thumbnail`
+        );
 
+      console.debug('[PostListItem] probe candidates for', this.item.id, candidates);
       for (const url of candidates) {
         if (!url) continue;
         const ok = await new Promise((resolve) => {
@@ -234,9 +237,11 @@ export default defineComponent({
         });
         if (ok) {
           this.resolvedCover = url;
+          console.debug('[PostListItem] resolved cover for', this.item.id, url);
           return;
         }
       }
+      console.debug('[PostListItem] no valid cover found for', this.item.id);
       this.coverFailed = true;
     },
   },
@@ -254,15 +259,15 @@ export default defineComponent({
         const m =
           this.item.cover_url.match(/(?:\/)??uploads\/cover\/(.+)$/) ||
           this.item.cover_url.match(/uploads\/cover\/(.+)$/);
-          if (m) {
-            const filename = m[1];
-            const extMatch = filename.match(/^(.+)\.(\w+)$/);
-            if (extMatch) {
-              const name = extMatch[1];
-              const ext = extMatch[2];
-              return `${API_BASE_URL}/uploads/cover/resized/${name}-thumbnail.${ext}`;
-            }
-            return `${API_BASE_URL}/uploads/cover/resized/${filename}-thumbnail`;
+        if (m) {
+          const filename = m[1];
+          const extMatch = filename.match(/^(.+)\.(\w+)$/);
+          if (extMatch) {
+            const name = extMatch[1];
+            const ext = extMatch[2];
+            return `${API_BASE_URL}/uploads/cover/resized/${name}-thumbnail.${ext}`;
+          }
+          return `${API_BASE_URL}/uploads/cover/resized/${filename}-thumbnail`;
         }
         return `${API_BASE_URL}${this.item.cover_url}`;
       }
