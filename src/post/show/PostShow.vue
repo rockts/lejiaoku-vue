@@ -231,9 +231,9 @@ export default defineComponent({
   computed: {
     resourceCoverURL() {
       if (this.resource?.cover_url) {
-        if (this.resource.cover_url.startsWith("http"))
-          return this.resource.cover_url;
-        const m = this.resource.cover_url.match(/\/uploads\/cover\/(.+)$/);
+        if (this.resource.cover_url.startsWith("http")) return this.resource.cover_url;
+        // 支持带/不带前导斜杠的路径
+        const m = this.resource.cover_url.match(/(?:\/)??uploads\/cover\/(.+)$/) || this.resource.cover_url.match(/uploads\/cover\/(.+)$/);
         if (m) return `${API_BASE_URL}/uploads/cover/resized/${m[1]}-large`;
         return `${API_BASE_URL}${this.resource.cover_url}?size=large`;
       }
