@@ -2,11 +2,12 @@
   <div class="resource-card" @click="onPreview">
     <!-- 封面图 -->
     <div class="resource-cover">
-      <template v-if="coverUrl">
+      <template v-if="resolvedCover && !coverFailed">
         <img
-          :src="coverUrl"
+          :src="resolvedCover"
           :alt="item.title"
           @load="onCoverLoad"
+          @error="coverFailed = true"
           :class="coverFitClass"
         />
       </template>
@@ -53,7 +54,23 @@ export default defineComponent({
   data() {
     return {
       coverFit: "cover",
+      resolvedCover: "",
+      coverFailed: false,
     };
+  },
+  watch: {
+    'item.cover_url': {
+      handler() {
+        this.resolveCoverUrl();
+      },
+      immediate: true,
+    },
+    'item.cover.id': {
+      handler() {
+        this.resolveCoverUrl();
+      },
+      immediate: true,
+    }
   },
   computed: {
     coverFitClass() {
@@ -111,6 +128,53 @@ export default defineComponent({
     },
   },
   methods: {
+    mounted() {
+      // when component mounts, try to resolve the actual cover URL
+      this.resolveCoverUrl();
+    },
+    async resolveCoverUrl() {
+      this.resolvedCover = "";
+      this.coverFailed = false;
+      const candidates = [];
+      const cv = this.item?.cover_url;
+      if (cv) {
+        if (cv.startsWith('http')) candidates.push(cv);
+        else {
+          const m = cv.match(/(?:\/)??uploads\/cover\/(.+)$/) || cv.match(/uploads\/cover\/(.+)$/);
+          if (m) {
+            const filename = m[1];
+            const extMatch = filename.match(/^(.+)\.(\w+)$/);
+            if (extMatch) {
+              const name = extMatch[1];
+              const ext = extMatch[2];
+              candidates.push(`${API_BASE_URL}/uploads/cover/resized/${name}-thumbnail.${ext}`);
+            }
+            candidates.push(`${API_BASE_URL}/uploads/cover/resized/${filename}-thumbnail`);
+          }
+          candidates.push(`${API_BASE_URL}${cv}`);
+        }
+      }
+      if (this.item?.cover?.id) candidates.push(`${API_BASE_URL}/covers/${this.item.cover.id}?size=thumbnail`);
+
+      for (const url of candidates) {
+        if (!url) continue;
+        const ok = await this.probeImage(url);
+        if (ok) {
+          this.resolvedCover = url;
+          return;
+        }
+      }
+      this.coverFailed = true;
+    },
+
+    probeImage(url) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+        img.src = url;
+      });
+    },
     onCoverLoad(e) {
       try {
         const img = e.target;
