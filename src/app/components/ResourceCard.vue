@@ -202,12 +202,16 @@ export default defineComponent({
       }
       // 如果所有候选都失败，但有原始 cover_url，则兜底显示原图
       if (!found && this.item.cover_url) {
-        if (this.item.cover_url.startsWith('http')) {
+        if (this.item.cover_url.startsWith("http")) {
           this.resolvedCover = this.item.cover_url;
         } else {
           this.resolvedCover = `${API_BASE_URL}${this.item.cover_url}`;
         }
-        console.log('[ResourceCard] fallback to raw cover_url for', this.item.id, this.resolvedCover);
+        console.log(
+          "[ResourceCard] fallback to raw cover_url for",
+          this.item.id,
+          this.resolvedCover
+        );
       }
       if (!this.resolvedCover) {
         this.coverFailed = true;
