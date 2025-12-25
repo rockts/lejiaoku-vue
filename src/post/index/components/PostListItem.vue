@@ -215,7 +215,11 @@ export default defineComponent({
       // 如果有直接可拼接的 resourceCoverURL，先让它作为初始展示，避免空白
       if (this.resourceCoverURL) {
         this.resolvedCover = this.resourceCoverURL;
-        console.log('[PostListItem] initial resolvedCover set to resourceCoverURL for', this.item.id, this.resolvedCover);
+        console.log(
+          "[PostListItem] initial resolvedCover set to resourceCoverURL for",
+          this.item.id,
+          this.resolvedCover
+        );
       }
       const candidates = [];
       const cv = this.item?.cover_url;
@@ -255,6 +259,7 @@ export default defineComponent({
         this.item.id,
         candidates
       );
+      let found = false;
       for (const url of candidates) {
         if (!url) continue;
         const ok = await new Promise((resolve) => {
@@ -264,20 +269,38 @@ export default defineComponent({
           img.src = url;
         });
         if (ok) {
-          // 优先使用探测成功的候选（可能是缩略图或更合适的尺寸）
           this.resolvedCover = url;
+          found = true;
           console.log("[PostListItem] resolved cover for", this.item.id, url);
-          return;
+          break;
         }
       }
-      console.log("[PostListItem] no valid cover found for", this.item.id);
-      this.coverFailed = true;
+      // 如果所有候选都失败，但有原始 cover_url，则兜底显示原图
+      if (!found && this.item.cover_url) {
+        if (this.item.cover_url.startsWith('http')) {
+          this.resolvedCover = this.item.cover_url;
+        } else {
+          this.resolvedCover = `${API_BASE_URL}${this.item.cover_url}`;
+        }
+        console.log('[PostListItem] fallback to raw cover_url for', this.item.id, this.resolvedCover);
+      }
+      if (!this.resolvedCover) {
+        this.coverFailed = true;
+        console.log("[PostListItem] no valid cover found for", this.item.id);
+      }
     },
     onCoverError(e) {
       try {
-        console.log('[PostListItem] cover load error for', this.item.id, e.target && e.target.src);
+        console.log(
+          "[PostListItem] cover load error for",
+          this.item.id,
+          e.target && e.target.src
+        );
       } catch (err) {
-        console.log('[PostListItem] cover load error (no src available) for', this.item.id);
+        console.log(
+          "[PostListItem] cover load error (no src available) for",
+          this.item.id
+        );
       }
       this.coverFailed = true;
     },

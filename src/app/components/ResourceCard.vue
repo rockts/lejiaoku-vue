@@ -145,7 +145,11 @@ export default defineComponent({
       // 先使用计算好的 coverUrl 作为快速展示（如果有），避免首页/卡片空白
       if (this.coverUrl) {
         this.resolvedCover = this.coverUrl;
-        console.log('[ResourceCard] initial resolvedCover set to coverUrl for', this.item.id, this.resolvedCover);
+        console.log(
+          "[ResourceCard] initial resolvedCover set to coverUrl for",
+          this.item.id,
+          this.resolvedCover
+        );
       }
       const candidates = [];
       const cv = this.item?.cover_url;
@@ -185,24 +189,44 @@ export default defineComponent({
         this.item.id,
         candidates
       );
+      let found = false;
       for (const url of candidates) {
         if (!url) continue;
         const ok = await this.probeImage(url);
         if (ok) {
           this.resolvedCover = url;
+          found = true;
           console.log("[ResourceCard] resolved cover for", this.item.id, url);
-          return;
+          break;
         }
       }
-      console.log("[ResourceCard] no valid cover found for", this.item.id);
-      this.coverFailed = true;
+      // 如果所有候选都失败，但有原始 cover_url，则兜底显示原图
+      if (!found && this.item.cover_url) {
+        if (this.item.cover_url.startsWith('http')) {
+          this.resolvedCover = this.item.cover_url;
+        } else {
+          this.resolvedCover = `${API_BASE_URL}${this.item.cover_url}`;
+        }
+        console.log('[ResourceCard] fallback to raw cover_url for', this.item.id, this.resolvedCover);
+      }
+      if (!this.resolvedCover) {
+        this.coverFailed = true;
+        console.log("[ResourceCard] no valid cover found for", this.item.id);
+      }
     },
 
     onCoverError(e) {
       try {
-        console.log('[ResourceCard] cover load error for', this.item.id, e.target && e.target.src);
+        console.log(
+          "[ResourceCard] cover load error for",
+          this.item.id,
+          e.target && e.target.src
+        );
       } catch (err) {
-        console.log('[ResourceCard] cover load error (no src available) for', this.item.id);
+        console.log(
+          "[ResourceCard] cover load error (no src available) for",
+          this.item.id
+        );
       }
       this.coverFailed = true;
     },
