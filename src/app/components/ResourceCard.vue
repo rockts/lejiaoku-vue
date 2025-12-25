@@ -1,11 +1,13 @@
 <template>
   <div class="resource-card" @click="onPreview">
     <!-- 封面图 -->
-    <div class="resource-cover" v-if="coverUrl">
-      <img :src="coverUrl" :alt="item.title" />
-    </div>
-    <div class="resource-cover placeholder" v-else>
-      <i class="bi bi-file-earmark"></i>
+    <div class="resource-cover">
+      <template v-if="coverUrl">
+        <img :src="coverUrl" :alt="item.title" />
+      </template>
+      <template v-else>
+        <i class="bi bi-file-earmark"></i>
+      </template>
     </div>
 
     <div class="resource-title">{{ item.title }}</div>
@@ -103,28 +105,36 @@ export default defineComponent({
 .resource-card:hover {
   transform: translateY(-2px);
 }
-.resource-card .resource-cover img {
-  width: 100% !important;
-  height: 100% !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
-  min-width: 100% !important;
-  min-height: 100% !important;
-  object-fit: contain !important;
-  object-position: center !important;
-  display: block !important;
-}
-.resource-cover.placeholder {
-  background: linear-gradient(
-    135deg,
-    rgba(79, 140, 255, 0.1) 0%,
-    rgba(155, 123, 255, 0.1) 100%
-  );
+.resource-card .resource-cover {
+  width: 150px;
+  height: 200px;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+  position: relative;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   display: flex;
   align-items: center;
   justify-content: center;
+  /* 保证图片始终居中 */
+  text-align: center;
+  position: relative;
 }
-.resource-cover.placeholder i {
+.resource-card .resource-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  background: #fff;
+  margin: auto;
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+}
+.resource-card .resource-cover i {
   font-size: 48px;
   color: var(--muted);
   opacity: 0.3;
