@@ -187,41 +187,58 @@ class NotificationManager {
                 left: 0;
                 right: 0;
                 bottom: 0;
-                background: rgba(0, 0, 0, 0.4);
+                background: rgba(0, 0, 0, 0.5);
                 z-index: 10000;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 padding: 20px;
+                animation: fadeIn 0.2s ease;
             `;
 
             // 创建对话框
             const dialog = document.createElement('div');
             dialog.style.cssText = `
                 background: white;
-                border: 1px solid #dee2e6;
+                border: none;
+                border-radius: 12px;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
                 min-width: 400px;
                 max-width: 500px;
                 width: 100%;
+                overflow: hidden;
+                animation: slideUp 0.3s ease;
             `;
 
             // 标题栏
             const header = document.createElement('div');
             header.style.cssText = `
-                padding: 1rem 1.25rem;
-                border-bottom: 1px solid #dee2e6;
+                padding: 1.25rem 1.5rem;
+                border-bottom: 1px solid #e9ecef;
                 font-weight: 600;
-                font-size: 1rem;
-                color: #212529;
-                background: #f8f9fa;
+                font-size: 1.25rem;
+                color: white;
+                background: linear-gradient(135deg, #4f8cff 0%, #9b7bff 100%);
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
             `;
-            header.textContent = title;
+            
+            // 添加图标
+            const icon = document.createElement('i');
+            icon.className = 'bi bi-question-circle-fill';
+            icon.style.cssText = 'font-size: 1.2rem;';
+            header.appendChild(icon);
+            
+            const titleText = document.createElement('span');
+            titleText.textContent = title;
+            header.appendChild(titleText);
 
             // 内容区域
             const body = document.createElement('div');
             body.style.cssText = `
-                padding: 1.5rem 1.25rem;
-                font-size: 0.875rem;
+                padding: 2rem 1.5rem;
+                font-size: 0.9375rem;
                 color: #495057;
                 line-height: 1.6;
                 white-space: pre-line;
@@ -231,59 +248,82 @@ class NotificationManager {
             // 按钮区域
             const footer = document.createElement('div');
             footer.style.cssText = `
-                padding: 0.75rem 1.25rem;
-                border-top: 1px solid #dee2e6;
+                padding: 1rem 1.5rem;
+                border-top: 1px solid #e9ecef;
                 display: flex;
                 justify-content: flex-end;
-                gap: 0.5rem;
+                gap: 0.75rem;
                 background: #f8f9fa;
             `;
 
             // 取消按钮
             const cancelBtn = document.createElement('button');
             cancelBtn.textContent = '取消';
+            cancelBtn.className = 'btn-cancel';
             cancelBtn.style.cssText = `
-                padding: 0.5rem 1rem;
+                padding: 0.625rem 1.5rem;
                 border: 1px solid #ced4da;
                 background: white;
                 color: #495057;
-                font-size: 0.875rem;
+                font-size: 0.9375rem;
+                font-weight: 600;
                 cursor: pointer;
-                transition: background-color 0.15s ease;
+                border-radius: 8px;
+                transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             `;
             cancelBtn.onmouseenter = () => {
                 cancelBtn.style.backgroundColor = '#f8f9fa';
+                cancelBtn.style.borderColor = '#adb5bd';
+                cancelBtn.style.transform = 'translateY(-1px)';
             };
             cancelBtn.onmouseleave = () => {
                 cancelBtn.style.backgroundColor = 'white';
+                cancelBtn.style.borderColor = '#ced4da';
+                cancelBtn.style.transform = 'translateY(0)';
             };
             cancelBtn.onclick = () => {
-                document.body.removeChild(overlay);
+                overlay.style.animation = 'fadeOut 0.2s ease';
+                dialog.style.animation = 'slideDown 0.2s ease';
+                setTimeout(() => {
+                    if (document.body.contains(overlay)) {
+                        document.body.removeChild(overlay);
+                    }
+                }, 200);
                 resolve(false);
             };
 
             // 确认按钮
             const confirmBtn = document.createElement('button');
             confirmBtn.textContent = '确认';
+            confirmBtn.className = 'btn-primary';
             confirmBtn.style.cssText = `
-                padding: 0.5rem 1rem;
-                border: 1px solid #dc3545;
-                background: #dc3545;
+                padding: 0.625rem 1.5rem;
+                border: none;
+                background: linear-gradient(135deg, #4f8cff 0%, #9b7bff 100%);
                 color: white;
-                font-size: 0.875rem;
+                font-size: 0.9375rem;
+                font-weight: 600;
                 cursor: pointer;
-                transition: background-color 0.15s ease;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(79, 140, 255, 0.3);
+                transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             `;
             confirmBtn.onmouseenter = () => {
-                confirmBtn.style.backgroundColor = '#c82333';
-                confirmBtn.style.borderColor = '#c82333';
+                confirmBtn.style.transform = 'translateY(-2px) scale(1.02)';
+                confirmBtn.style.boxShadow = '0 6px 16px rgba(79, 140, 255, 0.4)';
             };
             confirmBtn.onmouseleave = () => {
-                confirmBtn.style.backgroundColor = '#dc3545';
-                confirmBtn.style.borderColor = '#dc3545';
+                confirmBtn.style.transform = 'translateY(0) scale(1)';
+                confirmBtn.style.boxShadow = '0 4px 12px rgba(79, 140, 255, 0.3)';
             };
             confirmBtn.onclick = () => {
-                document.body.removeChild(overlay);
+                overlay.style.animation = 'fadeOut 0.2s ease';
+                dialog.style.animation = 'slideDown 0.2s ease';
+                setTimeout(() => {
+                    if (document.body.contains(overlay)) {
+                        document.body.removeChild(overlay);
+                    }
+                }, 200);
                 resolve(true);
             };
 
@@ -295,10 +335,53 @@ class NotificationManager {
             dialog.appendChild(footer);
             overlay.appendChild(dialog);
 
+            // 添加动画样式
+            if (!document.getElementById('confirm-dialog-styles')) {
+                const style = document.createElement('style');
+                style.id = 'confirm-dialog-styles';
+                style.textContent = `
+                    @keyframes fadeIn {
+                        from { opacity: 0; }
+                        to { opacity: 1; }
+                    }
+                    @keyframes fadeOut {
+                        from { opacity: 1; }
+                        to { opacity: 0; }
+                    }
+                    @keyframes slideUp {
+                        from {
+                            opacity: 0;
+                            transform: translateY(20px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
+                    }
+                    @keyframes slideDown {
+                        from {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
+                        to {
+                            opacity: 0;
+                            transform: translateY(20px);
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
             // 点击遮罩层关闭
             overlay.onclick = (e) => {
                 if (e.target === overlay) {
-                    document.body.removeChild(overlay);
+                    overlay.style.animation = 'fadeOut 0.2s ease';
+                    dialog.style.animation = 'slideDown 0.2s ease';
+                    setTimeout(() => {
+                        if (document.body.contains(overlay)) {
+                            document.body.removeChild(overlay);
+                        }
+                    }, 200);
                     resolve(false);
                 }
             };
@@ -306,8 +389,14 @@ class NotificationManager {
             // ESC 键关闭
             const handleEsc = (e: KeyboardEvent) => {
                 if (e.key === 'Escape') {
-                    document.body.removeChild(overlay);
-                    document.removeEventListener('keydown', handleEsc);
+                    overlay.style.animation = 'fadeOut 0.2s ease';
+                    dialog.style.animation = 'slideDown 0.2s ease';
+                    setTimeout(() => {
+                        if (document.body.contains(overlay)) {
+                            document.body.removeChild(overlay);
+                        }
+                        document.removeEventListener('keydown', handleEsc);
+                    }, 200);
                     resolve(false);
                 }
             };

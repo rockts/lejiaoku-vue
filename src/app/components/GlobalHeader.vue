@@ -165,6 +165,24 @@
                   <i class="bi bi-file-earmark-text me-2"></i>我的资源
                 </router-link>
               </li>
+              <!-- 申请成为贡献者：仅 user 角色显示 -->
+              <li v-if="isUser">
+                <a
+                  href="javascript:void(0)"
+                  class="dropdown-item"
+                  :class="{ 
+                    'text-muted': applicationStatus === 'pending',
+                    'disabled': isApplying || applicationStatus === 'pending'
+                  }"
+                  @click="handleApplyContributor"
+                  :style="(isApplying || applicationStatus === 'pending') ? 'pointer-events: none; cursor: not-allowed;' : ''"
+                >
+                  <i class="bi bi-person-plus me-2"></i>
+                  <span v-if="isApplying">提交中...</span>
+                  <span v-else-if="applicationStatus === 'pending'">审核中</span>
+                  <span v-else>申请成为贡献者</span>
+                </a>
+              </li>
               <li><hr class="dropdown-divider" /></li>
               <li>
                 <a
@@ -206,6 +224,7 @@ import { defineComponent } from "vue";
 import { mapGetters } from "vuex";
 import { API_BASE_URL } from "@/app/app.config";
 import { apiHttpClient } from "@/app/app.service";
+import notification from "@/utils/notification";
 import HeaderSearch from "./form/HeaderSearch.vue";
 import LoginModal from "./LoginModal.vue";
 import RegisterModal from "./RegisterModal.vue";
@@ -221,6 +240,7 @@ export default defineComponent({
                  showRegisterModal: false,
                  showUserDropdown: false,
                  avatarError: false, // 头像加载错误标志
+                 isApplying: false, // 是否正在提交申请
                };
              },
   computed: {
@@ -231,6 +251,7 @@ export default defineComponent({
       isContributor: "auth/isContributor",
       isEditor: "auth/isEditor",
       isAdmin: "auth/isAdmin",
+      applicationStatus: "auth/contributorApplicationStatus",
     }),
 
     // 是否可以上传资源：contributor / editor / admin
@@ -360,7 +381,7 @@ export default defineComponent({
       immediate: true
     }
   },
-  mounted() {
+  async mounted() {
     // 组件挂载时，如果已登录但 currentUser 为空，尝试刷新用户数据
     if (this.isAuthenticated && !this.currentUser) {
       this.refreshUserData();
@@ -386,12 +407,106 @@ export default defineComponent({
     } catch (e) {
       console.error("[GlobalHeader] 检查用户数据失败:", e);
     }
+    
+    // 检查申请状态（如果是 user 角色）
+    // 使用 setTimeout 确保在下一个事件循环中执行，给 store 足够时间初始化
+    setTimeout(async () => {
+      if (this.isAuthenticated && this.isUser) {
+        console.log('[GlobalHeader] mounted - 检查申请状态');
+        await this.$store.dispatch('auth/checkContributorApplicationStatus');
+        console.log('[GlobalHeader] mounted - 申请状态:', this.applicationStatus);
+      }
+    }, 50);
   },
+  
   methods: {
     handleLogout() {
       console.log("[GlobalHeader] 执行退出登录");
       this.$store.dispatch("auth/logout");
       this.$router.push("/");
+    },
+    
+    // 检查申请状态
+    async checkApplicationStatus() {
+      if (!this.isAuthenticated || !this.isUser) {
+        return;
+      }
+      
+      try {
+        console.log('[GlobalHeader] 检查贡献者申请状态...');
+        const response = await apiHttpClient.get('/api/contributor-applications/my');
+        const application = response.data;
+        if (application && application.status) {
+          this.applicationStatus = application.status;
+          console.log('[GlobalHeader] 申请状态:', this.applicationStatus);
+        } else {
+          // 如果没有状态，设置为 null（可以申请）
+          this.applicationStatus = null;
+        }
+      } catch (error) {
+        // 404 表示没有申请记录，设置为 null（可以申请）
+        if (error.response?.status === 404) {
+          this.applicationStatus = null;
+          console.log('[GlobalHeader] 没有申请记录，可以申请');
+        } else {
+          console.error('[GlobalHeader] 检查申请状态失败:', error);
+          // 其他错误时，保持当前状态不变，避免误判
+        }
+      }
+    },
+    
+    // 处理申请成为贡献者
+    async handleApplyContributor() {
+      if (!this.isAuthenticated || !this.isUser) {
+        notification.warning('请先登录');
+        return;
+      }
+      
+      // 如果已申请（pending/approved），不处理
+      if (this.applicationStatus === 'pending' || this.applicationStatus === 'approved') {
+        notification.info('您的申请正在审核中，请耐心等待');
+        return;
+      }
+      
+      // 确认弹窗
+      const confirmed = await notification.confirm(
+        '申请成为贡献者后，您将可以上传和管理教学资源。\n\n提交申请后，管理员将审核您的申请。\n\n确认提交申请吗？',
+        '申请成为贡献者'
+      );
+      
+      if (!confirmed) {
+        return;
+      }
+      
+      this.isApplying = true;
+      try {
+        console.log('[GlobalHeader] 提交贡献者申请...');
+        const response = await apiHttpClient.post('/api/contributor-applications', {});
+        console.log('[GlobalHeader] 申请提交成功:', response.data);
+        
+        notification.success('已提交申请，等待管理员审核');
+        // 更新 store 中的状态
+        this.$store.dispatch('auth/setContributorApplicationStatus', 'pending');
+      } catch (error) {
+        console.error('[GlobalHeader] 提交申请失败:', error);
+        
+        // 处理 400 错误：已存在申请
+        if (error.response?.status === 400) {
+          notification.warning('你已有申请，请勿重复提交');
+          // 重新检查申请状态，确保前端状态同步
+          await this.$store.dispatch('auth/checkContributorApplicationStatus');
+          return;
+        }
+        
+        // 其他错误
+        const errorMsg = error.response?.data?.message || 
+                        error.response?.data?.error ||
+                        error.message ||
+                        '提交申请失败，请稍后重试';
+        notification.error(errorMsg);
+      } finally {
+        this.isApplying = false;
+      }
     },
     
     // 刷新用户数据

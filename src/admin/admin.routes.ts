@@ -4,6 +4,7 @@
 import AdminIndex from './AdminIndex.vue';
 import AdminUsers from './AdminUsers.vue';
 import AdminResources from './AdminResources.vue';
+import AdminContributorApplications from './AdminContributorApplications.vue';
 
 export default [
     {
@@ -20,5 +21,10 @@ export default [
         path: '/admin/resources',
         name: 'AdminResources',
         component: AdminResources,
+    },
+    {
+        path: '/admin/contributor-applications',
+        name: 'AdminContributorApplications',
+        component: AdminContributorApplications,
     },
 ];

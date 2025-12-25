@@ -16,8 +16,25 @@
     </router-link>
   </div>
 
-  <!-- 已登录，显示上传表单 -->
-  <div v-else class="post-create-page">
+  <!-- 已登录但无权限（user 角色） -->
+  <div v-else-if="isAuthenticated && !canUpload" class="container my-5 text-center">
+    <div class="alert alert-warning mb-4" role="alert">
+      <i class="bi bi-exclamation-triangle me-2"></i>
+      <strong>无权限</strong>
+    </div>
+    <p class="mb-4">您需要成为贡献者才能上传资源</p>
+    <button
+      v-if="isUser"
+      type="button"
+      class="btn btn-primary"
+      @click="handleApplyContributor"
+    >
+      <i class="bi bi-person-plus me-2"></i>申请成为贡献者
+    </button>
+  </div>
+
+  <!-- 已登录且有权限，显示上传表单 -->
+  <div v-else-if="canUpload" class="post-create-page">
     <div class="container post-create-page-body">
       <!-- 上传提示 -->
         <div class="alert alert-info mb-4" role="alert">
@@ -491,6 +508,7 @@
 <script>
 import { apiHttpClient } from "@/app/app.service";
 import { defineComponent } from "vue";
+import { mapGetters } from "vuex";
 import BreadCrumbs from "@/app/components/BreadCrumbs.vue";
 import TextbookStructure from "./components/TextbookStructure.vue"; // 新增教材结构组件
 import notification from "@/utils/notification";
@@ -593,6 +611,19 @@ export default defineComponent({
   },
 
   computed: {
+    ...mapGetters({
+      currentUser: "auth/user",
+      isUser: "auth/isUser",
+      isContributor: "auth/isContributor",
+      isEditor: "auth/isEditor",
+      isAdmin: "auth/isAdmin",
+    }),
+    
+    // 是否可以上传资源：contributor / editor / admin
+    canUpload() {
+      return this.isContributor || this.isEditor || this.isAdmin;
+    },
+    
     // 学段选项（顶级）
     stageOptions() {
       const stages = this.textbookCatalog.filter((item) => !item.parent_id);
@@ -1407,6 +1438,37 @@ export default defineComponent({
     getNodeType(level) {
       const types = ["Unit", "Lesson", "Subtopic"];
       return types[level] || "Section";
+    },
+    
+    // 处理申请成为贡献者
+    async handleApplyContributor() {
+      // 确认弹窗
+      const confirmed = confirm(
+        '申请成为贡献者后，您将可以上传和管理教学资源。\n\n' +
+        '提交申请后，管理员将审核您的申请。\n\n' +
+        '确认提交申请吗？'
+      );
+      
+      if (!confirmed) {
+        return;
+      }
+      
+      try {
+        console.log('[PostCreate] 提交贡献者申请...');
+        const response = await apiHttpClient.post('/api/contributor-applications', {});
+        console.log('[PostCreate] 申请提交成功:', response.data);
+        
+        notification.success('已提交申请，等待管理员审核');
+        // 跳转到首页
+        this.$router.push('/');
+      } catch (error) {
+        console.error('[PostCreate] 提交申请失败:', error);
+        const errorMsg = error.response?.data?.message || 
+                        error.response?.data?.error ||
+                        error.message ||
+                        '提交申请失败，请稍后重试';
+        notification.error(errorMsg);
+      }
     },
   },
 });

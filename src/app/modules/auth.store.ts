@@ -14,6 +14,7 @@ export interface AuthStoreState {
     token: string | null;
     user: AuthUser | null;
     isAuthenticated: boolean;
+    contributorApplicationStatus: 'pending' | 'approved' | 'rejected' | null;
 }
 
 export const authStoreModule: Module<AuthStoreState, RootState> = {
@@ -23,6 +24,7 @@ export const authStoreModule: Module<AuthStoreState, RootState> = {
         token: null,
         user: null,
         isAuthenticated: false,
+        contributorApplicationStatus: null,
     } as AuthStoreState,
 
     getters: {
@@ -59,6 +61,11 @@ export const authStoreModule: Module<AuthStoreState, RootState> = {
         username(state) {
             return state.user?.username || '';
         },
+        
+        // 贡献者申请状态
+        contributorApplicationStatus(state) {
+            return state.contributorApplicationStatus;
+        },
     },
 
     mutations: {
@@ -75,6 +82,12 @@ export const authStoreModule: Module<AuthStoreState, RootState> = {
             state.token = null;
             state.user = null;
             state.isAuthenticated = false;
+            state.contributorApplicationStatus = null;
+        },
+        
+        // 设置贡献者申请状态
+        setContributorApplicationStatus(state, status: 'pending' | 'approved' | 'rejected' | null) {
+            state.contributorApplicationStatus = status;
         },
 
         // 从 localStorage 恢复身份信息
@@ -100,11 +113,19 @@ export const authStoreModule: Module<AuthStoreState, RootState> = {
                     console.log('[Auth Store] 用户 nickname:', state.user?.nickname);
                     console.log('[Auth Store] 用户 name:', state.user?.name);
                     console.log('[Auth Store] 用户 avatar_url:', state.user?.avatar_url);
+                    
+                    // 恢复申请状态
+                    const savedStatus = localStorage.getItem('contributor_application_status');
+                    if (savedStatus && ['pending', 'approved', 'rejected'].includes(savedStatus)) {
+                        state.contributorApplicationStatus = savedStatus as 'pending' | 'approved' | 'rejected';
+                        console.log('[Auth Store] 恢复申请状态:', state.contributorApplicationStatus);
+                    }
                 } catch (error) {
                     console.error('[Auth Store] 恢复身份信息失败:', error);
                     state.token = null;
                     state.user = null;
                     state.isAuthenticated = false;
+                    state.contributorApplicationStatus = null;
                 }
             }
         },
@@ -121,7 +142,47 @@ export const authStoreModule: Module<AuthStoreState, RootState> = {
             console.log('[Auth Store] 执行登出');
             localStorage.removeItem('auth_token');
             localStorage.removeItem('user_info');
+            localStorage.removeItem('contributor_application_status');
             commit('logout');
+        },
+        
+        // 检查贡献者申请状态
+        async checkContributorApplicationStatus({ commit, state, rootState }) {
+            if (!state.isAuthenticated || state.user?.role !== 'user') {
+                commit('setContributorApplicationStatus', null);
+                return;
+            }
+            
+            try {
+                const { apiHttpClient } = await import('../../app/app.service');
+                const response = await apiHttpClient.get('/api/contributor-applications/my');
+                const application = response.data;
+                if (application && application.status) {
+                    commit('setContributorApplicationStatus', application.status);
+                    // 保存到 localStorage
+                    localStorage.setItem('contributor_application_status', application.status);
+                } else {
+                    commit('setContributorApplicationStatus', null);
+                    localStorage.removeItem('contributor_application_status');
+                }
+            } catch (error: any) {
+                if (error.response?.status === 404) {
+                    commit('setContributorApplicationStatus', null);
+                    localStorage.removeItem('contributor_application_status');
+                } else {
+                    console.error('[Auth Store] 检查申请状态失败:', error);
+                }
+            }
+        },
+        
+        // 设置贡献者申请状态（用于提交申请后）
+        setContributorApplicationStatus({ commit }, status: 'pending' | 'approved' | 'rejected' | null) {
+            commit('setContributorApplicationStatus', status);
+            if (status) {
+                localStorage.setItem('contributor_application_status', status);
+            } else {
+                localStorage.removeItem('contributor_application_status');
+            }
         },
 
         // 检查用户是否可以编辑资源

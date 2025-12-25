@@ -37,6 +37,21 @@
           </div>
         </div>
       </div>
+      
+      <div class="col-md-6 mb-4">
+        <div class="admin-card card-hover">
+          <div class="card-icon bg-warning">
+            <i class="bi bi-person-check-fill"></i>
+          </div>
+          <div class="card-content">
+            <h5 class="card-title">贡献者申请</h5>
+            <p class="card-text text-muted">审核用户提交的贡献者申请</p>
+            <router-link to="/admin/contributor-applications" class="btn btn-warning">
+              <i class="bi bi-arrow-right-circle me-2"></i>进入审核
+            </router-link>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
