@@ -103,17 +103,6 @@ export default defineComponent({
 .resource-card:hover {
   transform: translateY(-2px);
 }
-.resource-card .resource-cover {
-  width: 100%;
-  height: 160px;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 12px;
-  background: #f8f9fa;
-  border: 1px solid var(--border);
-  position: relative;
-  flex-shrink: 0;
-}
 .resource-card .resource-cover img {
   width: 100% !important;
   height: 100% !important;
@@ -121,7 +110,7 @@ export default defineComponent({
   max-height: 100% !important;
   min-width: 100% !important;
   min-height: 100% !important;
-  object-fit: cover !important;
+  object-fit: contain !important;
   object-position: center !important;
   display: block !important;
 }

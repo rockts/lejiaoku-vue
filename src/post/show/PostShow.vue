@@ -357,4 +357,12 @@ export default defineComponent({
   color: #1f2937;
   line-height: 1.6;
 }
+
+.cover img {
+  width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+}
 </style>
