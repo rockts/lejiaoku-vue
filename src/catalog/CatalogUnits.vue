@@ -633,7 +633,7 @@ export default defineComponent({
         // 询问用户是否要跳转到任务列表
         const { notification: notificationModule } = await import("@/utils/notification");
         const goToTasks = await notificationModule.confirm(
-          "任务创建成功！是否要跳转到"我的任务"页面查看？",
+          "任务创建成功！是否要跳转到「我的任务」页面查看？",
           {
             requireAgreement: false,
           }
@@ -716,7 +716,7 @@ export default defineComponent({
         // 询问用户是否要跳转到任务列表
         const { notification: notificationModule } = await import("@/utils/notification");
         const goToTasks = await notificationModule.confirm(
-          "任务创建成功！是否要跳转到"我的任务"页面查看？",
+          "任务创建成功！是否要跳转到「我的任务」页面查看？",
           {
             requireAgreement: false,
           }
