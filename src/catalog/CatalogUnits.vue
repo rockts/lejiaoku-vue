@@ -44,6 +44,13 @@
 
       <!-- 教材章节内容 -->
       <div v-else-if="catalogInfo">
+        <!-- 从任务跳转提示 -->
+        <div v-if="fromTaskId" class="alert alert-info mb-3">
+          <i class="bi bi-info-circle me-2"></i>
+          <strong>来自任务：</strong>你正在查看任务关联的教材
+          <span v-if="targetUnit">，目标单元：<strong>{{ targetUnit }}</strong></span>
+        </div>
+        
         <!-- Catalog 级行为按钮 -->
         <div v-if="catalogInfo.view_state && catalogInfo.view_state !== 'no_action'" class="catalog-action-top mb-4">
           <button
@@ -206,14 +213,22 @@ export default defineComponent({
 
   created() {
     this.fetchCatalogData();
+    this.checkTaskContext();
   },
 
   watch: {
     catalogId: {
       handler() {
         this.fetchCatalogData();
+        this.checkTaskContext();
       },
       immediate: false,
+    },
+    '$route.query': {
+      handler() {
+        this.checkTaskContext();
+      },
+      immediate: true,
     },
   },
 

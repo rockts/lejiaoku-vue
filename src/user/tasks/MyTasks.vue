@@ -286,10 +286,17 @@ export default defineComponent({
     goToCatalog(task) {
       if (!task.catalog_id) {
         console.warn("[MyTasks] 任务没有 catalog_id，无法跳转:", task);
+        const { notification } = require("@/utils/notification");
+        notification.warning("该任务没有关联的教材信息");
         return;
       }
       
-      console.log("[MyTasks] 跳转到教材章节页:", task.catalog_id, task.unit);
+      console.log("[MyTasks] 跳转到教材章节页:", {
+        catalog_id: task.catalog_id,
+        unit: task.unit,
+        task_type: task.task_type,
+        task: task
+      });
       
       const routeParams = {
         path: `/catalog/${task.catalog_id}`,
@@ -297,10 +304,22 @@ export default defineComponent({
       
       // 如果有单元信息，添加到 query 参数
       if (task.unit) {
-        routeParams.query = { unit: task.unit };
+        routeParams.query = { 
+          unit: task.unit,
+          from_task: task.id // 标记来自任务跳转
+        };
+      } else {
+        routeParams.query = { 
+          from_task: task.id // 标记来自任务跳转
+        };
       }
       
-      this.$router.push(routeParams);
+      this.$router.push(routeParams).catch(err => {
+        // 忽略导航重复的错误
+        if (err.name !== 'NavigationDuplicated') {
+          console.error("[MyTasks] 路由跳转失败:", err);
+        }
+      });
     },
   },
 });
