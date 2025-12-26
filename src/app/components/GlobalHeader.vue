@@ -209,6 +209,12 @@
                   <i class="bi bi-file-earmark-text me-2"></i>我的资源
                 </router-link>
               </li>
+              <li>
+                <router-link class="dropdown-item" to="/me/tasks">
+                  <i class="bi bi-list-check me-2"></i>我的任务
+                </router-link>
+              </li>
+              <li><hr class="dropdown-divider" /></li>
               <!-- 申请成为贡献者：仅 user 角色显示 -->
               <li v-if="isUser">
                 <a
