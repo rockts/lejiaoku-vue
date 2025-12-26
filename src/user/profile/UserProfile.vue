@@ -1131,4 +1131,25 @@ export default defineComponent({
   color: white !important;
   border-color: #1e7e34;
 }
+
+/* 深色主题下的不可修改字段 */
+[data-theme="dark"] .form-control:disabled,
+[data-theme="dark"] input:disabled,
+[data-theme="dark"] .form-control[readonly] {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-theme="dark"] .form-control-plaintext {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+[data-theme="dark"] .form-label {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+[data-theme="dark"] small.text-muted {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
 </style>
