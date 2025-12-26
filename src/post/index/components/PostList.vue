@@ -301,9 +301,17 @@ export default defineComponent({
       this.$store.commit("post/index/setLoading", true);
       try {
         const { apiHttpClient } = await import("@/app/app.service");
+        console.log("[PostList] fetchFilteredResources - 请求参数:", JSON.stringify(params, null, 2));
         const response = await apiHttpClient.get("/api/resources", { params });
         console.log("[PostList] 过滤结果:", response.data);
         console.log("[PostList] 响应头:", response.headers);
+        
+        // 检查返回的资源类型
+        if (params.category && response.data.length > 0) {
+          const categories = [...new Set(response.data.map(r => r.category))];
+          console.log(`[PostList] 返回的资源类型:`, categories);
+          console.log(`[PostList] 请求的类型:`, params.category);
+        }
         try {
           // 输出前 5 条资源的关键封面字段，方便排查前端封面逻辑
           console.debug(
@@ -335,10 +343,22 @@ export default defineComponent({
         );
 
         // 后端已经做了权限过滤，只返回用户可以查看的资源
-        // 前端不需要再次过滤，直接显示后端返回的资源
-        // 如果后端返回了资源，说明用户有权限查看
+        // 如果后端支持 category 参数，则已经过滤；如果不支持，前端需要再次过滤
         console.log("[PostList] 后端返回的资源数量:", response.data.length);
-        const filteredResources = response.data;
+        let filteredResources = response.data;
+        
+        // 前端过滤：如果后端不支持 category 参数，则在前端过滤
+        // 检查是否有 category 参数，但返回的资源中包含其他类型
+        if (params.category && filteredResources.length > 0) {
+          const requestedCategory = params.category;
+          const allMatchCategory = filteredResources.every(r => r.category === requestedCategory);
+          
+          if (!allMatchCategory) {
+            console.log(`[PostList] 后端可能不支持 category 参数，前端过滤 category=${requestedCategory}`);
+            filteredResources = filteredResources.filter(r => r.category === requestedCategory);
+            console.log(`[PostList] 前端过滤后资源数量:`, filteredResources.length);
+          }
+        }
 
         this.$store.commit("post/index/setResources", filteredResources);
       } catch (error) {
