@@ -514,47 +514,36 @@ export default defineComponent({
   z-index: 1;
 }
 
-/* CTA 区域：全屏背景，带图案 */
+/* CTA 区域：全屏背景，带简洁图案 */
 .cta-section-fullwidth {
   width: 100%;
   position: relative;
   padding: 50px 0;
   margin-top: 0;
   overflow: hidden;
-  /* 浅色主题：渐变背景 + 柔和图案 */
-  background: linear-gradient(135deg, rgba(79, 140, 255, 0.08) 0%, rgba(155, 123, 255, 0.08) 100%);
-  /* 几何图案叠加 - 浅色主题使用更明显的图案，方向与 Hero 相反 */
+  /* 浅色主题：渐变背景 + 简洁的圆形图案 */
+  background: linear-gradient(135deg, rgba(79, 140, 255, 0.06) 0%, rgba(155, 123, 255, 0.06) 100%);
+  /* 使用简洁的圆形图案，位置与 Hero 区域不同 */
   background-image: 
-    radial-gradient(circle at 80% 30%, rgba(79, 140, 255, 0.18) 0%, transparent 60%),
-    radial-gradient(circle at 20% 70%, rgba(155, 123, 255, 0.18) 0%, transparent 60%),
-    repeating-linear-gradient(
-      -45deg,
-      transparent,
-      transparent 10px,
-      rgba(155, 123, 255, 0.03) 10px,
-      rgba(155, 123, 255, 0.03) 20px
-    );
-  background-size: 100% 100%, 100% 100%, 40px 40px;
-  background-position: 0 0, 0 0, 0 0;
+    radial-gradient(circle at 75% 30%, rgba(79, 140, 255, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 25% 70%, rgba(155, 123, 255, 0.12) 0%, transparent 50%);
+  background-size: 500px 500px, 600px 600px;
+  background-position: calc(100% + 50px) -50px, -100px calc(100% + 50px);
+  background-repeat: no-repeat;
   border-top: 2px solid var(--border);
   border-bottom: 2px solid var(--border);
 }
 
 [data-theme="dark"] .cta-section-fullwidth {
-  /* 深色主题：使用更柔和的渐变和图案 */
-  background: linear-gradient(135deg, rgba(79, 140, 255, 0.12) 0%, rgba(155, 123, 255, 0.12) 100%);
-  /* 深色主题使用更柔和的图案，避免过于突兀 */
+  /* 深色主题：使用更柔和的渐变和圆形图案 */
+  background: linear-gradient(135deg, rgba(79, 140, 255, 0.1) 0%, rgba(155, 123, 255, 0.1) 100%);
+  /* 深色主题使用更柔和的圆形图案 */
   background-image: 
-    radial-gradient(circle at 80% 30%, rgba(79, 140, 255, 0.1) 0%, transparent 70%),
-    radial-gradient(circle at 20% 70%, rgba(155, 123, 255, 0.1) 0%, transparent 70%),
-    repeating-linear-gradient(
-      -45deg,
-      transparent,
-      transparent 15px,
-      rgba(255, 255, 255, 0.015) 15px,
-      rgba(255, 255, 255, 0.015) 16px
-    );
-  background-size: 100% 100%, 100% 100%, 50px 50px;
+    radial-gradient(circle at 75% 30%, rgba(79, 140, 255, 0.08) 0%, transparent 60%),
+    radial-gradient(circle at 25% 70%, rgba(155, 123, 255, 0.08) 0%, transparent 60%);
+  background-size: 600px 600px, 700px 700px;
+  background-position: calc(100% + 100px) -100px, -150px calc(100% + 100px);
+  background-repeat: no-repeat;
 }
 
 .cta {
