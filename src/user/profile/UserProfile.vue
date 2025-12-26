@@ -158,7 +158,7 @@
                 <div class="avatar-upload-section">
                   <div class="avatar-preview mb-3">
                     <img
-                      v-if="avatarPreviewUrl || avatarDisplayUrl"
+                      v-if="avatarPreviewUrl || (avatarDisplayUrl && !avatarLoadError)"
                       :src="avatarPreviewUrl || avatarDisplayUrl"
                       alt="头像预览"
                       class="avatar-preview-image"
