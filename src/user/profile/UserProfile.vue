@@ -321,37 +321,42 @@
               <div
                 class="list-group-item d-flex justify-content-between align-items-center"
               >
-                <div>
+                <div class="flex-grow-1">
                   <h6 class="mb-1">登录密码</h6>
                   <small class="text-muted"
                     >定期更改密码可以提高账号安全性</small
                   >
                 </div>
-                <button
-                  class="btn btn-sm btn-outline-primary"
-                  @click="activeTab = 'password'"
-                >
-                  修改
-                </button>
+                <div class="ms-3 flex-shrink-0">
+                  <button
+                    class="btn btn-sm btn-outline-primary"
+                    @click="activeTab = 'password'"
+                  >
+                    修改
+                  </button>
+                </div>
               </div>
               <div
                 class="list-group-item d-flex justify-content-between align-items-center"
               >
-                <div>
+                <div class="flex-grow-1">
                   <h6 class="mb-1">邮箱验证</h6>
                   <small class="text-muted">{{ currentUser?.email }}</small>
                 </div>
-                <span class="badge bg-success">已验证</span>
+                <div class="ms-3 flex-shrink-0">
+                  <span class="badge bg-success">已验证</span>
+                </div>
               </div>
               <div
                 class="list-group-item d-flex justify-content-between align-items-center"
               >
-                <div>
+                <div class="flex-grow-1">
                   <h6 class="mb-1">账号注册时间</h6>
                   <small class="text-muted">{{
                     formatDate(currentUser?.created_at)
                   }}</small>
                 </div>
+                <div class="ms-3 flex-shrink-0"></div>
               </div>
             </div>
           </div>
