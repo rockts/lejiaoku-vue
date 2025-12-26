@@ -19,10 +19,31 @@
     </div>
 
     <!-- 空状态 -->
-    <div v-else-if="tasks.length === 0" class="text-center py-5">
+    <div v-else-if="tasks.length === 0 && !apiNotFound" class="text-center py-5">
       <i class="bi bi-inbox display-1 text-muted"></i>
       <p class="mt-3 text-muted">暂无任务</p>
       <p class="text-muted small">创建的任务将显示在这里</p>
+    </div>
+
+    <!-- API 不存在提示 -->
+    <div v-else-if="apiNotFound" class="text-center py-5">
+      <i class="bi bi-exclamation-triangle display-1 text-warning"></i>
+      <h4 class="mt-3">任务功能暂未启用</h4>
+      <p class="text-muted mt-2">
+        后端尚未实现任务相关接口，该功能正在开发中。
+      </p>
+      <div class="alert alert-info mt-4 text-start" style="max-width: 600px; margin: 0 auto;">
+        <h6 class="alert-heading">后端需要实现的接口：</h6>
+        <ul class="mb-0">
+          <li><code>POST /api/tasks</code> - 创建任务</li>
+          <li><code>GET /my/tasks</code> 或 <code>GET /api/tasks/my</code> - 获取我的任务列表</li>
+        </ul>
+        <hr>
+        <p class="mb-0 small">
+          <strong>请求参数示例（创建任务）：</strong><br>
+          <code>{ task_type: "add_resources", catalog_id: 123, unit: "第一单元" }</code>
+        </p>
+      </div>
     </div>
 
     <!-- 任务列表 -->
@@ -159,11 +180,12 @@ export default defineComponent({
         const { notification } = await import("@/utils/notification");
         
         if (error.response?.status === 404) {
-          notification.warning(
-            "任务列表 API 不存在，请确认后端是否已实现该接口。\n" +
-            "尝试的路径：/my/tasks, /api/my/tasks, /api/tasks/my"
-          );
+          // 所有路径都返回 404，说明 API 不存在
+          this.apiNotFound = true;
+          // 不显示通知，因为页面会显示友好的提示
+          console.warn("[MyTasks] 任务列表 API 不存在，后端需要实现该接口");
         } else {
+          this.apiNotFound = false;
           notification.error(
             error.response?.data?.message || error.message || "获取任务列表失败"
           );
