@@ -396,6 +396,32 @@ export default defineComponent({
   font-size: 11px;
   flex-shrink: 0;
 }
+.resource-unit,
+.resource-unit-pending {
+  margin-top: 6px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-height: 20px;
+}
+.resource-unit {
+  color: var(--text, #212529);
+}
+.resource-unit i {
+  font-size: 11px;
+  flex-shrink: 0;
+}
+.resource-unit-pending {
+  color: var(--muted, #6c757d);
+}
+.resource-unit-pending i {
+  font-size: 11px;
+  flex-shrink: 0;
+}
 .resource-actions {
   display: flex;
   gap: 8px;
