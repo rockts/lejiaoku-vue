@@ -217,6 +217,63 @@ export default defineComponent({
       getResources: "post/index/getResources",
     }),
 
+    // 从 URL query 参数读取筛选条件
+    loadFiltersFromQuery() {
+      const query = this.$route.query;
+      if (query.category) {
+        this.filters.category = decodeURIComponent(query.category);
+      } else {
+        this.filters.category = "";
+      }
+      if (query.grade) {
+        this.filters.grade = decodeURIComponent(query.grade);
+      } else {
+        this.filters.grade = "";
+      }
+      if (query.subject) {
+        this.filters.subject = decodeURIComponent(query.subject);
+      } else {
+        this.filters.subject = "";
+      }
+      if (query.textbook_version) {
+        this.filters.textbook_version = decodeURIComponent(query.textbook_version);
+      } else {
+        this.filters.textbook_version = "";
+      }
+      if (query.volume) {
+        this.filters.volume = decodeURIComponent(query.volume);
+      } else {
+        this.filters.volume = "";
+      }
+      if (query.chapter_keyword) {
+        this.filters.chapter_keyword = decodeURIComponent(query.chapter_keyword);
+      } else {
+        this.filters.chapter_keyword = "";
+      }
+      if (query.page) {
+        this.currentPage = parseInt(query.page) || 1;
+      } else {
+        this.currentPage = 1;
+      }
+      console.log("[PostList] loadFiltersFromQuery - 筛选条件:", this.filters);
+    },
+
+    // 加载资源数据
+    loadResources() {
+      const params = {
+        page: this.currentPage,
+        limit: this.pageSize,
+      };
+      Object.keys(this.filters).forEach((key) => {
+        const value = this.filters[key];
+        if (value && String(value).trim()) {
+          params[key] = String(value).trim();
+        }
+      });
+      console.log("[PostList] loadResources - 请求参数:", params);
+      this.fetchFilteredResources(params);
+    },
+
     applyFilters() {
       // 构建查询参数
       const params = {
