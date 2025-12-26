@@ -250,6 +250,7 @@ export default defineComponent({
 
     clearFilters() {
       this.filters = {
+        category: "",
         grade: "",
         subject: "",
         textbook_version: "",
@@ -258,6 +259,8 @@ export default defineComponent({
       };
       this.currentPage = 1;
       console.log("[PostList] 清除筛选");
+      // 清除 URL 参数
+      this.$router.replace({ path: '/posts', query: {} });
       this.fetchFilteredResources({ page: 1, limit: this.pageSize });
     },
 
@@ -272,13 +275,18 @@ export default defineComponent({
         limit: this.pageSize,
       };
 
+      const query = { page: String(page) };
       Object.keys(this.filters).forEach((key) => {
         if (this.filters[key].trim()) {
           params[key] = this.filters[key].trim();
+          query[key] = this.filters[key].trim();
         }
       });
 
       console.log(`[PostList] 切换到第 ${page} 页，参数:`, params);
+      
+      // 更新 URL query 参数
+      this.$router.replace({ path: '/posts', query });
       this.fetchFilteredResources(params);
 
       // 滚动到顶部
