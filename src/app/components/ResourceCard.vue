@@ -35,9 +35,12 @@
       <span class="badge format">{{ item.format }}</span>
       <span class="muted">{{ textbookInfo }}</span>
     </div>
-    <!-- 教材信息和单元数 -->
-    <div class="resource-chapter" v-if="unitCount">
-      <i class="bi bi-bookmark"></i> {{ unitCount }}
+    <!-- 所属单元 -->
+    <div class="resource-unit" v-if="item.unit">
+      <i class="bi bi-bookmark"></i> 所属单元：{{ item.unit }}
+    </div>
+    <div class="resource-unit-pending" v-else-if="item.catalog_id">
+      <i class="bi bi-exclamation-circle"></i> <span class="text-muted">待整理</span>
     </div>
     <div class="resource-actions">
       <button class="btn btn-sm btn-outline-primary" @click.stop="onPreview">
@@ -120,14 +123,6 @@ export default defineComponent({
       const volume = info.volume || "";
       const subject = info.subject || this.item.subject || "-";
       return `${grade}${volume} · ${subject}`;
-    },
-    unitCount() {
-      // 显示单元数量
-      const structure =
-        this.item.catalog_info?.structure ||
-        this.item.auto_meta_result?.structure ||
-        [];
-      return structure.length > 0 ? `${structure.length} 个单元` : null;
     },
   },
   methods: {

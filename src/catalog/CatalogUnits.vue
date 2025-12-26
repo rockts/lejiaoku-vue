@@ -230,6 +230,7 @@ export default defineComponent({
 
     /**
      * 从已绑定该 catalog 的资源中提取单元信息
+     * 只从 resource.unit 字段提取，不再推断
      */
     async extractUnitsFromResources() {
       try {
@@ -239,7 +240,7 @@ export default defineComponent({
         const response = await apiHttpClient.get("/api/resources", {
           params: {
             catalog_id: this.catalogId,
-            limit: 100, // 获取足够多的资源以提取单元信息
+            limit: 1000, // 获取足够多的资源以提取单元信息
           },
         });
 
@@ -264,39 +265,21 @@ export default defineComponent({
 
         console.log("[CatalogUnits] 已绑定 catalog 的资源数量:", resources.length);
 
-        // 提取单元信息
+        // 只从 resource.unit 字段提取单元信息
         const unitSet = new Set();
         const unitMap = new Map();
 
         resources.forEach((resource) => {
-          // 优先级1：chapter_info
-          if (resource.chapter_info) {
-            const unitName = resource.chapter_info.unit || resource.chapter_info.name;
-            if (unitName) {
-              unitSet.add(unitName);
-              if (!unitMap.has(unitName)) {
-                unitMap.set(unitName, {
-                  name: unitName,
-                  title: resource.chapter_info.title || null,
-                });
-              }
+          // 只使用 resource.unit 字段
+          if (resource.unit && String(resource.unit).trim() !== "") {
+            const unitName = String(resource.unit).trim();
+            unitSet.add(unitName);
+            if (!unitMap.has(unitName)) {
+              unitMap.set(unitName, {
+                name: unitName,
+                title: null, // unit 字段不包含 title
+              });
             }
-          }
-
-          // 优先级2：auto_meta_result.structure
-          if (resource.auto_meta_result?.structure) {
-            resource.auto_meta_result.structure.forEach((item) => {
-              const unitName = item.unit || item.name;
-              if (unitName) {
-                unitSet.add(unitName);
-                if (!unitMap.has(unitName)) {
-                  unitMap.set(unitName, {
-                    name: unitName,
-                    title: item.title || null,
-                  });
-                }
-              }
-            });
           }
         });
 
@@ -308,7 +291,7 @@ export default defineComponent({
           return aNum - bNum;
         });
 
-        console.log("[CatalogUnits] 从资源中提取到单元:", this.units);
+        console.log("[CatalogUnits] 从 resource.unit 字段提取到单元:", this.units);
 
         // 如果从资源中提取到了 catalog 信息，更新 catalogInfo
         if (resources.length > 0) {

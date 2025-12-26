@@ -183,11 +183,15 @@
           {{ catalogInfo.version }} · {{ catalogInfo.subject }} ·
           {{ catalogInfo.grade }} · {{ catalogInfo.volume }}
         </p>
-        <ul v-if="catalogInfo.units?.length" class="structure">
-          <li v-for="(unit, idx) in catalogInfo.units" :key="idx">
-            {{ unit }}
-          </li>
-        </ul>
+        <!-- 所属单元：使用 resource.unit 字段 -->
+        <div v-if="resource.unit" class="mb-2">
+          <strong>所属单元：</strong>
+          <span class="badge bg-primary">{{ resource.unit }}</span>
+        </div>
+        <div v-else-if="resource.catalog_id" class="mb-2">
+          <strong>所属单元：</strong>
+          <span class="badge bg-secondary">待整理</span>
+        </div>
       </section>
 
       <!-- 3. 教材结构（只读） -->
