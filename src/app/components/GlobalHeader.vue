@@ -140,25 +140,27 @@
                            />
                            <i v-else class="bi bi-person-circle user-avatar-icon"></i>
                          </div>
-                         <span class="user-name">{{ displayName }}</span>
-              <span
-                v-if="isAdmin"
-                class="badge badge-admin ms-1"
-              >
-                <i class="bi bi-shield-check me-1"></i>管理员
-              </span>
-              <span
-                v-else-if="currentUser.role === 'editor'"
-                class="badge badge-editor ms-1"
-              >
-                <i class="bi bi-pencil me-1"></i>编辑
-              </span>
-              <span
-                v-else-if="currentUser.role === 'contributor'"
-                class="badge badge-contributor ms-1"
-              >
-                <i class="bi bi-person-plus me-1"></i>贡献者
-              </span>
+                         <span class="user-name user-name-with-badge">
+                            {{ displayName }}
+                            <span
+                              v-if="isAdmin"
+                              class="badge badge-admin badge-corner"
+                            >
+                              管理员
+                            </span>
+                            <span
+                              v-else-if="currentUser.role === 'editor'"
+                              class="badge badge-editor badge-corner"
+                            >
+                              编辑
+                            </span>
+                            <span
+                              v-else-if="currentUser.role === 'contributor'"
+                              class="badge badge-contributor badge-corner"
+                            >
+                              贡献者
+                            </span>
+                          </span>
             </button>
             <ul
               class="dropdown-menu dropdown-menu-end"
