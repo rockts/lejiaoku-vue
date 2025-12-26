@@ -182,9 +182,6 @@
                       </span>
                     </div>
                     <div class="user-email">{{ currentUser.email || '未设置邮箱' }}</div>
-                    <div v-if="currentUser.nickname" class="user-nickname">
-                      <i class="bi bi-at"></i> {{ currentUser.nickname }}
-                    </div>
                   </div>
                 </div>
               </li>
