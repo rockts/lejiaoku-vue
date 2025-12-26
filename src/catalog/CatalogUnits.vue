@@ -143,7 +143,7 @@
         </div>
 
         <!-- 教材信息展示（只读） -->
-        <div class="catalog-info-card mb-4">
+        <div class="catalog-info-card mb-3">
           <div class="card">
             <div class="card-body">
               <h2 class="card-title mb-3">
@@ -170,7 +170,7 @@
 
         <!-- 单元列表 -->
         <div class="units-section">
-          <h3 class="section-title mb-4">
+          <h3 class="section-title mb-3">
             <i class="bi bi-list-ul me-2"></i>选择单元
           </h3>
 
