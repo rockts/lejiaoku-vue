@@ -1467,4 +1467,71 @@ export default defineComponent({
 [data-theme="dark"] small.text-muted {
   color: rgba(255, 255, 255, 0.6) !important;
 }
+
+/* 账号安全列表样式 */
+.security-list {
+  border: none;
+}
+
+.security-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1rem;
+  border: 1px solid var(--border, #dee2e6);
+  border-radius: 0;
+  margin-bottom: 0;
+}
+
+.security-item:first-child {
+  border-top-left-radius: 0.375rem;
+  border-top-right-radius: 0.375rem;
+}
+
+.security-item:last-child {
+  border-bottom-left-radius: 0.375rem;
+  border-bottom-right-radius: 0.375rem;
+  margin-bottom: 0;
+}
+
+.security-item:not(:last-child) {
+  border-bottom: none;
+}
+
+.security-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.security-content h6 {
+  margin: 0 0 0.25rem 0;
+  font-weight: 600;
+  color: var(--text, #212529);
+}
+
+.security-content small {
+  display: block;
+  color: var(--muted, #6c757d);
+}
+
+.security-action {
+  flex-shrink: 0;
+  margin-left: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+/* 深色主题 */
+[data-theme="dark"] .security-item {
+  border-color: rgba(255, 255, 255, 0.15);
+  background-color: var(--surface, rgba(22,25,31,0.6));
+}
+
+[data-theme="dark"] .security-content h6 {
+  color: #ffffff;
+}
+
+[data-theme="dark"] .security-content small {
+  color: rgba(255, 255, 255, 0.7);
+}
 </style>
