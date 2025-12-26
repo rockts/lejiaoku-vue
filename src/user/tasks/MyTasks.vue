@@ -52,16 +52,20 @@
         v-for="task in tasks" 
         :key="task.id" 
         class="task-card card mb-3"
+        :class="{ 'task-card-clickable': task.catalog_id }"
+        @click="handleTaskClick(task)"
       >
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-start">
             <div class="task-content flex-grow-1">
               <h5 class="card-title mb-2">
-                <i class="bi" :class="getTaskIcon(task.task_type)" me-2></i>
-                {{ getTaskTypeText(task.task_type) }}
+                <i class="bi" :class="getTaskIcon(task.task_type)"></i>
+                <span class="ms-2">{{ getTaskTypeText(task.task_type) }}</span>
               </h5>
-              <p class="card-text text-muted mb-2" v-if="task.catalog_info">
-                <strong>教材：</strong>{{ task.catalog_info.displayName || `教材 #${task.catalog_id}` }}
+              <p class="card-text text-muted mb-2" v-if="task.catalog_info || task.catalog_id">
+                <strong>教材：</strong>
+                <span v-if="task.catalog_info">{{ task.catalog_info.displayName || task.catalog_info.textbook_version || `教材 #${task.catalog_id}` }}</span>
+                <span v-else>教材 #{{ task.catalog_id }}</span>
               </p>
               <p class="card-text text-muted mb-2" v-if="task.unit">
                 <strong>单元：</strong>{{ task.unit }}
@@ -73,10 +77,18 @@
                 </small>
               </p>
             </div>
-            <div class="task-status ms-3">
+            <div class="task-status ms-3 d-flex flex-column align-items-end gap-2">
               <span class="badge" :class="getStatusClass(task.status)">
                 {{ getStatusText(task.status) }}
               </span>
+              <button
+                v-if="task.catalog_id"
+                class="btn btn-sm btn-outline-primary"
+                @click.stop="goToCatalog(task)"
+                title="查看教材章节"
+              >
+                <i class="bi bi-arrow-right me-1"></i>查看
+              </button>
             </div>
           </div>
         </div>
@@ -270,9 +282,14 @@ export default defineComponent({
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.task-card:hover {
+.task-card-clickable {
+  cursor: pointer;
+}
+
+.task-card-clickable:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-color: var(--primary, #0d6efd);
 }
 
 .task-content {
