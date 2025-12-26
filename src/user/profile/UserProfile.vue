@@ -1501,24 +1501,29 @@ export default defineComponent({
 .security-content {
   flex: 1;
   min-width: 0;
+  text-align: left;
 }
 
 .security-content h6 {
   margin: 0 0 0.25rem 0;
   font-weight: 600;
   color: var(--text, #212529);
+  text-align: left;
 }
 
 .security-content small {
   display: block;
   color: var(--muted, #6c757d);
+  text-align: left;
 }
 
 .security-action {
   flex-shrink: 0;
-  margin-left: 1rem;
+  margin-left: 1.5rem;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+  min-width: 80px;
 }
 
 /* 深色主题 */
