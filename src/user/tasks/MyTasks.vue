@@ -269,6 +269,38 @@ export default defineComponent({
         minute: "2-digit",
       });
     },
+
+    /**
+     * 处理任务卡片点击
+     */
+    handleTaskClick(task) {
+      if (task.catalog_id) {
+        this.goToCatalog(task);
+      }
+    },
+
+    /**
+     * 跳转到教材章节页
+     */
+    goToCatalog(task) {
+      if (!task.catalog_id) {
+        console.warn("[MyTasks] 任务没有 catalog_id，无法跳转:", task);
+        return;
+      }
+      
+      console.log("[MyTasks] 跳转到教材章节页:", task.catalog_id, task.unit);
+      
+      const routeParams = {
+        path: `/catalog/${task.catalog_id}`,
+      };
+      
+      // 如果有单元信息，添加到 query 参数
+      if (task.unit) {
+        routeParams.query = { unit: task.unit };
+      }
+      
+      this.$router.push(routeParams);
+    },
   },
 });
 </script>
