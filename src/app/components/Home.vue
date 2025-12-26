@@ -471,24 +471,38 @@ export default defineComponent({
   padding: 60px 0;
   margin-bottom: 0;
   overflow: hidden;
-  /* 渐变背景 */
-  background: linear-gradient(135deg, rgba(79, 140, 255, 0.12) 0%, rgba(155, 123, 255, 0.12) 100%);
-  /* 几何图案叠加 */
+  /* 浅色主题：渐变背景 + 柔和图案 */
+  background: linear-gradient(135deg, rgba(79, 140, 255, 0.1) 0%, rgba(155, 123, 255, 0.1) 100%);
+  /* 几何图案叠加 - 浅色主题使用更明显的图案 */
   background-image: 
-    radial-gradient(circle at 20% 50%, rgba(79, 140, 255, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(155, 123, 255, 0.15) 0%, transparent 50%),
-    linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.05) 30%, rgba(255, 255, 255, 0.05) 50%, transparent 50%, transparent 80%, rgba(255, 255, 255, 0.05) 80%, rgba(255, 255, 255, 0.05) 100%);
-  background-size: 100% 100%, 100% 100%, 60px 60px;
+    radial-gradient(circle at 15% 40%, rgba(79, 140, 255, 0.2) 0%, transparent 60%),
+    radial-gradient(circle at 85% 70%, rgba(155, 123, 255, 0.2) 0%, transparent 60%),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(79, 140, 255, 0.03) 10px,
+      rgba(79, 140, 255, 0.03) 20px
+    );
+  background-size: 100% 100%, 100% 100%, 40px 40px;
   background-position: 0 0, 0 0, 0 0;
 }
 
 [data-theme="dark"] .hero-section-fullwidth {
-  background: linear-gradient(135deg, rgba(79, 140, 255, 0.18) 0%, rgba(155, 123, 255, 0.18) 100%);
+  /* 深色主题：使用更柔和的渐变和图案 */
+  background: linear-gradient(135deg, rgba(79, 140, 255, 0.15) 0%, rgba(155, 123, 255, 0.15) 100%);
+  /* 深色主题使用更柔和的图案，避免过于突兀 */
   background-image: 
-    radial-gradient(circle at 20% 50%, rgba(79, 140, 255, 0.2) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(155, 123, 255, 0.2) 0%, transparent 50%),
-    linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.03) 30%, rgba(255, 255, 255, 0.03) 50%, transparent 50%, transparent 80%, rgba(255, 255, 255, 0.03) 80%, rgba(255, 255, 255, 0.03) 100%);
-  background-size: 100% 100%, 100% 100%, 60px 60px;
+    radial-gradient(circle at 15% 40%, rgba(79, 140, 255, 0.12) 0%, transparent 70%),
+    radial-gradient(circle at 85% 70%, rgba(155, 123, 255, 0.12) 0%, transparent 70%),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 15px,
+      rgba(255, 255, 255, 0.02) 15px,
+      rgba(255, 255, 255, 0.02) 16px
+    );
+  background-size: 100% 100%, 100% 100%, 50px 50px;
 }
 
 /* 内容区域：增强对比 */
@@ -507,25 +521,39 @@ export default defineComponent({
   padding: 50px 0;
   margin-top: 0;
   overflow: hidden;
-  /* 渐变背景 */
-  background: linear-gradient(135deg, rgba(79, 140, 255, 0.1) 0%, rgba(155, 123, 255, 0.1) 100%);
-  /* 几何图案叠加 */
+  /* 浅色主题：渐变背景 + 柔和图案 */
+  background: linear-gradient(135deg, rgba(79, 140, 255, 0.08) 0%, rgba(155, 123, 255, 0.08) 100%);
+  /* 几何图案叠加 - 浅色主题使用更明显的图案，方向与 Hero 相反 */
   background-image: 
-    radial-gradient(circle at 80% 20%, rgba(79, 140, 255, 0.12) 0%, transparent 50%),
-    radial-gradient(circle at 20% 80%, rgba(155, 123, 255, 0.12) 0%, transparent 50%),
-    linear-gradient(-45deg, transparent 30%, rgba(255, 255, 255, 0.04) 30%, rgba(255, 255, 255, 0.04) 50%, transparent 50%, transparent 80%, rgba(255, 255, 255, 0.04) 80%, rgba(255, 255, 255, 0.04) 100%);
-  background-size: 100% 100%, 100% 100%, 50px 50px;
+    radial-gradient(circle at 80% 30%, rgba(79, 140, 255, 0.18) 0%, transparent 60%),
+    radial-gradient(circle at 20% 70%, rgba(155, 123, 255, 0.18) 0%, transparent 60%),
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 10px,
+      rgba(155, 123, 255, 0.03) 10px,
+      rgba(155, 123, 255, 0.03) 20px
+    );
+  background-size: 100% 100%, 100% 100%, 40px 40px;
   background-position: 0 0, 0 0, 0 0;
   border-top: 2px solid var(--border);
   border-bottom: 2px solid var(--border);
 }
 
 [data-theme="dark"] .cta-section-fullwidth {
-  background: linear-gradient(135deg, rgba(79, 140, 255, 0.15) 0%, rgba(155, 123, 255, 0.15) 100%);
+  /* 深色主题：使用更柔和的渐变和图案 */
+  background: linear-gradient(135deg, rgba(79, 140, 255, 0.12) 0%, rgba(155, 123, 255, 0.12) 100%);
+  /* 深色主题使用更柔和的图案，避免过于突兀 */
   background-image: 
-    radial-gradient(circle at 80% 20%, rgba(79, 140, 255, 0.18) 0%, transparent 50%),
-    radial-gradient(circle at 20% 80%, rgba(155, 123, 255, 0.18) 0%, transparent 50%),
-    linear-gradient(-45deg, transparent 30%, rgba(255, 255, 255, 0.02) 30%, rgba(255, 255, 255, 0.02) 50%, transparent 50%, transparent 80%, rgba(255, 255, 255, 0.02) 80%, rgba(255, 255, 255, 0.02) 100%);
+    radial-gradient(circle at 80% 30%, rgba(79, 140, 255, 0.1) 0%, transparent 70%),
+    radial-gradient(circle at 20% 70%, rgba(155, 123, 255, 0.1) 0%, transparent 70%),
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 15px,
+      rgba(255, 255, 255, 0.015) 15px,
+      rgba(255, 255, 255, 0.015) 16px
+    );
   background-size: 100% 100%, 100% 100%, 50px 50px;
 }
 
