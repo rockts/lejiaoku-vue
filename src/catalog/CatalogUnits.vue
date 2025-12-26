@@ -787,16 +787,14 @@ export default defineComponent({
 .catalog-units {
   min-height: calc(100vh - 200px);
   background: var(--bg, #ffffff);
-  margin-top: -76px; /* 抵消 #app 的 padding-top: 76px，让内容紧贴 topbar */
-  padding-top: 78px; /* 恢复必要间距：76px（topbar高度）+ 2px（小间距） */
 }
 
 .catalog-units .container {
-  padding-top: 0 !important; /* 移除 container 的上边距 */
+  padding-top: 0.5rem !important;
 }
 
 .catalog-units .breadcrumb {
-  margin-top: 0.25rem; /* 只给面包屑保留很小的上边距（约 4px） */
+  margin-top: 0;
   margin-bottom: 0.5rem;
 }
 
