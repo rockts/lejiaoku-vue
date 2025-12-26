@@ -9,6 +9,7 @@
 import { RouteRecordRaw } from 'vue-router';
 import MyResources from './resources/MyResources.vue';
 import UserProfile from './profile/UserProfile.vue';
+import MyTasks from './tasks/MyTasks.vue';
 
 /**
  * 定义路由
@@ -37,6 +38,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'UserResources',
         component: MyResources,
         props: true,
+    },
+    {
+        path: '/me/tasks',
+        name: 'MyTasks',
+        component: MyTasks,
     },
 ];
 

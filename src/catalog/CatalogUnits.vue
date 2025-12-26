@@ -26,14 +26,20 @@
         <i class="bi bi-exclamation-triangle display-1 text-danger"></i>
         <p class="mt-3 text-danger">{{ error }}</p>
         <p class="text-muted small mt-2">
-          可能的原因：后端接口不可用、网络连接问题、或 catalogId 不存在
-        </p>
-        <p class="text-muted small">
           当前 catalogId: {{ catalogId }}
         </p>
-        <router-link to="/catalog" class="btn btn-primary mt-3">
-          <i class="bi bi-arrow-left me-2"></i>返回教材目录
-        </router-link>
+        <div class="mt-4">
+          <button 
+            class="btn btn-outline-primary me-2" 
+            @click="fetchCatalogData"
+            :disabled="loading"
+          >
+            <i class="bi bi-arrow-clockwise me-2"></i>重试
+          </button>
+          <router-link to="/catalog" class="btn btn-primary">
+            <i class="bi bi-arrow-left me-2"></i>返回教材目录
+          </router-link>
+        </div>
       </div>
 
       <!-- 教材章节内容 -->
