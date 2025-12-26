@@ -652,6 +652,17 @@ export default defineComponent({
 </script>
 
 <style scoped>
+/* 固定导航栏 */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1030;
+  width: 100%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
 .dropdown .dropdown-menu {
   min-width: 280px;
   z-index: 1100;
