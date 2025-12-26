@@ -38,10 +38,16 @@ const routes: Array<RouteRecordRaw> = [
         component: PostEdit,
         props: true,
     },
-    // 历史兼容重定向
+    // 历史兼容重定向（保留 query 参数）
     {
         path: '/posts',
-        redirect: '/resources',
+        redirect: (to) => {
+            // 如果有 query 参数，保留它们
+            if (Object.keys(to.query).length > 0) {
+                return { path: '/resources', query: to.query };
+            }
+            return '/resources';
+        },
     },
     {
         path: '/posts/:id',
