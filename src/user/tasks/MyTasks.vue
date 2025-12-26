@@ -81,14 +81,25 @@
               <span class="badge" :class="getStatusClass(task.status)">
                 {{ getStatusText(task.status) }}
               </span>
-              <button
-                v-if="task.catalog_id"
-                class="btn btn-sm btn-outline-primary"
-                @click.stop="goToCatalog(task)"
-                title="查看教材章节"
-              >
-                <i class="bi bi-arrow-right me-1"></i>查看
-              </button>
+              <div class="d-flex gap-2">
+                <button
+                  v-if="task.catalog_id"
+                  class="btn btn-sm btn-outline-primary"
+                  @click.stop="goToCatalog(task)"
+                  title="查看教材章节"
+                >
+                  <i class="bi bi-arrow-right me-1"></i>查看
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  @click.stop="deleteTask(task)"
+                  title="删除任务"
+                  :disabled="deletingTaskId === task.id"
+                >
+                  <i v-if="deletingTaskId !== task.id" class="bi bi-trash"></i>
+                  <span v-else class="spinner-border spinner-border-sm" role="status"></span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
