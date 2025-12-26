@@ -762,6 +762,20 @@ nav {
   background-color: rgba(0, 0, 0, 0.05);
 }
 
+/* 深色主题下的主题切换按钮 */
+[data-theme="dark"] .btn-theme {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .btn-theme:hover {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .btn-theme i {
+  color: #ffffff !important;
+}
+
 /* 
 /* 用户下拉菜单按钮样式 */
 .user-dropdown-btn {
