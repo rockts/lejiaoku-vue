@@ -74,13 +74,13 @@ export default defineComponent({
 .admin-header {
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #e9ecef;
+  border-bottom: 2px solid var(--border, #e9ecef);
 }
 
 .admin-title {
   font-size: 2rem;
   font-weight: 600;
-  color: #212529;
+  color: var(--text, #212529);
   margin: 0;
 }
 
@@ -90,10 +90,11 @@ export default defineComponent({
 }
 
 .admin-card {
-  background: white;
+  background: var(--surface, white);
+  border: 1px solid var(--border, transparent);
   border-radius: 16px;
   padding: 2rem;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow, 0 2px 12px rgba(0, 0, 0, 0.08));
   transition: all 0.3s ease;
   height: 100%;
   display: flex;
@@ -125,7 +126,7 @@ export default defineComponent({
 .card-title {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #212529;
+  color: var(--text, #212529);
   margin-bottom: 0.75rem;
 }
 

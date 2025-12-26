@@ -7,10 +7,10 @@
         <a target="_blank" href="https://lekeopen.com">乐可开源</a> 创建的项目
       </li>
       <li class="list-inline-item">
-        <router-link to="/legal/user-agreement">用户协议</router-link>
+        <router-link to="/legal/user-agreement">《用户协议》</router-link>
       </li>
       <li class="list-inline-item">
-        <router-link to="/legal/privacy-policy">隐私政策</router-link>
+        <router-link to="/legal/privacy-policy">《隐私政策》</router-link>
       </li>
       <li class="list-inline-item">
         <a href="https://beian.miit.gov.cn" target="_blank"

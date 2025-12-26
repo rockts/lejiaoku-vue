@@ -17,7 +17,17 @@ import adminRoutes from '@/admin/admin.routes';
 
 const router = createRouter({
   history: createWebHistory(),
-  routes: [...appRoutes, ...postRoutes, ...userRoutes, ...adminRoutes],
+  routes: [
+    ...appRoutes, 
+    ...postRoutes, 
+    ...userRoutes, 
+    ...adminRoutes,
+    // 404 处理：所有未匹配的路由都跳转到首页
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: '/'
+    }
+  ],
 });
 
 /**
@@ -45,6 +55,13 @@ router.beforeEach((to, from, next) => {
     } catch (error) {
       console.error('[Router] 解析用户信息失败:', error);
     }
+  }
+
+  // 如果已登录用户访问登录页，重定向到首页
+  if (to.path === '/login' && token && user) {
+    console.log('[Router] 已登录用户访问登录页，重定向到首页');
+    next({ path: '/' });
+    return;
   }
 
   // 检查登录状态
@@ -86,6 +103,14 @@ router.beforeEach((to, from, next) => {
       next({ path: '/' });
       return;
     }
+  }
+
+  // 检查路由是否存在（避免显示加载中）
+  const matched = router.resolve(to.path).matched;
+  if (matched.length === 0 && to.path !== '/') {
+    console.log('[Router] 路由不存在，跳转首页:', to.path);
+    next({ path: '/' });
+    return;
   }
 
   next();

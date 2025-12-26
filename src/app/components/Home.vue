@@ -24,15 +24,16 @@
             登录后可上传和管理教学资源
           </template>
         </div>
-        <div class="cta-actions" :class="{ 'justify-center': !canUpload }">
+        <div class="cta-actions">
           <!-- 上传按钮：仅 contributor / editor / admin 显示 -->
-          <router-link
-            v-if="canUpload"
-            to="/resources/create"
-            class="btn upload-btn"
-          >
-            <i class="bi bi-upload me-2"></i> 上传资源
-          </router-link>
+          <div v-if="canUpload" class="qr-wrapper-center">
+            <router-link
+              to="/resources/create"
+              class="btn upload-btn"
+            >
+              <i class="bi bi-upload me-2"></i> 上传资源
+            </router-link>
+          </div>
           
           <!-- 申请成为贡献者按钮：已登录 && role === user（替换原来的二维码位置） -->
           <div
@@ -83,6 +84,10 @@
       v-model="showLoginModal"
       @switch-to-register="handleSwitchToRegister"
     />
+    <RegisterModal
+      v-model="showRegisterModal"
+      @switch-to-login="handleSwitchToLogin"
+    />
   </div>
 </template>
 
@@ -96,12 +101,13 @@ import ResourceList from "./ResourceList.vue";
 import CategoryNav from "./CategoryNav.vue";
 import ActiveFilters from "./ActiveFilters.vue";
 import LoginModal from "./LoginModal.vue";
+import RegisterModal from "./RegisterModal.vue";
 
 export default defineComponent({
   name: "Home",
   props: ["user"],
 
-  components: { SearchBar, ResourceList, CategoryNav, ActiveFilters, LoginModal },
+  components: { SearchBar, ResourceList, CategoryNav, ActiveFilters, LoginModal, RegisterModal },
   data() {
     return {
       filterState: {
@@ -112,6 +118,7 @@ export default defineComponent({
       },
       resources: [],
       showLoginModal: false,
+      showRegisterModal: false,
       isApplying: false, // 是否正在提交申请
     };
   },
@@ -203,6 +210,10 @@ export default defineComponent({
     }
     try {
       const response = await apiHttpClient.get("/api/resources");
+      // 后端已经做了权限过滤，只返回用户可以查看的资源
+      // 前端不需要再次过滤，直接显示后端返回的资源
+      // 如果后端返回了资源，说明用户有权限查看（包括未登录用户）
+      console.log("[Home] 后端返回的资源数量:", response.data.length);
       this.resources = response.data;
     } catch (error) {
       console.error("获取资源数据失败:", error);
@@ -330,8 +341,12 @@ export default defineComponent({
     },
     handleSwitchToRegister() {
       this.showLoginModal = false;
-      // 跳转到注册页面（如果存在）或显示提示
-      notification.info("请通过首页右上角注册按钮进行注册");
+      // 直接打开注册弹窗
+      this.showRegisterModal = true;
+    },
+    handleSwitchToLogin() {
+      this.showRegisterModal = false;
+      this.showLoginModal = true;
     },
     
     
@@ -380,10 +395,14 @@ export default defineComponent({
         return;
       }
       
-      // 确认弹窗
+      // 确认弹窗（带同意复选框）
       const confirmed = await notification.confirm(
         '申请成为贡献者后，您将可以上传和管理教学资源。\n\n提交申请后，管理员将审核您的申请。\n\n确认提交申请吗？',
-        '申请成为贡献者'
+        '申请成为贡献者',
+        {
+          requireAgreement: true,
+          agreementText: '我已阅读并同意遵守<a href="/legal/contributor-responsibilities" target="_blank" style="color: #4f8cff; text-decoration: underline;">《贡献者义务与责任》</a>'
+        }
       );
       
       if (!confirmed) {
@@ -446,11 +465,9 @@ export default defineComponent({
 }
 .cta-actions {
   display: flex;
+  justify-content: center;
   gap: 12px;
   position: relative;
-}
-.cta-actions.justify-center {
-  justify-content: center;
 }
 
 .qr-wrapper-center {

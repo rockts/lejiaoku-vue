@@ -23,18 +23,37 @@
             <router-link class="nav-link" to="/posts">资源 </router-link>
           </li>
 
-          <li class="nav-item">
-            <router-link class="nav-link" to="/">贡献者</router-link>
-          </li>
-
-          <!-- 管理后台：仅管理员可见 -->
+          <!-- 管理后台：仅管理员可见，带下拉菜单 -->
           <li
             v-if="canAccessAdmin"
-            class="nav-item"
+            class="nav-item dropdown"
           >
-            <router-link class="nav-link" to="/admin">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              id="adminDropdown"
+              role="button"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
               <i class="bi bi-shield-check"></i> 管理后台
-            </router-link>
+            </a>
+            <div class="dropdown-menu" aria-labelledby="adminDropdown">
+              <router-link class="dropdown-item" to="/admin">
+                <i class="bi bi-house me-2"></i>管理首页
+              </router-link>
+              <div class="dropdown-divider"></div>
+              <router-link class="dropdown-item" to="/admin/users">
+                <i class="bi bi-people me-2"></i>用户管理
+              </router-link>
+              <router-link class="dropdown-item" to="/admin/resources">
+                <i class="bi bi-file-earmark-text me-2"></i>资源管理
+              </router-link>
+              <router-link class="dropdown-item" to="/admin/contributor-applications">
+                <i class="bi bi-person-check me-2"></i>贡献者申请
+              </router-link>
+            </div>
           </li>
         </ul>
 
@@ -456,10 +475,14 @@ export default defineComponent({
         return;
       }
       
-      // 确认弹窗
+      // 确认弹窗（带同意复选框）
       const confirmed = await notification.confirm(
         '申请成为贡献者后，您将可以上传和管理教学资源。\n\n提交申请后，管理员将审核您的申请。\n\n确认提交申请吗？',
-        '申请成为贡献者'
+        '申请成为贡献者',
+        {
+          requireAgreement: true,
+          agreementText: '我已阅读并同意遵守<a href="/legal/contributor-responsibilities" target="_blank" style="color: #4f8cff; text-decoration: underline;">《贡献者义务与责任》</a>'
+        }
       );
       
       if (!confirmed) {
@@ -605,6 +628,51 @@ export default defineComponent({
 .dropdown .dropdown-menu {
   min-width: 280px;
   z-index: 1100;
+}
+
+/* 管理后台下拉菜单样式 */
+.navbar-nav .nav-item.dropdown .dropdown-menu {
+  min-width: 200px;
+  margin-top: 0.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #dee2e6;
+  left: 0;
+  right: auto;
+}
+
+.navbar-nav .nav-item.dropdown .dropdown-toggle {
+  cursor: pointer;
+}
+
+.navbar-nav .nav-item.dropdown .dropdown-toggle::after {
+  margin-left: 0.5rem;
+  vertical-align: 0.15em;
+}
+
+.navbar-nav .nav-item.dropdown .dropdown-item {
+  padding: 0.75rem 1.25rem;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+  color: #495057;
+}
+
+.navbar-nav .nav-item.dropdown .dropdown-item:hover {
+  background-color: #f8f9fa;
+  color: var(--primary, #4f8cff);
+}
+
+.navbar-nav .nav-item.dropdown .dropdown-item i {
+  width: 20px;
+  text-align: center;
+  margin-right: 0.5rem;
+}
+
+.navbar-nav .nav-item.dropdown .dropdown-divider {
+  margin: 0.5rem 0;
+  border-top: 1px solid #e9ecef;
 }
 
 nav {

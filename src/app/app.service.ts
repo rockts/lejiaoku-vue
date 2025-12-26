@@ -59,8 +59,16 @@ apiHttpClient.interceptors.response.use(
     // 处理 403 无权限错误
     else if (error.response?.status === 403) {
       console.log('[APIClient] 403 无权限');
-      const { notification } = require('@/utils/notification');
-      notification.error('无权限');
+      // 检查是否是资源上传相关的接口，这些接口的错误会在组件中处理
+      const url = error.config?.url || '';
+      const isResourceUploadRelated = url.includes('/api/resources') && 
+        (url.includes('/auto-parse') || url.includes('/bind-textbook'));
+      
+      // 如果是资源上传相关的接口，不在全局拦截器中显示错误，让组件自己处理
+      if (!isResourceUploadRelated) {
+        const { notification } = require('@/utils/notification');
+        notification.error('无权限');
+      }
     }
     return Promise.reject(error);
   }

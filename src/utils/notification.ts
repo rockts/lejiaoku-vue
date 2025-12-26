@@ -175,9 +175,10 @@ class NotificationManager {
      * 显示确认对话框（扁平化设计）
      * @param message 提示信息
      * @param title 标题（可选）
+     * @param options 可选配置（包括是否需要同意复选框）
      * @returns Promise<boolean> 用户点击确认返回 true，取消返回 false
      */
-    confirm(message: string, title: string = '确认操作'): Promise<boolean> {
+    confirm(message: string, title: string = '确认操作', options?: { requireAgreement?: boolean, agreementText?: string }): Promise<boolean> {
         return new Promise((resolve) => {
             // 创建遮罩层
             const overlay = document.createElement('div');
@@ -243,7 +244,19 @@ class NotificationManager {
                 line-height: 1.6;
                 white-space: pre-line;
             `;
-            body.textContent = message;
+            // 支持 HTML 内容（用于显示链接等）
+            if (message.includes('<') || message.includes('&lt;')) {
+                body.innerHTML = message;
+                // 为所有链接添加点击事件处理，防止点击链接时关闭对话框
+                const links = body.querySelectorAll('a');
+                links.forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.stopPropagation(); // 阻止事件冒泡，避免关闭对话框
+                    });
+                });
+            } else {
+                body.textContent = message;
+            }
 
             // 按钮区域
             const footer = document.createElement('div');
@@ -296,27 +309,110 @@ class NotificationManager {
             const confirmBtn = document.createElement('button');
             confirmBtn.textContent = '确认';
             confirmBtn.className = 'btn-primary';
-            confirmBtn.style.cssText = `
+            const baseConfirmStyle = `
                 padding: 0.625rem 1.5rem;
                 border: none;
                 background: linear-gradient(135deg, #4f8cff 0%, #9b7bff 100%);
                 color: white;
                 font-size: 0.9375rem;
                 font-weight: 600;
-                cursor: pointer;
                 border-radius: 8px;
                 box-shadow: 0 4px 12px rgba(79, 140, 255, 0.3);
                 transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             `;
+            
+            // 如果需要同意复选框，初始状态为禁用
+            if (options?.requireAgreement) {
+                confirmBtn.disabled = true;
+                confirmBtn.style.cssText = baseConfirmStyle + `
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                `;
+            } else {
+                confirmBtn.style.cssText = baseConfirmStyle + `
+                    cursor: pointer;
+                `;
+            }
+            
             confirmBtn.onmouseenter = () => {
-                confirmBtn.style.transform = 'translateY(-2px) scale(1.02)';
-                confirmBtn.style.boxShadow = '0 6px 16px rgba(79, 140, 255, 0.4)';
+                if (!confirmBtn.disabled) {
+                    confirmBtn.style.transform = 'translateY(-2px) scale(1.02)';
+                    confirmBtn.style.boxShadow = '0 6px 16px rgba(79, 140, 255, 0.4)';
+                }
             };
             confirmBtn.onmouseleave = () => {
-                confirmBtn.style.transform = 'translateY(0) scale(1)';
-                confirmBtn.style.boxShadow = '0 4px 12px rgba(79, 140, 255, 0.3)';
+                if (!confirmBtn.disabled) {
+                    confirmBtn.style.transform = 'translateY(0) scale(1)';
+                    confirmBtn.style.boxShadow = '0 4px 12px rgba(79, 140, 255, 0.3)';
+                }
             };
+            // 如果需要同意复选框，在确认按钮定义后添加
+            let agreementChecked = false;
+            if (options?.requireAgreement) {
+                const agreementContainer = document.createElement('div');
+                agreementContainer.style.cssText = `
+                    margin-top: 1.5rem;
+                    padding-top: 1.5rem;
+                    border-top: 1px solid #e9ecef;
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 0.75rem;
+                `;
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = 'agreement-checkbox';
+                checkbox.style.cssText = `
+                    margin-top: 0.25rem;
+                    width: 18px;
+                    height: 18px;
+                    cursor: pointer;
+                    flex-shrink: 0;
+                `;
+                
+                const label = document.createElement('label');
+                label.htmlFor = 'agreement-checkbox';
+                label.style.cssText = `
+                    cursor: pointer;
+                    user-select: none;
+                    flex: 1;
+                    line-height: 1.5;
+                `;
+                label.innerHTML = options.agreementText || '我已阅读并同意';
+                
+                // 为标签中的链接添加点击事件处理
+                const labelLinks = label.querySelectorAll('a');
+                labelLinks.forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                    });
+                });
+                
+                agreementContainer.appendChild(checkbox);
+                agreementContainer.appendChild(label);
+                body.appendChild(agreementContainer);
+                
+                // 监听复选框变化
+                checkbox.addEventListener('change', (e) => {
+                    agreementChecked = (e.target as HTMLInputElement).checked;
+                    // 更新确认按钮状态
+                    if (agreementChecked) {
+                        confirmBtn.disabled = false;
+                        confirmBtn.style.opacity = '1';
+                        confirmBtn.style.cursor = 'pointer';
+                    } else {
+                        confirmBtn.disabled = true;
+                        confirmBtn.style.opacity = '0.5';
+                        confirmBtn.style.cursor = 'not-allowed';
+                    }
+                });
+            }
+
             confirmBtn.onclick = () => {
+                // 如果需要同意复选框但未勾选，不允许提交
+                if (options?.requireAgreement && !agreementChecked) {
+                    return;
+                }
                 overlay.style.animation = 'fadeOut 0.2s ease';
                 dialog.style.animation = 'slideDown 0.2s ease';
                 setTimeout(() => {

@@ -79,11 +79,38 @@
                   </div>
                 </div>
 
+                <!-- 申请成为贡献者选项 -->
+                <div class="mb-3">
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="applyContributor"
+                      v-model="applyContributor"
+                    />
+                    <label class="form-check-label" for="applyContributor">
+                      <strong>申请成为贡献者</strong>
+                    </label>
+                  </div>
+                  <small class="text-muted d-block mt-2 ms-4">
+                    注册时选择成为贡献者的
+                    <a 
+                      href="/legal/contributor-responsibilities" 
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-primary"
+                      @click.stop
+                    >
+                      《贡献者义务与责任》
+                    </a>
+                  </small>
+                </div>
+
                 <div class="mb-3">
                   <small class="text-muted">
                     点击 "注册" 即表示您同意并愿意遵守乐教库
-                    <router-link to="/user-agreement">用户协议</router-link> 和
-                    <router-link to="/privacy-policy">隐私政策</router-link>。
+                    <router-link to="/legal/user-agreement">《用户协议》</router-link> 和
+                    <router-link to="/legal/privacy-policy">《隐私政策》</router-link>。
                   </small>
                 </div>
 
@@ -105,33 +132,6 @@
                   {{ loading ? "注册中..." : "注册" }}
                 </button>
 
-                <div class="text-center mt-4">
-                  <p class="text-muted small mb-2">社交账号直接注册</p>
-                  <div class="d-flex justify-content-center gap-3">
-                    <button
-                      type="button"
-                      class="btn btn-outline-secondary btn-sm"
-                    >
-                      <img
-                        src="@/assets/img/weixin.png"
-                        style="width: 20px; height: 20px"
-                        alt="微信"
-                      />
-                      微信
-                    </button>
-                    <button
-                      type="button"
-                      class="btn btn-outline-secondary btn-sm"
-                    >
-                      <img
-                        src="@/assets/img/qq.png"
-                        style="width: 20px; height: 20px"
-                        alt="QQ"
-                      />
-                      QQ
-                    </button>
-                  </div>
-                </div>
               </form>
             </div>
           </div>
@@ -161,6 +161,7 @@ export default defineComponent({
       email: "",
       password: "",
       loading: false,
+      applyContributor: false, // 是否申请成为贡献者
     };
   },
   methods: {
@@ -177,6 +178,7 @@ export default defineComponent({
       this.password = "";
       this.loading = false;
       this.usernameError = "";
+      this.applyContributor = false;
     },
     validateUsername() {
       if (!this.username) {
@@ -243,6 +245,7 @@ export default defineComponent({
         this.$store.commit("auth/setToken", token);
 
         // 注册成功后，立即从 /user 接口获取完整的用户信息（包含 nickname）
+        let finalUserData = user; // 默认使用注册接口返回的用户数据
         try {
           console.log("[RegisterModal] 获取完整用户信息...");
           const userResponse = await apiHttpClient.get("/user");
@@ -252,33 +255,143 @@ export default defineComponent({
 
           // 使用完整的用户信息
           if (fullUserData && fullUserData.id) {
-            // 保存完整的用户信息到 localStorage 和 store
-            localStorage.setItem("user_info", JSON.stringify(fullUserData));
-            this.$store.commit("auth/setUser", fullUserData);
-            console.log("[RegisterModal] 已保存完整用户信息");
+            finalUserData = fullUserData;
+            console.log("[RegisterModal] 已获取完整用户信息");
           } else {
             // 如果获取失败，使用注册接口返回的用户数据
             console.warn("[RegisterModal] 获取完整用户信息失败，使用注册接口返回的数据");
-            localStorage.setItem("user_info", JSON.stringify(user));
-            this.$store.commit("auth/setUser", user);
           }
         } catch (error) {
           console.error("[RegisterModal] 获取完整用户信息失败:", error);
           // 如果获取失败，使用注册接口返回的用户数据
-          localStorage.setItem("user_info", JSON.stringify(user));
-          this.$store.commit("auth/setUser", user);
+          console.warn("[RegisterModal] 使用注册接口返回的用户数据");
+        }
+        
+        // 确保用户数据包含必要的字段
+        if (!finalUserData.role) {
+          finalUserData.role = 'user'; // 默认角色
+        }
+        
+        // 保存完整的用户信息到 localStorage 和 store
+        console.log("[RegisterModal] 保存用户信息到 localStorage 和 store:", finalUserData);
+        localStorage.setItem("user_info", JSON.stringify(finalUserData));
+        this.$store.commit("auth/setUser", finalUserData);
+        console.log("[RegisterModal] 用户信息已保存，当前登录状态:", this.$store.getters["auth/isAuthenticated"]);
+
+        // 如果用户选择了申请成为贡献者，提交申请
+        // 注意：必须在 token 和用户信息保存之后才能调用 API
+        if (this.applyContributor) {
+          try {
+            console.log("[RegisterModal] 用户选择了申请成为贡献者，提交申请...");
+            console.log("[RegisterModal] 当前 token:", token);
+            console.log("[RegisterModal] 当前用户 ID:", finalUserData.id);
+            
+            // 确保 token 已经设置到 apiHttpClient 中（通过设置 Authorization header）
+            // apiHttpClient 应该已经自动从 localStorage 读取 token，但为了确保，我们显式设置
+            console.log("[RegisterModal] 准备调用贡献者申请 API...");
+            console.log("[RegisterModal] API 路径: /api/contributor-applications");
+            const response = await apiHttpClient.post('/api/contributor-applications', {});
+            console.log("[RegisterModal] 贡献者申请响应:", response);
+            console.log("[RegisterModal] 贡献者申请响应数据:", response.data);
+            console.log("[RegisterModal] 贡献者申请已提交");
+            
+            // 更新 store 中的状态
+            await this.$store.dispatch('auth/setContributorApplicationStatus', 'pending');
+            console.log("[RegisterModal] 申请状态已更新为 pending");
+            
+            // 验证状态是否已保存
+            const savedStatus = localStorage.getItem('contributor_application_status');
+            console.log("[RegisterModal] 验证：localStorage 中的申请状态:", savedStatus);
+            console.log("[RegisterModal] 验证：store 中的申请状态:", this.$store.getters["auth/contributorApplicationStatus"]);
+            
+            notification.success("🎉 注册成功！已自动登录，贡献者申请已提交，等待审核", 5000);
+          } catch (error) {
+            console.error("[RegisterModal] 提交贡献者申请失败:", error);
+            console.error("[RegisterModal] 错误详情:", {
+              message: error.message,
+              status: error.response?.status,
+              statusText: error.response?.statusText,
+              data: error.response?.data,
+              headers: error.response?.headers,
+            });
+            
+            // 检查是否是网络错误或 token 问题
+            if (!error.response) {
+              console.error("[RegisterModal] 网络错误或请求未发送");
+              notification.error("贡献者申请提交失败：网络错误，请稍后重试");
+            } else if (error.response.status === 401) {
+              console.error("[RegisterModal] 401 未授权，token 可能无效");
+              notification.error("贡献者申请提交失败：登录状态已失效，请重新登录");
+            } else if (error.response.status === 400) {
+              // 如果已经申请过（不应该发生，因为是新注册），更新状态
+              console.log("[RegisterModal] 收到 400 错误，可能是已申请过，检查状态...");
+              await this.$store.dispatch('auth/checkContributorApplicationStatus');
+              notification.warning("贡献者申请可能已存在，请检查申请状态");
+            } else {
+              // 其他错误，提示用户但继续注册流程
+              console.warn("[RegisterModal] 贡献者申请提交失败，但注册成功");
+              const errorMsg = error.response?.data?.message || error.message || "未知错误";
+              notification.warning(`贡献者申请提交失败：${errorMsg}，可稍后手动申请`);
+            }
+            notification.success("🎉 注册成功！已自动登录", 5000);
+          }
+        } else {
+          // 显示成功提示（显示时间稍长一些，确保用户能看到）
+          notification.success("🎉 注册成功！已自动登录", 5000);
         }
 
-        // 显示成功提示（显示时间稍长一些，确保用户能看到）
-        notification.success("🎉 注册成功！已自动登录", 5000);
-
+        // 确保 isAuthenticated 状态正确
+        // setToken 已经设置了 isAuthenticated，但为了确保，再次检查
+        if (!this.$store.getters["auth/isAuthenticated"]) {
+          console.warn("[RegisterModal] isAuthenticated 状态异常，重新设置");
+          this.$store.commit("auth/setToken", token);
+        }
+        
+        // 确保用户信息已保存到 store
+        if (!this.$store.getters["auth/user"]) {
+          console.warn("[RegisterModal] 用户信息未保存到 store，重新设置");
+          this.$store.commit("auth/setUser", finalUserData);
+        }
+        
+        // 验证所有数据都已保存
+        const savedToken = localStorage.getItem('auth_token');
+        const savedUserInfo = localStorage.getItem('user_info');
+        const storeToken = this.$store.getters["auth/token"];
+        const storeUser = this.$store.getters["auth/user"];
+        const storeIsAuthenticated = this.$store.getters["auth/isAuthenticated"];
+        
+        console.log("[RegisterModal] 注册完成，验证数据保存状态:");
+        console.log("[RegisterModal] - localStorage token:", savedToken ? "已保存" : "未保存");
+        console.log("[RegisterModal] - localStorage user_info:", savedUserInfo ? "已保存" : "未保存");
+        console.log("[RegisterModal] - store token:", storeToken ? "已保存" : "未保存");
+        console.log("[RegisterModal] - store user:", storeUser ? "已保存" : "未保存");
+        console.log("[RegisterModal] - store isAuthenticated:", storeIsAuthenticated);
+        
+        if (!savedToken || !savedUserInfo || !storeToken || !storeUser || !storeIsAuthenticated) {
+          console.error("[RegisterModal] 数据保存不完整，尝试重新保存");
+          // 重新保存所有数据
+          localStorage.setItem("auth_token", token);
+          localStorage.setItem("user_info", JSON.stringify(finalUserData));
+          this.$store.commit("auth/setToken", token);
+          this.$store.commit("auth/setUser", finalUserData);
+        }
+        
         // 关闭弹窗
         this.closeModal();
 
-        // 延迟刷新页面，确保用户能看到成功提示
+        // 延迟一小段时间后跳转到首页，确保所有状态都已保存
+        // 跳转到首页可以确保所有组件都重新初始化，使用最新的登录状态
         setTimeout(() => {
-          window.location.reload();
-        }, 1500);
+          console.log("[RegisterModal] 注册成功，跳转到首页");
+          this.$router.push('/');
+          // 使用 nextTick 确保路由跳转完成后再刷新，这样可以确保首页正确显示登录状态
+          this.$nextTick(() => {
+            // 如果还在当前页面，强制刷新
+            if (this.$route.path !== '/') {
+              window.location.href = '/';
+            }
+          });
+        }, 500);
       } catch (error) {
         console.error("[RegisterModal] 注册失败:", error);
         const errorMessage = error.response?.data?.message || error.message || "注册失败，请稍后重试";
@@ -416,6 +529,27 @@ a {
 a:hover {
   color: #3d7ae8;
   text-decoration: underline;
+}
+
+/* 贡献者申请选项样式 */
+.form-check {
+  padding-left: 0;
+}
+
+.form-check-input {
+  margin-top: 0.25rem;
+  margin-right: 0.5rem;
+  cursor: pointer;
+}
+
+.form-check-label {
+  cursor: pointer;
+  user-select: none;
+}
+
+.form-check-label strong {
+  color: #212529;
+  font-weight: 600;
 }
 
 /* 动画效果 */

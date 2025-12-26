@@ -9,19 +9,22 @@
           </h2>
           <p class="admin-subtitle text-muted mb-0">审核和管理系统资源</p>
         </div>
-        <div class="d-flex">
-          <router-link to="/admin/users" class="btn btn-primary mr-2">
+        <div class="d-flex align-items-center header-actions">
+          <router-link to="/admin/users" class="btn btn-header btn-primary me-2">
             <i class="bi bi-people me-2"></i>用户管理
           </router-link>
-          <router-link to="/admin" class="btn btn-outline-secondary mr-2">
+          <router-link to="/admin/contributor-applications" class="btn btn-header btn-warning me-2">
+            <i class="bi bi-person-check me-2"></i>贡献者申请
+          </router-link>
+          <router-link to="/admin" class="btn btn-header btn-outline-secondary me-2">
             <i class="bi bi-house me-2"></i>管理首页
           </router-link>
           <button
-            class="btn btn-outline-primary"
+            class="btn btn-header btn-outline-primary"
             @click="fetchResources"
             :disabled="loading"
           >
-            <i class="bi bi-arrow-clockwise me-2"></i>刷新
+            <i class="bi bi-arrow-clockwise me-2" :class="{ 'spinning': loading }"></i>刷新
           </button>
         </div>
       </div>
@@ -139,7 +142,12 @@
                 </div>
               </td>
               <td>
-                <span class="badge bg-info">#{{ resource.user_id || '-' }}</span>
+                <span class="badge bg-info" v-if="resource.user_id">
+                  #{{ resource.user_id }}
+                </span>
+                <span class="text-muted small" v-else>
+                  未设置
+                </span>
               </td>
               <td>
                 <span class="badge" :class="getStatusClass(resource.status)">
@@ -150,23 +158,35 @@
                 <small class="text-muted">{{ formatDate(resource.created_at) }}</small>
               </td>
               <td>
-                <div class="d-flex align-items-center">
+                <div class="action-buttons-horizontal">
+                  <!-- 查看资源链接 -->
+                  <router-link
+                    :to="`/resources/${resource.id}`"
+                    class="btn btn-sm btn-info"
+                    target="_blank"
+                    title="查看资源详情"
+                  >
+                    <i class="bi bi-eye me-1"></i>查看
+                  </router-link>
+                  
                   <template v-if="resource.status === 'pending'">
                     <button
-                      class="btn btn-sm btn-success me-2"
-                      @click="updateStatus(resource.id, 'approved')"
-                      :disabled="processing[resource.id]"
+                      class="btn btn-sm btn-success"
+                      @click.stop.prevent="updateStatus(resource.id, 'approved')"
+                      :disabled="processing && processing[resource.id]"
                     >
                       <i class="bi bi-check-lg me-1"></i>
-                      {{ processing[resource.id] ? '处理中...' : '通过' }}
+                      <span v-if="processing && processing[resource.id]">处理中...</span>
+                      <span v-else>通过</span>
                     </button>
                     <button
-                      class="btn btn-sm btn-warning me-2"
-                      @click="updateStatus(resource.id, 'rejected')"
-                      :disabled="processing[resource.id]"
+                      class="btn btn-sm btn-warning"
+                      @click.stop.prevent="updateStatus(resource.id, 'rejected')"
+                      :disabled="processing && processing[resource.id]"
                     >
                       <i class="bi bi-x-lg me-1"></i>
-                      {{ processing[resource.id] ? '处理中...' : '拒绝' }}
+                      <span v-if="processing && processing[resource.id]">处理中...</span>
+                      <span v-else>拒绝</span>
                     </button>
                   </template>
                   <button
@@ -268,11 +288,29 @@ export default defineComponent({
             console.log("[AdminResources] 从 response.data 获取数据（直接数组）");
           }
         }
-        this.resources = resources;
+        // 处理资源数据，确保 user_id 字段正确
+        this.resources = resources.map(resource => {
+          // 如果后端返回了 user 对象，提取 user_id
+          if (resource.user && resource.user.id && !resource.user_id) {
+            resource.user_id = resource.user.id;
+          }
+          // 如果后端返回了 userId（驼峰命名），转换为 user_id
+          if (resource.userId && !resource.user_id) {
+            resource.user_id = resource.userId;
+          }
+          // 如果后端返回了 uploader_id，转换为 user_id
+          if (resource.uploader_id && !resource.user_id) {
+            resource.user_id = resource.uploader_id;
+          }
+          return resource;
+        });
         
         console.log("[AdminResources] 获取到资源数量:", this.resources.length);
         if (this.resources.length > 0) {
           console.log("[AdminResources] 资源数据示例:", this.resources[0]);
+          console.log("[AdminResources] 第一个资源的 user_id:", this.resources[0].user_id);
+          console.log("[AdminResources] 第一个资源的 user 对象:", this.resources[0].user);
+          console.log("[AdminResources] 第一个资源的完整数据:", JSON.stringify(this.resources[0], null, 2));
         }
       } catch (error) {
         console.error("[AdminResources] 获取资源列表失败:", error);
@@ -292,32 +330,60 @@ export default defineComponent({
     },
 
     async updateStatus(resourceId, status) {
+      console.log("[AdminResources] updateStatus 被调用:", { resourceId, status });
+      
       const confirmed = await notification.confirm(
         `确定要${status === 'approved' ? '通过' : '拒绝'}该资源吗？`,
         status === 'approved' ? '通过审核' : '拒绝审核'
       );
+      
+      console.log("[AdminResources] 确认结果:", confirmed);
+      
       if (!confirmed) {
+        console.log("[AdminResources] 用户取消了操作");
         return;
       }
 
-      this.$set(this.processing, resourceId, true);
+      // 使用 Vue 3 的响应式方式设置 processing 状态
+      // Vue 3 中可以直接设置对象属性，不需要 $set
+      this.processing = { ...this.processing, [resourceId]: true };
+      
+      console.log("[AdminResources] 开始更新资源状态，resourceId:", resourceId, "status:", status);
+      
       try {
-        await apiHttpClient.patch(`/api/admin/resources/${resourceId}/status`, {
+        const response = await apiHttpClient.patch(`/api/admin/resources/${resourceId}/status`, {
           status,
         });
+        
+        console.log("[AdminResources] 更新状态成功，响应:", response.data);
 
         notification.success(
           status === "approved" ? "资源已通过审核" : "资源已拒绝"
         );
 
+        // 刷新列表
+        console.log("[AdminResources] 刷新资源列表...");
         await this.fetchResources();
+        console.log("[AdminResources] 资源列表已刷新");
       } catch (error) {
         console.error("[AdminResources] 更新状态失败:", error);
-        notification.error(
-          error.response?.data?.message || "操作失败，请重试"
-        );
+        console.error("[AdminResources] 错误详情:", {
+          message: error.message,
+          status: error.response?.status,
+          data: error.response?.data,
+          url: error.config?.url,
+        });
+        
+        const errorMessage = error.response?.data?.message || 
+                           error.response?.data?.error ||
+                           error.message ||
+                           "操作失败，请重试";
+        notification.error(errorMessage);
       } finally {
-        this.$set(this.processing, resourceId, false);
+        // 使用 Vue 3 的响应式方式清除 processing 状态
+        // Vue 3 中可以直接设置对象属性，不需要 $set
+        this.processing = { ...this.processing, [resourceId]: false };
+        console.log("[AdminResources] 更新状态操作完成");
       }
     },
 
@@ -469,41 +535,69 @@ export default defineComponent({
   max-width: 1400px;
   margin: 0 auto;
   padding: 1.5rem;
-  background: #f8f9fa;
+  background: var(--bg, #f8f9fa);
 }
 
 .admin-header {
   margin-bottom: 1.5rem;
   padding: 1.25rem 1.5rem;
-  background: white;
-  border: 1px solid #dee2e6;
+  background: var(--surface, white);
+  border: 1px solid var(--border, #dee2e6);
+  border-radius: 12px;
+}
+
+.header-actions {
+  gap: 0.5rem;
+}
+
+.btn-header {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.btn-header:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .admin-title {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #212529;
+  color: var(--text, #212529);
   margin: 0;
 }
 
 .admin-subtitle {
   font-size: 0.875rem;
   margin-top: 0.25rem;
-  color: #6c757d;
+  color: var(--muted, #6c757d);
 }
 
 .stat-card {
-  background: white;
-  border: 1px solid #dee2e6;
+  background: var(--surface, white);
+  border: 1px solid var(--border, #dee2e6);
   padding: 1.25rem;
   display: flex;
   align-items: center;
   gap: 1rem;
   transition: background-color 0.15s ease;
+  border-radius: 12px;
 }
 
 .stat-card:hover {
-  background-color: #f8f9fa;
+  background-color: var(--bg, #f8f9fa);
 }
 
 .stat-icon {
@@ -524,20 +618,21 @@ export default defineComponent({
 .stat-value {
   font-size: 1.75rem;
   font-weight: 600;
-  color: #212529;
+  color: var(--text, #212529);
   line-height: 1;
 }
 
 .stat-label {
   font-size: 0.875rem;
-  color: #6c757d;
+  color: var(--muted, #6c757d);
   margin-top: 0.25rem;
 }
 
 .admin-card {
-  background: white;
-  border: 1px solid #dee2e6;
+  background: var(--surface, white);
+  border: 1px solid var(--border, #dee2e6);
   padding: 1.5rem;
+  border-radius: 12px;
 }
 
 .table {
@@ -581,8 +676,104 @@ export default defineComponent({
   font-weight: 500;
 }
 
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.action-buttons-horizontal {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+}
+
+.action-buttons-horizontal .btn {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 .btn-sm {
   padding: 0.375rem 0.75rem;
   font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.btn-sm:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-sm:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* 页面底部按钮容器始终居中 */
+.admin-container > *:last-child .btn,
+.admin-container > *:last-child button,
+.admin-container .text-center .btn,
+.admin-container .text-center button {
+  display: inline-block;
+}
+
+/* 确保空状态时的按钮居中 */
+.admin-card .text-center,
+.table-responsive .text-center {
+  text-align: center !important;
+}
+
+/* 底部操作区域居中 */
+.admin-container .action-area-bottom {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #dee2e6;
+}
+
+@media (max-width: 768px) {
+  .admin-container {
+    padding: 1rem;
+  }
+  
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 1rem;
+  }
+  
+  .header-actions {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  
+  .btn-header {
+    flex: 1;
+    min-width: 120px;
+  }
+  
+  .action-buttons,
+  .action-buttons-horizontal {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .btn-sm {
+    width: 100%;
+  }
+  
+  .action-buttons-horizontal .btn {
+    width: 100%;
+  }
+  
+  .action-area-bottom {
+    flex-direction: column;
+  }
 }
 </style>

@@ -53,15 +53,15 @@
             @input="debouncedApplyFilters"
           />
         </div>
-        <div class="col-md-2 d-flex align-items-end">
-          <button @click="applyFilters" class="btn btn-primary btn-sm w-100">
-            搜索
+        <div class="col-md-2 d-flex align-items-end" style="gap: 0.75rem;">
+          <button @click="applyFilters" class="btn btn-primary btn-sm flex-fill">
+            <i class="bi bi-search me-1"></i>搜索
           </button>
           <button
             @click="clearFilters"
-            class="btn btn-outline-secondary btn-sm w-100 ms-2"
+            class="btn btn-outline-secondary btn-sm flex-fill"
           >
-            重置
+            <i class="bi bi-arrow-counterclockwise me-1"></i>重置
           </button>
         </div>
       </div>
@@ -284,7 +284,13 @@ export default defineComponent({
           `[PostList] 总计 ${this.total} 条，当前第 ${this.currentPage}/${this.totalPages} 页`
         );
 
-        this.$store.commit("post/index/setResources", response.data);
+        // 后端已经做了权限过滤，只返回用户可以查看的资源
+        // 前端不需要再次过滤，直接显示后端返回的资源
+        // 如果后端返回了资源，说明用户有权限查看
+        console.log("[PostList] 后端返回的资源数量:", response.data.length);
+        const filteredResources = response.data;
+
+        this.$store.commit("post/index/setResources", filteredResources);
       } catch (error) {
         console.error("[PostList] 过滤失败:", error);
       } finally {

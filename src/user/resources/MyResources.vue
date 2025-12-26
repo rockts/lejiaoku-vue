@@ -19,6 +19,7 @@
           <th>标题</th>
           <th>分类</th>
           <th>状态</th>
+          <th>操作</th>
         </tr>
       </thead>
       <tbody>
@@ -30,6 +31,16 @@
             <span class="badge" :class="getStatusClass(resource.status)">
               {{ getStatusText(resource.status) }}
             </span>
+          </td>
+          <td>
+            <router-link
+              :to="`/resources/${resource.id}`"
+              class="btn btn-sm btn-info"
+              target="_blank"
+              title="查看资源详情"
+            >
+              <i class="bi bi-eye me-1"></i>查看
+            </router-link>
           </td>
         </tr>
       </tbody>

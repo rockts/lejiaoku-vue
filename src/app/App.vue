@@ -39,6 +39,13 @@ export default defineComponent({
       this.$store.dispatch('auth/logout');
     });
     
+    // 检查路由参数，如果是从登录页跳转过来要打开注册弹窗
+    if (this.$route.query.register === 'true') {
+      this.showRegisterModal = true;
+      // 清除 query 参数，避免刷新后再次打开
+      this.$router.replace({ path: '/', query: {} });
+    }
+    
     // 如果已登录，从后端获取最新用户信息并更新 store
     const token = localStorage.getItem('auth_token');
     if (token) {
@@ -120,6 +127,17 @@ export default defineComponent({
       } catch (error) {
         console.log("获取用户信息失败:", error);
         this.user = null;
+      }
+    }
+  },
+
+  watch: {
+    '$route'(to) {
+      // 检查路由参数，如果是从登录页跳转过来要打开注册弹窗
+      if (to.query.register === 'true') {
+        this.showRegisterModal = true;
+        // 清除 query 参数，避免刷新后再次打开
+        this.$router.replace({ path: to.path, query: {} });
       }
     }
   },

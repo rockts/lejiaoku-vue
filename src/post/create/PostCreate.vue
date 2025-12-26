@@ -1343,38 +1343,64 @@ export default defineComponent({
 
         // 显示成功消息
         notification.success(
-          `资源上传成功！ID: ${resourceId || "N/A"}，正在处理教材信息...`,
+          `资源上传成功！ID: ${resourceId || "N/A"}，正在处理教材信息，3秒后跳转到详情页...`,
           3000
         );
 
         // 立即调用 auto-parse 接口
         if (resourceId) {
+          // 先重置提交状态，避免一直显示"提交中"
+          this.isSubmitting = false;
+          
           try {
             console.log("[PostCreate] 调用 auto-parse 接口...");
             await apiHttpClient.post(`/api/resources/${resourceId}/auto-parse`);
             console.log("[PostCreate] auto-parse 调用成功");
             notification.success(
-              "教材信息已自动提取，8秒后跳转到首页...",
-              8000
+              "教材信息已自动提取，3秒后跳转到详情页...",
+              3000
             );
           } catch (error) {
             console.error("[PostCreate] auto-parse 调用失败:", error);
-            notification.warning(
-              `教材信息提取失败，5秒后仍将跳转到首页`,
-              5000
-            );
+            // 如果是 403 无权限错误，已经在全局拦截器中显示了"无权限"通知
+            // 这里只显示信息提取失败的提示，避免重复通知
+            if (error.response?.status !== 403) {
+              notification.warning(
+                `教材信息提取失败，3秒后仍将跳转到详情页`,
+                3000
+              );
+            } else {
+              // 403 错误时，只显示一个友好的提示
+              notification.warning(
+                `教材信息自动提取功能暂不可用，资源已上传成功，3秒后跳转到详情页`,
+                3000
+              );
+            }
           }
 
           // 绑定教材（如果有选择）
-          await this.bindTextbook(resourceId);
+          try {
+            await this.bindTextbook(resourceId);
+          } catch (error) {
+            // 绑定教材失败不影响整体流程，只记录错误
+            console.error("[PostCreate] 绑定教材失败:", error);
+            // 如果是 403 错误，已经在全局拦截器中显示了"无权限"通知，这里不再显示
+            if (error.response?.status !== 403) {
+              console.warn("[PostCreate] 绑定教材失败，但不影响资源上传");
+            }
+          }
 
-          // 延迟 8 秒后跳转到首页
+          // 延迟 3 秒后跳转到资源详情页，让用户确认资源
           setTimeout(() => {
             console.log(
-              "[PostCreate] 跳转到首页"
+              "[PostCreate] 跳转到资源详情页，resourceId:",
+              resourceId
             );
-            this.$router.push('/');
-          }, 8000);
+            this.$router.push(`/resources/${resourceId}`);
+          }, 3000);
+        } else {
+          // 如果没有 resourceId，也要重置提交状态
+          this.isSubmitting = false;
         }
 
         // 仅清空文件选择（避免重复上传）
@@ -1442,11 +1468,15 @@ export default defineComponent({
     
     // 处理申请成为贡献者
     async handleApplyContributor() {
-      // 确认弹窗
-      const confirmed = confirm(
-        '申请成为贡献者后，您将可以上传和管理教学资源。\n\n' +
-        '提交申请后，管理员将审核您的申请。\n\n' +
-        '确认提交申请吗？'
+      // 确认弹窗（带同意复选框）
+      const { notification } = await import('@/utils/notification');
+      const confirmed = await notification.confirm(
+        '申请成为贡献者后，您将可以上传和管理教学资源。\n\n提交申请后，管理员将审核您的申请。\n\n确认提交申请吗？',
+        '申请成为贡献者',
+        {
+          requireAgreement: true,
+          agreementText: '我已阅读并同意遵守<a href="/legal/contributor-responsibilities" target="_blank" style="color: #4f8cff; text-decoration: underline;">《贡献者义务与责任》</a>'
+        }
       );
       
       if (!confirmed) {

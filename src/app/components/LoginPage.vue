@@ -44,8 +44,8 @@
 
                 <div class="d-flex justify-content-between mb-3">
                   <a href="#" class="text-muted small">忘记密码？</a>
-                  <router-link to="/register" class="small"
-                    >还没有账号？立即注册</router-link
+                  <a href="#" @click.prevent="goToRegister" class="small"
+                    >还没有账号？立即注册</a
                   >
                 </div>
 
@@ -89,6 +89,10 @@ export default defineComponent({
     };
   },
   methods: {
+    goToRegister() {
+      // 跳转到首页并打开注册弹窗
+      this.$router.push({ path: '/', query: { register: 'true' } });
+    },
     async handleSubmit() {
       if (!this.account || !this.password) {
         notification.warning("请填写完整信息");

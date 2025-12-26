@@ -10,10 +10,13 @@
           <p class="admin-subtitle text-muted mb-0">管理系统用户角色和权限</p>
         </div>
         <div class="d-flex align-items-center header-actions">
-          <router-link to="/admin/resources" class="btn btn-header btn-success mr-2">
+          <router-link to="/admin/contributor-applications" class="btn btn-header btn-warning me-2">
+            <i class="bi bi-person-check me-2"></i>贡献者申请
+          </router-link>
+          <router-link to="/admin/resources" class="btn btn-header btn-success me-2">
             <i class="bi bi-file-earmark-text me-2"></i>资源管理
           </router-link>
-          <router-link to="/admin" class="btn btn-header btn-outline-secondary mr-2">
+          <router-link to="/admin" class="btn btn-header btn-outline-secondary me-2">
             <i class="bi bi-house me-2"></i>管理首页
           </router-link>
           <button
@@ -603,41 +606,69 @@ export default defineComponent({
   max-width: 1400px;
   margin: 0 auto;
   padding: 1.5rem;
-  background: #f8f9fa;
+  background: var(--bg, #f8f9fa);
 }
 
 .admin-header {
   margin-bottom: 1.5rem;
   padding: 1.25rem 1.5rem;
-  background: white;
-  border: 1px solid #dee2e6;
+  background: var(--surface, white);
+  border: 1px solid var(--border, #dee2e6);
+  border-radius: 12px;
 }
 
 .admin-title {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #212529;
+  color: var(--text, #212529);
   margin: 0;
 }
 
 .admin-subtitle {
   font-size: 0.875rem;
   margin-top: 0.25rem;
-  color: #6c757d;
+  color: var(--muted, #6c757d);
+}
+
+.header-actions {
+  gap: 0.5rem;
+}
+
+.btn-header {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.btn-header:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .stat-card {
-  background: white;
-  border: 1px solid #dee2e6;
+  background: var(--surface, white);
+  border: 1px solid var(--border, #dee2e6);
   padding: 1.25rem;
   display: flex;
   align-items: center;
   gap: 1rem;
   transition: background-color 0.15s ease;
+  border-radius: 12px;
 }
 
 .stat-card:hover {
-  background-color: #f8f9fa;
+  background-color: var(--bg, #f8f9fa);
 }
 
 .stat-icon {
@@ -658,20 +689,21 @@ export default defineComponent({
 .stat-value {
   font-size: 1.75rem;
   font-weight: 600;
-  color: #212529;
+  color: var(--text, #212529);
   line-height: 1;
 }
 
 .stat-label {
   font-size: 0.875rem;
-  color: #6c757d;
+  color: var(--muted, #6c757d);
   margin-top: 0.25rem;
 }
 
 .admin-card {
-  background: white;
-  border: 1px solid #dee2e6;
+  background: var(--surface, white);
+  border: 1px solid var(--border, #dee2e6);
   padding: 1.5rem;
+  border-radius: 12px;
 }
 
 .user-table {
@@ -827,6 +859,31 @@ export default defineComponent({
 .col-date { width: 140px; }
 .col-actions { width: 180px; }
 
+/* 页面底部按钮容器始终居中 */
+.admin-container > *:last-child .btn,
+.admin-container > *:last-child button,
+.admin-container .text-center .btn,
+.admin-container .text-center button {
+  display: inline-block;
+}
+
+/* 确保空状态时的按钮居中 */
+.admin-card .text-center,
+.table-responsive .text-center {
+  text-align: center !important;
+}
+
+/* 底部操作区域居中 */
+.admin-container .action-area-bottom {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border, #dee2e6);
+}
+
 @media (max-width: 1200px) {
   .admin-container {
     padding: 1rem;
@@ -840,6 +897,10 @@ export default defineComponent({
   .btn-save,
   .btn-delete {
     width: 100%;
+  }
+  
+  .action-area-bottom {
+    flex-direction: column;
   }
 }
 </style>

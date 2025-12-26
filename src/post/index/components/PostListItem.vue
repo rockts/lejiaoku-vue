@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div class="card resource-item-clickable" @click="goToResource">
     <div class="container">
       <div class="row">
         <div class="col-md-4 cover">
@@ -38,11 +38,7 @@
               </span>
             </h5>
             <h5 class="card-title text-justify">
-              <router-link
-                :to="{ name: 'resourceShow', params: { id: item.id } }"
-              >
-                {{ item.title }}
-              </router-link>
+              <span class="resource-title-link">{{ item.title }}</span>
             </h5>
 
             <div class="content">
@@ -177,6 +173,9 @@ export default defineComponent({
     this.resolveCoverUrl();
   },
   methods: {
+    goToResource() {
+      this.$router.push({ name: 'resourceShow', params: { id: this.item.id } });
+    },
     moment(...args) {
       return moment(...args);
     },
@@ -429,5 +428,27 @@ export default defineComponent({
   font-size: 56px;
   color: #94a3b8;
   opacity: 0.6;
+}
+
+/* 整个卡片可点击 */
+.resource-item-clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.resource-item-clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.resource-title-link {
+  color: #0d6efd;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.resource-item-clickable:hover .resource-title-link {
+  color: #0a58ca;
+  text-decoration: underline;
 }
 </style>

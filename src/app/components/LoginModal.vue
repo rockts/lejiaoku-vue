@@ -70,33 +70,6 @@
                   {{ loading ? "登录中..." : "登录" }}
                 </button>
 
-                <div class="text-center mt-4">
-                  <p class="text-muted small mb-2">社交账号登录</p>
-                  <div class="d-flex justify-content-center gap-3">
-                    <button
-                      type="button"
-                      class="btn btn-outline-secondary btn-sm"
-                    >
-                      <img
-                        src="@/assets/img/weixin.png"
-                        style="width: 20px; height: 20px"
-                        alt="微信"
-                      />
-                      微信
-                    </button>
-                    <button
-                      type="button"
-                      class="btn btn-outline-secondary btn-sm"
-                    >
-                      <img
-                        src="@/assets/img/qq.png"
-                        style="width: 20px; height: 20px"
-                        alt="QQ"
-                      />
-                      QQ
-                    </button>
-                  </div>
-                </div>
               </form>
             </div>
           </div>

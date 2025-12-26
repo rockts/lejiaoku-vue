@@ -74,6 +74,15 @@
 <template>
   <bread-crumbs />
 
+  <!-- 无权限提示 -->
+  <div v-if="!loading && !showResource && resource === null" class="container my-5 text-center">
+    <div class="alert alert-warning" role="alert">
+      <i class="bi bi-exclamation-triangle me-2"></i>
+      <strong>无权查看</strong>
+      <p class="mb-0 mt-2">该资源正在审核中，仅发布者可以查看</p>
+    </div>
+  </div>
+
   <div class="resource-page" v-if="showResource">
     <div class="container resource-wrapper">
       <!-- 1. 资源基础信息 -->
@@ -383,11 +392,69 @@ export default defineComponent({
   methods: {
     async getResourceById(resourceId) {
       this.loading = true;
+      
+      // 先获取当前用户信息，用于判断权限
+      const currentUser = this.$store.getters["auth/user"];
+      const isAdmin = currentUser && (currentUser.role === 'admin' || currentUser.role === 'editor');
+      
+      console.log("[PostShow] 开始获取资源，resourceId:", resourceId);
+      console.log("[PostShow] 当前用户:", {
+        id: currentUser?.id,
+        role: currentUser?.role,
+        isAdmin
+      });
+      
       try {
         const response = await apiHttpClient.get(
           `/api/resources/${resourceId}`
         );
         this.resource = response.data;
+        
+        console.log("[PostShow] 获取资源成功:", {
+          id: this.resource?.id,
+          status: this.resource?.status,
+          user_id: this.resource?.user_id
+        });
+        
+        // 权限检查：
+        // 1. 管理员（admin/editor）可以查看所有资源（包括通过、拒绝、未审核）
+        // 2. 发布者可以查看自己发布的资源（所有状态）
+        // 3. 其他用户只能查看已通过审核的资源（approved）
+        // 注意：如果资源在首页或列表页显示，说明后端已经过滤过了，前端应该允许查看
+        const isOwner = currentUser && currentUser.id && 
+                       this.resource.user_id && 
+                       String(currentUser.id) === String(this.resource.user_id);
+        const resourceStatus = this.resource.status;
+        const isApproved = resourceStatus === 'approved';
+        
+        console.log("[PostShow] 权限检查:", {
+          isAdmin,
+          isOwner,
+          resourceStatus,
+          isApproved,
+          currentUserId: currentUser?.id,
+          resourceUserId: this.resource.user_id
+        });
+        
+        // 如果是管理员，可以查看所有资源（包括通过、拒绝、未审核）
+        if (isAdmin) {
+          console.log("[PostShow] ✅ 管理员查看资源，允许访问所有状态");
+          // 继续加载资源
+        } else if (isOwner) {
+          // 如果是发布者，可以查看自己的资源（包括所有状态）
+          console.log("[PostShow] ✅ 发布者查看自己的资源，允许访问");
+          // 继续加载资源
+        } else if (isApproved) {
+          // 其他用户可以查看已通过审核的资源
+          console.log("[PostShow] ✅ 普通用户查看已通过审核的资源，允许访问");
+          // 继续加载资源
+        } else {
+          // 其他人无权查看待审核或已拒绝的资源
+          // 但如果后端返回了数据，说明后端允许访问，前端也应该允许
+          console.log("[PostShow] ⚠️ 资源状态为", resourceStatus, "，但后端已返回数据，允许访问");
+          // 继续加载资源（后端已经做了权限控制）
+        }
+        
         // reset cover failed flag when new resource loaded
         this.coverFailed = false;
 
@@ -399,6 +466,39 @@ export default defineComponent({
         this.resolveCoverUrl();
       } catch (error) {
         console.error("[PostShow] 获取资源详情失败:", error);
+        console.error("[PostShow] 错误详情:", {
+          message: error.message,
+          status: error.response?.status,
+          data: error.response?.data,
+          isAdmin
+        });
+        
+        const { notification } = require('@/utils/notification');
+        
+        // 如果是管理员，即使 API 返回 403/404，也可能是后端权限控制问题
+        // 但前端应该允许管理员查看所有资源，所以这里给出更明确的提示
+        if (isAdmin && (error.response?.status === 403 || error.response?.status === 404)) {
+          console.warn("[PostShow] ⚠️ 管理员访问资源时 API 返回错误，可能是后端权限配置问题");
+          console.warn("[PostShow] 错误状态码:", error.response?.status);
+          notification.warning('获取资源失败。如果是未审核或已拒绝的资源，请检查后端是否允许管理员查看所有状态的资源。');
+          // 管理员也跳转到首页
+          setTimeout(() => {
+            this.$router.push('/');
+          }, 2000);
+        } else if (error.response?.status === 403 || error.response?.status === 404) {
+          notification.warning('无权查看该资源或资源不存在');
+          setTimeout(() => {
+            this.$router.push('/');
+          }, 1500);
+        } else {
+          notification.error('加载资源失败，请稍后重试');
+          // 其他错误也跳转到首页
+          setTimeout(() => {
+            this.$router.push('/');
+          }, 2000);
+        }
+        
+        this.resource = null;
       } finally {
         this.loading = false;
       }
