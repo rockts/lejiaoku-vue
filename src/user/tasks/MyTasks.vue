@@ -89,7 +89,43 @@ export default defineComponent({
     async fetchTasks() {
       this.loading = true;
       try {
-        const response = await apiHttpClient.get("/api/tasks/my");
+        // 尝试多个可能的 API 路径
+        let response = null;
+        const possiblePaths = [
+          "/my/tasks",           // 参考 /my/resources 的格式
+          "/api/my/tasks",       // 带 /api 前缀
+          "/api/tasks/my",       // 原始路径
+          "/api/tasks",          // 获取所有任务（可能需要过滤）
+        ];
+
+        let lastError = null;
+        for (const path of possiblePaths) {
+          try {
+            console.log(`[MyTasks] 尝试 API 路径: ${path}`);
+            response = await apiHttpClient.get(path);
+            console.log(`[MyTasks] ${path} 响应成功:`, response.data);
+            break; // 成功则跳出循环
+          } catch (error) {
+            console.warn(`[MyTasks] ${path} 失败:`, error.response?.status, error.message);
+            lastError = error;
+            // 如果是 404，继续尝试下一个路径
+            if (error.response?.status === 404) {
+              continue;
+            }
+            // 其他错误直接抛出
+            throw error;
+          }
+        }
+
+        // 如果所有路径都失败，抛出最后一个错误
+        if (!response && lastError) {
+          throw lastError;
+        }
+
+        if (!response) {
+          throw new Error("无法连接到后端服务");
+        }
+
         console.log("[MyTasks] 任务列表响应:", response.data);
 
         // 处理不同的响应格式
@@ -100,6 +136,20 @@ export default defineComponent({
             this.tasks = response.data.tasks;
           } else if (Array.isArray(response.data)) {
             this.tasks = response.data;
+          } else {
+            this.tasks = [];
+          }
+        } else {
+          this.tasks = [];
+        }
+
+        // 如果是获取所有任务，需要过滤出当前用户的任务
+        if (this.tasks.length > 0 && this.tasks[0].user_id) {
+          const currentUser = this.$store.getters["auth/user"];
+          if (currentUser && currentUser.id) {
+            this.tasks = this.tasks.filter(
+              (task) => task.user_id === currentUser.id
+            );
           }
         }
 
@@ -107,9 +157,17 @@ export default defineComponent({
       } catch (error) {
         console.error("[MyTasks] 获取任务列表失败:", error);
         const { notification } = await import("@/utils/notification");
-        notification.error(
-          error.response?.data?.message || error.message || "获取任务列表失败"
-        );
+        
+        if (error.response?.status === 404) {
+          notification.warning(
+            "任务列表 API 不存在，请确认后端是否已实现该接口。\n" +
+            "尝试的路径：/my/tasks, /api/my/tasks, /api/tasks/my"
+          );
+        } else {
+          notification.error(
+            error.response?.data?.message || error.message || "获取任务列表失败"
+          );
+        }
       } finally {
         this.loading = false;
       }
