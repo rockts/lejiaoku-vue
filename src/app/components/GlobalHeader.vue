@@ -178,23 +178,25 @@
                     <i v-else class="bi bi-person-circle user-avatar-large-icon"></i>
                   </div>
                   <div>
-                    <div class="user-name-large user-name-large-with-badge">
+                    <div class="user-name-large">
                       {{ displayName }}
+                    </div>
+                    <div class="user-role-badge-wrapper">
                       <span
                         v-if="isAdmin"
-                        class="badge badge-admin badge-corner-large"
+                        class="badge badge-admin badge-inline"
                       >
                         管理员
                       </span>
                       <span
                         v-else-if="currentUser.role === 'editor'"
-                        class="badge badge-editor badge-corner-large"
+                        class="badge badge-editor badge-inline"
                       >
                         编辑
                       </span>
                       <span
                         v-else-if="currentUser.role === 'contributor'"
-                        class="badge badge-contributor badge-corner-large"
+                        class="badge badge-contributor badge-inline"
                       >
                         贡献者
                       </span>
@@ -924,6 +926,21 @@ nav {
 .badge-corner i,
 .badge-corner-large i {
   display: none;
+}
+
+/* 用户组标识 - 昵称下方独立显示 */
+.user-role-badge-wrapper {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.badge-inline {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  line-height: 1.2;
 }
 
 /* 下拉菜单 */
