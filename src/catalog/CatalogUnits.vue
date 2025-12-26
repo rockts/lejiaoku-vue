@@ -73,27 +73,33 @@
         
         <!-- 备用按钮：当 view_state 为空时，显示通用任务创建按钮 -->
         <div v-else-if="!catalogInfo.view_state || catalogInfo.view_state === 'no_action'" class="catalog-action-top mb-4">
-          <div class="btn-group" role="group">
-            <button
-              class="btn btn-primary btn-lg"
-              @click="createCatalogTask('add_resources')"
-              :disabled="creatingTask"
-              title="为该教材创建补充资源任务"
-            >
-              <i class="bi bi-plus-circle me-2"></i>补充教材资源
-            </button>
-            <button
-              class="btn btn-outline-primary btn-lg"
-              @click="createCatalogTask('organize_units')"
-              :disabled="creatingTask"
-              title="为该教材创建整理单元任务"
-            >
-              <i class="bi bi-list-check me-2"></i>整理教材单元
-            </button>
+          <div class="alert alert-light border mb-3">
+            <h6 class="alert-heading mb-2">
+              <i class="bi bi-lightbulb me-2"></i>下一步操作
+            </h6>
+            <p class="mb-2">该教材暂无单元信息，建议先整理单元结构，再补充资源内容。</p>
+            <div class="btn-group" role="group">
+              <button
+                class="btn btn-primary btn-lg"
+                @click="createCatalogTask('add_resources')"
+                :disabled="creatingTask"
+                title="为该教材创建补充资源任务"
+              >
+                <i class="bi bi-plus-circle me-2"></i>补充教材资源
+              </button>
+              <button
+                class="btn btn-outline-primary btn-lg"
+                @click="createCatalogTask('organize_units')"
+                :disabled="creatingTask"
+                title="为该教材创建整理单元任务"
+              >
+                <i class="bi bi-list-check me-2"></i>整理教材单元
+              </button>
+            </div>
+            <p class="text-muted small mt-2 mb-0">
+              <i class="bi bi-info-circle me-1"></i>点击按钮创建任务，任务会加入"我的任务"列表
+            </p>
           </div>
-          <p class="text-muted small mt-2 mb-0">
-            <i class="bi bi-info-circle me-1"></i>后端未返回 view_state，显示通用任务创建按钮
-          </p>
         </div>
         
         <!-- 调试信息（开发时可见，帮助排查按钮显示问题） -->
