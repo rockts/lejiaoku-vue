@@ -1,8 +1,8 @@
 <template>
   <div class="catalog-units">
-    <div class="container py-3">
+    <div class="container pt-2 pb-3">
       <!-- 面包屑导航 -->
-      <nav aria-label="breadcrumb" class="mb-3">
+      <nav aria-label="breadcrumb" class="mb-2">
         <ol class="breadcrumb mb-0">
           <li class="breadcrumb-item">
             <router-link to="/catalog">教材目录</router-link>
@@ -92,7 +92,7 @@
         </div>
         
         <!-- 备用按钮：当 view_state 为空时，显示通用任务创建按钮 -->
-        <div v-else-if="!catalogInfo.view_state || catalogInfo.view_state === 'no_action'" class="catalog-action-top mb-3">
+        <div v-else-if="!catalogInfo.view_state || catalogInfo.view_state === 'no_action'" class="catalog-action-top mb-2">
           <div class="alert alert-light border">
             <h6 class="alert-heading mb-2">
               <i class="bi bi-lightbulb me-2"></i>执行任务
@@ -131,7 +131,7 @@
         </div>
         
         <!-- 调试信息（开发时可见，帮助排查按钮显示问题） -->
-        <div v-if="catalogInfo" class="alert alert-info mb-3" style="font-size: 0.875rem;">
+        <div v-if="catalogInfo" class="alert alert-info mb-2" style="font-size: 0.875rem;">
           <strong>调试信息：</strong><br>
           catalogId: {{ catalogId }}<br>
           view_state: {{ catalogInfo.view_state || '(null/undefined)' }}<br>
