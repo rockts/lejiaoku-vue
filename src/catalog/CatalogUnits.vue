@@ -581,6 +581,19 @@ export default defineComponent({
     },
 
     /**
+     * 跳转到资源上传页面
+     */
+    goToUpload() {
+      // 跳转到资源上传页面，并传递 catalog_id 参数
+      this.$router.push({
+        path: "/resources/create",
+        query: {
+          catalog_id: this.catalogId,
+        },
+      });
+    },
+
+    /**
      * 跳转到资源列表页
      */
     goToResources(unit) {
