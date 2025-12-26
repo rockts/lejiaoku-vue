@@ -25,16 +25,16 @@
             <div v-if="displayUser?.nickname" class="text-muted small mb-2">
               <i class="bi bi-at"></i> {{ displayUser.nickname }}
             </div>
-            <span v-if="displayUser?.role === 'admin'" class="badge bg-danger">
+            <span v-if="displayUser?.role === 'admin'" class="badge rounded-pill text-bg-danger">
               管理员
             </span>
-            <span v-else-if="displayUser?.role === 'editor'" class="badge bg-primary">
+            <span v-else-if="displayUser?.role === 'editor'" class="badge rounded-pill text-bg-warning">
               编辑
             </span>
-            <span v-else-if="displayUser?.role === 'contributor'" class="badge bg-success">
+            <span v-else-if="displayUser?.role === 'contributor'" class="badge rounded-pill text-bg-info">
               贡献者
             </span>
-            <span v-else class="badge user-badge">普通用户</span>
+            <span v-else class="badge rounded-pill text-bg-secondary">普通用户</span>
           </div>
         </div>
 
@@ -90,10 +90,10 @@
               <div class="col-md-6 mb-3">
                 <label class="form-label text-muted">角色</label>
                 <div class="form-control-plaintext">
-                  <span v-if="displayUser?.role === 'admin'" class="badge bg-danger">管理员</span>
-                  <span v-else-if="displayUser?.role === 'editor'" class="badge bg-primary">编辑</span>
-                  <span v-else-if="displayUser?.role === 'contributor'" class="badge bg-success">贡献者</span>
-                  <span v-else class="badge user-badge">普通用户</span>
+                  <span v-if="displayUser?.role === 'admin'" class="badge rounded-pill text-bg-danger">管理员</span>
+                  <span v-else-if="displayUser?.role === 'editor'" class="badge rounded-pill text-bg-warning">编辑</span>
+                  <span v-else-if="displayUser?.role === 'contributor'" class="badge rounded-pill text-bg-info">贡献者</span>
+                  <span v-else class="badge rounded-pill text-bg-secondary">普通用户</span>
                 </div>
               </div>
               <div class="col-12 mb-3" v-if="displayUser?.description">
@@ -1042,6 +1042,16 @@ export default defineComponent({
   border-radius: 8px;
   padding: 1rem;
   background-color: #f8f9fa;
+}
+
+/* 深色主题下的上传区域 */
+[data-theme="dark"] .avatar-upload-section {
+  border-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .avatar-upload-section .text-muted {
+  color: rgba(255, 255, 255, 0.7) !important;
 }
 
 .avatar-preview {
