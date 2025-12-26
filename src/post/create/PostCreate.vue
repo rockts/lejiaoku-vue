@@ -43,6 +43,34 @@
           系统自动解析教材信息 → 8秒后跳转到首页
       </div>
 
+      <!-- 教材绑定提示 -->
+      <div v-if="routeCatalogId || textbookCatalogId" class="alert alert-success mb-4" role="alert">
+        <i class="bi bi-book-half me-2"></i>
+        <strong>已绑定教材：</strong>
+        <span v-if="routeCatalogId">教材 #{{ routeCatalogId }}</span>
+        <span v-else-if="textbookCatalogId">
+          教材 #{{ textbookCatalogId }}
+          <span class="text-muted small ms-2">
+            ({{ getSelectedTextbookName() }})
+          </span>
+        </span>
+        <span v-if="routeUnit || chapterInfo" class="ms-2">
+          <i class="bi bi-list-ul me-1"></i>单元：{{ routeUnit || chapterInfo }}
+        </span>
+        <span v-else class="ms-2 text-warning">
+          <i class="bi bi-info-circle me-1"></i>单元：未填写（整本教材可留空）
+        </span>
+        <div v-if="!routeCatalogId && textbookCatalogId" class="mt-2">
+          <small class="text-muted d-block mb-1">
+            <i class="bi bi-info-circle me-1"></i>
+            如果该教材在系统中不存在，请先前往「教材目录」创建
+          </small>
+          <router-link to="/catalog" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-book me-1"></i>前往教材目录
+          </router-link>
+        </div>
+      </div>
+
       <form>
         <!-- 资源标题 -->
         <div class="mb-4 card shadow-sm">
@@ -384,24 +412,32 @@
                 />
               </div>
               <div class="col-12">
-                <label class="form-label small text-muted">
-                  章节 / 单元 / 课（可选）
+                <label class="form-label small" :class="{'text-muted': !(routeCatalogId || textbookCatalogId), 'text-warning': (routeCatalogId || textbookCatalogId)}">
+                  章节 / 单元 / 课
+                  <span v-if="routeCatalogId || textbookCatalogId" class="text-warning">*</span>
+                  <span v-else class="text-muted">（可选）</span>
                   <i
                     class="bi bi-info-circle text-muted"
-                    title="如：第一章、第三单元、第5课等"
+                    title="如：第一章、第三单元、第5课等。如果是整本教材，可留空"
                   ></i>
                 </label>
                 <input
                   type="text"
                   class="form-control"
                   v-model="chapterInfo"
-                  placeholder="如：第一章、第三单元、第5课等"
+                  placeholder="如：第一章、第三单元、第5课等（整本教材可留空）"
+                  :required="false"
                 />
               </div>
               <div class="col-12">
-                <p class="text-muted small mb-0">
+                <p class="small mb-0" :class="{'text-warning': (routeCatalogId || textbookCatalogId), 'text-muted': !(routeCatalogId || textbookCatalogId)}">
                   <i class="bi bi-info-circle"></i>
-                  系统会尝试自动识别，也可手动输入或修改
+                  <span v-if="routeCatalogId || textbookCatalogId">
+                    💡 已绑定教材：如果是某个单元，请填写单元信息；如果是整本教材，可留空（系统会自动标记为「整本教材」）
+                  </span>
+                  <span v-else>
+                    系统会尝试自动识别，也可手动输入或修改
+                  </span>
                 </p>
               </div>
             </div>
@@ -581,6 +617,10 @@ export default defineComponent({
       // 步骤控制
       currentStep: 1, // 当前步骤（1:基础信息, 2:教材信息, 3:上传文件）
       isAuthenticated: false, // 认证状态
+
+      // 从 URL 参数获取的教材绑定信息
+      routeCatalogId: null, // 从路由参数获取的 catalog_id
+      routeUnit: null, // 从路由参数获取的 unit
     };
   },
 
@@ -600,6 +640,25 @@ export default defineComponent({
         this.$router.push({ path: '/login', query: { redirect: this.$route.fullPath } });
       }
       return;
+    }
+
+    // 从路由参数读取 catalog_id 和 unit
+    const catalogId = this.$route.query.catalog_id;
+    const unit = this.$route.query.unit;
+    
+    if (catalogId) {
+      this.routeCatalogId = catalogId;
+      this.textbookCatalogId = Number(catalogId);
+      console.log("[PostCreate] 从路由参数获取 catalog_id:", catalogId);
+    }
+    
+    if (unit) {
+      this.routeUnit = unit;
+      // 如果用户没有手动填写章节信息，自动填充 unit
+      if (!this.chapterInfo) {
+        this.chapterInfo = unit;
+      }
+      console.log("[PostCreate] 从路由参数获取 unit:", unit);
     }
 
     await this.fetchTextbookCatalog();
@@ -675,6 +734,32 @@ export default defineComponent({
   },
 
   methods: {
+    // 获取已选择教材的名称（用于显示）
+    getSelectedTextbookName() {
+      const parts = [];
+      if (this.textbookStage) {
+        const stage = this.stageOptions.find(s => s.id === this.textbookStage);
+        if (stage) parts.push(stage.name);
+      }
+      if (this.textbookGrade) {
+        const grade = this.gradeOptions.find(g => g.id === this.textbookGrade);
+        if (grade) parts.push(grade.name);
+      }
+      if (this.textbookSubject) {
+        const subject = this.subjectOptions.find(s => s.id === this.textbookSubject);
+        if (subject) parts.push(subject.name);
+      }
+      if (this.textbookVolume) {
+        const volume = this.volumeOptions.find(v => v.id === this.textbookVolume);
+        if (volume) parts.push(volume.name);
+      }
+      if (this.textbookVersion) {
+        const version = this.versionOptions.find(v => v.id === this.textbookVersion);
+        if (version) parts.push(version.name);
+      }
+      return parts.join(' · ') || '未知教材';
+    },
+
     // 获取教材目录数据
     async fetchTextbookCatalog() {
       try {
@@ -1288,6 +1373,78 @@ export default defineComponent({
           console.log("[PostCreate] 添加章节信息:", this.chapterInfo);
         }
 
+        // 确定要绑定的 catalog_id（优先级：路由参数 > 手动选择）
+        const catalogIdToBind = this.routeCatalogId || this.textbookCatalogId;
+        
+        // 确定要传递的 unit（优先级：路由参数 > 章节信息）
+        const unitToBind = this.routeUnit || (this.chapterInfo ? this.chapterInfo : null);
+
+        // 验证：如果手动选择了教材，确保教材ID有效
+        if (this.textbookCatalogId && !this.routeCatalogId) {
+          // 检查选择的教材是否在教材目录中存在
+          const selectedCatalog = this.textbookCatalog.find(
+            (item) => item.id === this.textbookCatalogId || 
+                      String(item.id) === String(this.textbookCatalogId)
+          );
+          
+          if (!selectedCatalog) {
+            console.warn("[PostCreate] 选择的教材ID不存在:", this.textbookCatalogId);
+            notification.warning(
+              "选择的教材在系统中不存在。请先前往「教材目录」页面创建该教材，或取消选择教材直接上传资源。"
+            );
+            this.isSubmitting = false;
+            return;
+          }
+          
+          console.log("[PostCreate] 验证教材存在:", {
+            catalogId: this.textbookCatalogId,
+            catalogName: selectedCatalog.name,
+            stage: this.textbookStage,
+            grade: this.textbookGrade,
+            subject: this.textbookSubject,
+            volume: this.textbookVolume,
+            version: this.textbookVersion
+          });
+        }
+
+        // 如果绑定了教材，提示用户填写单元（但允许整本教材的情况）
+        if (catalogIdToBind && !unitToBind) {
+          // 询问用户是否是整本教材
+          const { notification: notificationModule } = await import("@/utils/notification");
+          const isFullTextbook = await notificationModule.confirm(
+            "该资源已绑定教材。\n\n" +
+            "如果是整本教材，请点击「确定」继续上传（单元将标记为「整本教材」）。\n\n" +
+            "如果是某个单元的内容，请点击「取消」并填写「章节/单元/课」字段。",
+            {
+              requireAgreement: false,
+              confirmText: "是整本教材",
+              cancelText: "填写单元"
+            }
+          );
+          
+          if (isFullTextbook) {
+            // 整本教材，使用特殊标记
+            formData.append("unit", "整本教材");
+            console.log("[PostCreate] 整本教材，使用特殊标记");
+          } else {
+            // 用户选择填写单元，阻止提交
+            this.isSubmitting = false;
+            return;
+          }
+        }
+
+        // 添加 catalog_id（如果存在）
+        if (catalogIdToBind) {
+          formData.append("catalog_id", catalogIdToBind);
+          console.log("[PostCreate] 添加 catalog_id:", catalogIdToBind, "来源:", this.routeCatalogId ? "路由参数" : "手动选择");
+        }
+
+        // 添加 unit（如果存在）
+        if (unitToBind) {
+          formData.append("unit", unitToBind);
+          console.log("[PostCreate] 添加 unit:", unitToBind, "来源:", this.routeUnit ? "路由参数" : "章节信息");
+        }
+
         // 添加文件（如果有）
         if (this.file) {
           formData.append("file", this.file);
@@ -1355,9 +1512,13 @@ export default defineComponent({
           try {
             console.log("[PostCreate] 调用 auto-parse 接口...");
             await apiHttpClient.post(`/api/resources/${resourceId}/auto-parse`);
-            console.log("[PostCreate] auto-parse 调用成功");
+            console.log("[PostCreate] auto-parse 调用成功，开始轮询识别结果...");
+            
+            // 启动轮询 AI 识别结果
+            this.startAIPolling(resourceId);
+            
             notification.success(
-              "教材信息已自动提取，3秒后跳转到详情页...",
+              "正在自动提取教材信息，请稍候...",
               3000
             );
           } catch (error) {
@@ -1378,26 +1539,47 @@ export default defineComponent({
             }
           }
 
-          // 绑定教材（如果有选择）
-          try {
-          await this.bindTextbook(resourceId);
-          } catch (error) {
-            // 绑定教材失败不影响整体流程，只记录错误
-            console.error("[PostCreate] 绑定教材失败:", error);
-            // 如果是 403 错误，已经在全局拦截器中显示了"无权限"通知，这里不再显示
-            if (error.response?.status !== 403) {
-              console.warn("[PostCreate] 绑定教材失败，但不影响资源上传");
+          // 绑定教材（如果通过 FormData 没有传递 catalog_id，则单独绑定）
+          // 注意：如果已经在 FormData 中传递了 catalog_id，后端应该已经处理了绑定
+          // 这里只处理手动选择教材的情况（没有路由参数时）
+          if (!this.routeCatalogId && this.textbookCatalogId) {
+            try {
+              await this.bindTextbook(resourceId);
+            } catch (error) {
+              // 绑定教材失败不影响整体流程，只记录错误
+              console.error("[PostCreate] 绑定教材失败:", error);
+              // 如果是 403 错误，已经在全局拦截器中显示了"无权限"通知，这里不再显示
+              if (error.response?.status !== 403) {
+                console.warn("[PostCreate] 绑定教材失败，但不影响资源上传");
+              }
             }
+          } else if (this.routeCatalogId) {
+            console.log("[PostCreate] 已通过 FormData 传递 catalog_id，无需单独绑定");
           }
 
-          // 延迟 3 秒后跳转到资源详情页，让用户确认资源
-          setTimeout(() => {
-            console.log(
-              "[PostCreate] 跳转到资源详情页，resourceId:",
-              resourceId
-            );
-            this.$router.push(`/resources/${resourceId}`);
-          }, 3000);
+          // 延迟跳转到资源详情页，让用户确认资源
+          // 如果 AI 识别已完成，立即跳转；否则等待最多 10 秒
+          const maxWaitTime = 10000; // 最多等待 10 秒
+          const checkInterval = 1000; // 每秒检查一次
+          let waitedTime = 0;
+          
+          const checkAndJump = () => {
+            if (this.aiRecognized || waitedTime >= maxWaitTime) {
+              console.log(
+                "[PostCreate] 跳转到资源详情页，resourceId:",
+                resourceId,
+                "AI识别状态:",
+                this.aiRecognized ? "已完成" : "超时"
+              );
+              this.$router.push(`/resources/${resourceId}`);
+            } else {
+              waitedTime += checkInterval;
+              setTimeout(checkAndJump, checkInterval);
+            }
+          };
+          
+          // 3 秒后开始检查
+          setTimeout(checkAndJump, 3000);
         } else {
           // 如果没有 resourceId，也要重置提交状态
           this.isSubmitting = false;

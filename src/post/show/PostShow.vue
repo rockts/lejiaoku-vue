@@ -156,12 +156,23 @@
       <section v-if="resource.auto_meta_result" class="card section">
         <h5 class="section-title">【教材信息】</h5>
         <p class="text-muted mb-2">
-          {{ resource.auto_meta_result.textbook_version || "-" }} ·
-          {{ resource.auto_meta_result.subject || "-" }} ·
-          {{ resource.auto_meta_result.grade || "-"
-          }}{{ resource.auto_meta_result.volume || "" }}
+          {{ resource.auto_meta_result.textbook_info?.version || resource.auto_meta_result.textbook_version || "-" }} ·
+          {{ resource.auto_meta_result.textbook_info?.subject || resource.auto_meta_result.subject || "-" }} ·
+          {{ resource.auto_meta_result.textbook_info?.grade || resource.auto_meta_result.grade || "-"
+          }}{{ resource.auto_meta_result.textbook_info?.volume || resource.auto_meta_result.volume || "" }}
         </p>
-        <div v-if="resource.auto_meta_result.structure">
+        <div v-if="resource.auto_meta_result.textbook_structure?.length">
+          <p class="mb-1"><strong>单元列表：</strong></p>
+          <ul class="structure">
+            <li
+              v-for="(item, idx) in resource.auto_meta_result.textbook_structure"
+              :key="idx"
+            >
+              {{ item.name || item }}
+            </li>
+          </ul>
+        </div>
+        <div v-else-if="resource.auto_meta_result.structure?.length">
           <p class="mb-1"><strong>单元列表：</strong></p>
           <ul class="structure">
             <li
@@ -172,6 +183,19 @@
             </li>
           </ul>
         </div>
+        <p v-else class="text-muted small">教材结构信息正在提取中...</p>
+      </section>
+      
+      <!-- 如果 auto_meta_result 不存在，显示提示 -->
+      <section v-else-if="resource && !resource.auto_meta_result" class="card section">
+        <h5 class="section-title">【教材信息】</h5>
+        <p class="text-muted">
+          <i class="bi bi-info-circle me-2"></i>
+          教材信息正在自动提取中，请稍候刷新页面查看...
+        </p>
+        <button class="btn btn-sm btn-outline-primary mt-2" @click="getResourceById(id)">
+          <i class="bi bi-arrow-clockwise me-1"></i>刷新
+        </button>
       </section>
 
       <!-- 2. 教材目录绑定信息 -->
@@ -195,14 +219,14 @@
       </section>
 
       <!-- 3. 教材结构（只读） -->
-      <section v-if="resource.auto_meta_result" class="card section">
+      <section v-if="resource.auto_meta_result && typeof resource.auto_meta_result === 'object'" class="card section">
         <h5 class="section-title">教材结构</h5>
         <p class="text-muted mb-2">
           📘
-          {{ resource.auto_meta_result.textbook_info?.version || "-" }} ·
-          {{ resource.auto_meta_result.textbook_info?.subject || "-" }} ·
-          {{ resource.auto_meta_result.textbook_info?.grade || "-" }} ·
-          {{ resource.auto_meta_result.textbook_info?.volume || "-" }}
+          {{ resource.auto_meta_result.textbook_info?.version || resource.auto_meta_result.textbook_version || "-" }} ·
+          {{ resource.auto_meta_result.textbook_info?.subject || resource.auto_meta_result.subject || "-" }} ·
+          {{ resource.auto_meta_result.textbook_info?.grade || resource.auto_meta_result.grade || "-" }} ·
+          {{ resource.auto_meta_result.textbook_info?.volume || resource.auto_meta_result.volume || "-" }}
         </p>
         <ul
           v-if="resource.auto_meta_result.textbook_structure?.length"
@@ -213,6 +237,17 @@
             :key="unit.id || unit.name"
           >
             {{ unit.name }}
+          </li>
+        </ul>
+        <ul
+          v-else-if="resource.auto_meta_result.structure?.length"
+          class="structure"
+        >
+          <li
+            v-for="(item, idx) in resource.auto_meta_result.structure"
+            :key="idx"
+          >
+            {{ item.unit }}：{{ item.title }}
           </li>
         </ul>
       </section>
@@ -414,10 +449,27 @@ export default defineComponent({
         );
         this.resource = response.data;
         
+        // 如果 auto_meta_result 是字符串，需要解析为对象
+        if (this.resource?.auto_meta_result && typeof this.resource.auto_meta_result === 'string') {
+          try {
+            this.resource.auto_meta_result = JSON.parse(this.resource.auto_meta_result);
+            console.log("[PostShow] 已解析 auto_meta_result 字符串为对象:", this.resource.auto_meta_result);
+          } catch (error) {
+            console.error("[PostShow] 解析 auto_meta_result 失败:", error);
+            // 解析失败，保持原样
+          }
+        }
+        
         console.log("[PostShow] 获取资源成功:", {
           id: this.resource?.id,
           status: this.resource?.status,
-          user_id: this.resource?.user_id
+          user_id: this.resource?.user_id,
+          catalog_id: this.resource?.catalog_id,
+          unit: this.resource?.unit,
+          has_auto_meta_result: !!this.resource?.auto_meta_result,
+          auto_meta_result: this.resource?.auto_meta_result,
+          catalog_info: this.resource?.catalog_info,
+          auto_meta_result_type: typeof this.resource?.auto_meta_result
         });
         
         // 权限检查：
