@@ -51,6 +51,11 @@
             <i class="bi bi-list-check me-2"></i>整理教材单元
           </button>
         </div>
+        
+        <!-- 调试信息（开发时可见，帮助排查按钮显示问题） -->
+        <div v-if="catalogInfo.view_state" class="alert alert-info mb-3" style="font-size: 0.875rem;">
+          <strong>调试信息：</strong> view_state = "{{ catalogInfo.view_state }}", action_hint = "{{ catalogInfo.action_hint }}"
+        </div>
 
         <!-- 教材信息展示（只读） -->
         <div class="catalog-info-card mb-4">
