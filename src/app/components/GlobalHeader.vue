@@ -20,13 +20,12 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           <!-- 资源下拉菜单 -->
-          <li class="nav-item dropdown">
+          <li class="nav-item dropdown dropdown-hover">
             <a
               class="nav-link dropdown-toggle"
               href="#"
               id="resourceDropdown"
               role="button"
-              data-toggle="dropdown"
               aria-haspopup="true"
               aria-expanded="false"
             >
@@ -51,14 +50,13 @@
           <!-- 管理后台：仅管理员可见，带下拉菜单 -->
           <li
             v-if="canAccessAdmin"
-            class="nav-item dropdown"
+            class="nav-item dropdown dropdown-hover"
           >
             <a
               class="nav-link dropdown-toggle"
               href="#"
               id="adminDropdown"
               role="button"
-              data-toggle="dropdown"
               aria-haspopup="true"
               aria-expanded="false"
             >
@@ -126,11 +124,10 @@
               <i class="bi bi-cloud-upload-fill"></i>
             </router-link>
           </li>
-                     <li class="nav-item dropdown">
+                     <li class="nav-item dropdown dropdown-hover">
                        <button
                          class="nav-link dropdown-toggle btn btn-link user-dropdown-btn"
                          type="button"
-                         @click="toggleDropdown"
                          aria-expanded="false"
                        >
                          <div class="user-avatar-wrapper">
