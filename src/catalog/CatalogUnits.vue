@@ -32,6 +32,26 @@
 
       <!-- 教材章节内容 -->
       <div v-else-if="catalogInfo">
+        <!-- Catalog 级行为按钮 -->
+        <div v-if="catalogInfo.view_state && catalogInfo.view_state !== 'no_action'" class="catalog-action-top mb-4">
+          <button
+            v-if="catalogInfo.view_state === 'add_resources'"
+            class="btn btn-primary btn-lg"
+            @click="createCatalogTask('add_resources')"
+            :disabled="creatingTask"
+          >
+            <i class="bi bi-plus-circle me-2"></i>补充教材资源
+          </button>
+          <button
+            v-else-if="catalogInfo.view_state === 'organize_units'"
+            class="btn btn-primary btn-lg"
+            @click="createCatalogTask('organize_units')"
+            :disabled="creatingTask"
+          >
+            <i class="bi bi-list-check me-2"></i>整理教材单元
+          </button>
+        </div>
+
         <!-- 教材信息展示（只读） -->
         <div class="catalog-info-card mb-4">
           <div class="card">
@@ -89,8 +109,18 @@
                     {{ unit.title }}
                   </p>
                 </div>
-                <div class="unit-arrow">
-                  <i class="bi bi-arrow-right"></i>
+                <div class="unit-actions">
+                  <button
+                    v-if="unit.unit_state === 'empty' || unit.unit_state === 'sparse'"
+                    class="btn btn-sm btn-outline-primary unit-action-btn"
+                    @click.stop="createUnitTask(unit)"
+                    :disabled="creatingTask"
+                  >
+                    <i class="bi bi-plus-circle me-1"></i>补充资源
+                  </button>
+                  <div v-else class="unit-arrow">
+                    <i class="bi bi-arrow-right"></i>
+                  </div>
                 </div>
               </div>
             </div>
@@ -121,6 +151,7 @@ export default defineComponent({
       error: null,
       catalogInfo: null,
       units: [], // 单元列表
+      creatingTask: false, // 创建任务中
     };
   },
 
@@ -176,6 +207,8 @@ export default defineComponent({
             textbook_version: catalogData.textbook_version,
             education_level: catalogData.education_level,
             displayName: this.buildDisplayName(catalogData),
+            view_state: catalogData.view_state || null,
+            action_hint: catalogData.action_hint || null,
           };
 
           // 尝试从 catalog 数据中提取 units
@@ -184,6 +217,7 @@ export default defineComponent({
               name: typeof u === "string" ? u : u.name || u.unit || u.title,
               title: typeof u === "string" ? null : u.title || null,
               index: idx,
+              unit_state: typeof u === "object" ? u.unit_state : null,
             }));
             console.log("[CatalogUnits] 从 catalog 数据中提取到单元:", this.units);
           } else if (catalogData.structure && Array.isArray(catalogData.structure)) {
@@ -191,6 +225,7 @@ export default defineComponent({
               name: s.name || s.unit || s.title,
               title: s.title || null,
               index: idx,
+              unit_state: s.unit_state || null,
             }));
             console.log("[CatalogUnits] 从 catalog structure 中提取到单元:", this.units);
           } else if (catalogData.chapters && Array.isArray(catalogData.chapters)) {
@@ -198,6 +233,7 @@ export default defineComponent({
               name: c.name || c.unit || c.title,
               title: c.title || null,
               index: idx,
+              unit_state: c.unit_state || null,
             }));
             console.log("[CatalogUnits] 从 catalog chapters 中提取到单元:", this.units);
           } else {
@@ -472,8 +508,13 @@ export default defineComponent({
   word-break: break-word;
 }
 
-.unit-arrow {
+.unit-actions {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.unit-arrow {
   color: var(--muted, #6c757d);
   font-size: 1.25rem;
   transition: all 0.2s;
@@ -482,6 +523,16 @@ export default defineComponent({
 .unit-card:hover .unit-arrow {
   color: var(--primary, #4f8cff);
   transform: translateX(4px);
+}
+
+.unit-action-btn {
+  white-space: nowrap;
+  font-size: 0.875rem;
+  padding: 0.375rem 0.75rem;
+}
+
+.catalog-action-top {
+  text-align: center;
 }
 
 /* 深色主题适配 */
