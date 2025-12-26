@@ -309,12 +309,26 @@ export default defineComponent({
           };
           await this.extractUnitsFromResources();
         }
-      } catch (error) {
-        console.error("[CatalogUnits] 获取教材数据失败:", error);
-        this.error =
-          error.response?.data?.message ||
-          error.message ||
-          "获取教材数据失败";
+        } catch (error) {
+          console.error("[CatalogUnits] 获取教材数据失败:", error);
+          
+          // 根据错误类型提供更友好的提示
+          if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+            this.error = "请求超时，请检查网络连接或稍后重试";
+          } else if (error.code === 'ERR_NETWORK' || error.message?.includes('Network Error')) {
+            this.error = "网络连接失败，请检查后端服务是否正常运行";
+          } else if (error.response?.status === 500) {
+            this.error = "服务器内部错误，请稍后重试";
+          } else if (error.response?.status === 503) {
+            this.error = "服务暂时不可用，请稍后重试";
+          } else if (error.response?.status === 404) {
+            this.error = `教材 ID ${this.catalogId} 不存在`;
+          } else {
+            this.error =
+              error.response?.data?.message ||
+              error.message ||
+              "获取教材数据失败";
+          }
       } finally {
         this.loading = false;
       }
