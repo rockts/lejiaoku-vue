@@ -59,8 +59,25 @@
           </tr>
           <tr v-else v-for="app in applications" :key="app.id">
             <td>{{ app.id }}</td>
-            <td>{{ app.user?.username || app.user?.name || '未知用户' }}</td>
-            <td>{{ app.user?.email || '-' }}</td>
+            <td>
+              <template v-if="app.user">
+                {{ app.user.username || app.user.name || app.user.nickname || '未知用户' }}
+              </template>
+              <template v-else-if="app.user_id">
+                用户ID: {{ app.user_id }} (用户信息缺失)
+              </template>
+              <template v-else>
+                未知用户
+              </template>
+            </td>
+            <td>
+              <template v-if="app.user">
+                {{ app.user.email || '-' }}
+              </template>
+              <template v-else>
+                -
+              </template>
+            </td>
             <td>{{ formatDate(app.created_at) }}</td>
             <td>
               <span
@@ -140,15 +157,48 @@ export default defineComponent({
         console.log("[AdminContributorApplications] 获取申请列表...");
         const params = this.statusFilter ? { status: this.statusFilter } : {};
         const response = await apiHttpClient.get("/api/contributor-applications", { params });
-        console.log("[AdminContributorApplications] 申请列表:", response.data);
+        console.log("[AdminContributorApplications] API 响应:", response);
+        console.log("[AdminContributorApplications] response.data:", response.data);
+        console.log("[AdminContributorApplications] response.data 类型:", typeof response.data);
+        console.log("[AdminContributorApplications] response.data 是否为数组:", Array.isArray(response.data));
         
-        this.applications = Array.isArray(response.data) 
-          ? response.data 
-          : (response.data?.data || response.data?.applications || []);
+        let applications = [];
+        if (Array.isArray(response.data)) {
+          applications = response.data;
+        } else if (response.data?.data && Array.isArray(response.data.data)) {
+          applications = response.data.data;
+        } else if (response.data?.applications && Array.isArray(response.data.applications)) {
+          applications = response.data.applications;
+        } else if (response.data && typeof response.data === 'object') {
+          // 如果是单个对象，转换为数组
+          applications = [response.data];
+        }
+        
+        console.log("[AdminContributorApplications] 解析后的申请列表:", applications);
+        console.log("[AdminContributorApplications] 申请数量:", applications.length);
+        
+        // 检查每个申请是否包含用户信息
+        applications.forEach((app, index) => {
+          console.log(`[AdminContributorApplications] 申请 ${index + 1}:`, {
+            id: app.id,
+            status: app.status,
+            user: app.user,
+            userId: app.user_id,
+            createdAt: app.created_at
+          });
+        });
+        
+        this.applications = applications;
       } catch (error) {
         console.error("[AdminContributorApplications] 获取申请列表失败:", error);
+        console.error("[AdminContributorApplications] 错误详情:", {
+          message: error.message,
+          response: error.response,
+          status: error.response?.status,
+          data: error.response?.data
+        });
         notification.error(
-          error.response?.data?.message || "获取申请列表失败"
+          error.response?.data?.message || error.message || "获取申请列表失败"
         );
       } finally {
         this.loading = false;
@@ -263,4 +313,5 @@ export default defineComponent({
   font-weight: 500;
 }
 </style>
+
 

@@ -426,45 +426,33 @@ export default defineComponent({
       this.$router.push("/");
     },
     
-    // 检查申请状态
+    // 检查申请状态（使用 store 的 action）
     async checkApplicationStatus() {
       if (!this.isAuthenticated || !this.isUser) {
         return;
       }
       
-      try {
-        console.log('[GlobalHeader] 检查贡献者申请状态...');
-        const response = await apiHttpClient.get('/api/contributor-applications/my');
-        const application = response.data;
-        if (application && application.status) {
-          this.applicationStatus = application.status;
-          console.log('[GlobalHeader] 申请状态:', this.applicationStatus);
-        } else {
-          // 如果没有状态，设置为 null（可以申请）
-          this.applicationStatus = null;
-        }
-      } catch (error) {
-        // 404 表示没有申请记录，设置为 null（可以申请）
-        if (error.response?.status === 404) {
-          this.applicationStatus = null;
-          console.log('[GlobalHeader] 没有申请记录，可以申请');
-        } else {
-          console.error('[GlobalHeader] 检查申请状态失败:', error);
-          // 其他错误时，保持当前状态不变，避免误判
-        }
-      }
+      await this.$store.dispatch('auth/checkContributorApplicationStatus');
+      console.log('[GlobalHeader] 申请状态已更新:', this.applicationStatus);
     },
     
     // 处理申请成为贡献者
     async handleApplyContributor() {
-      if (!this.isAuthenticated || !this.isUser) {
-        notification.warning('请先登录');
+      // 首先检查状态，如果已申请，直接返回，不显示任何弹窗
+      const currentStatus = this.applicationStatus;
+      if (currentStatus === 'pending' || currentStatus === 'approved') {
+        console.log('[GlobalHeader] 已有申请，阻止点击，状态:', currentStatus);
+        return; // 直接返回，不显示任何提示
+      }
+      
+      // 双重检查：防止在禁用状态下仍然被点击
+      if (this.isApplying) {
+        console.log('[GlobalHeader] 正在提交中，阻止重复点击');
         return;
       }
       
-      // 如果已申请（pending/approved），不处理
-      if (this.applicationStatus === 'pending' || this.applicationStatus === 'approved') {
-        notification.info('您的申请正在审核中，请耐心等待');
+      if (!this.isAuthenticated || !this.isUser) {
+        notification.warning('请先登录');
         return;
       }
       
@@ -485,16 +473,22 @@ export default defineComponent({
         console.log('[GlobalHeader] 申请提交成功:', response.data);
         
         notification.success('已提交申请，等待管理员审核');
-        // 更新 store 中的状态
+        // 立即更新 store 中的状态并保存到 localStorage
         this.$store.dispatch('auth/setContributorApplicationStatus', 'pending');
+        console.log('[GlobalHeader] 申请提交成功，状态已更新为 pending');
       } catch (error) {
         console.error('[GlobalHeader] 提交申请失败:', error);
         
         // 处理 400 错误：已存在申请
         if (error.response?.status === 400) {
           notification.warning('你已有申请，请勿重复提交');
-          // 重新检查申请状态，确保前端状态同步
+          // 立即设置为 pending 状态，然后重新检查申请状态，确保前端状态同步
+          this.$store.dispatch('auth/setContributorApplicationStatus', 'pending');
+          // 使用 nextTick 确保状态更新后再继续
+          await this.$nextTick();
           await this.$store.dispatch('auth/checkContributorApplicationStatus');
+          console.log('[GlobalHeader] 检测到已有申请，状态已更新:', this.applicationStatus);
+          // 不设置 isApplying = false，保持按钮禁用状态
           return;
         }
         
@@ -504,9 +498,10 @@ export default defineComponent({
                         error.message ||
                         '提交申请失败，请稍后重试';
         notification.error(errorMsg);
-      } finally {
+        // 其他错误时，重置 isApplying
         this.isApplying = false;
       }
+      // 注意：400 错误时已经在 catch 中 return，不会执行到这里
     },
     
     // 刷新用户数据

@@ -45,7 +45,8 @@
               :class="{
                 'btn-apply-contributor-disabled': isApplying || applicationStatus === 'pending' || applicationStatus === 'approved'
               }"
-              @click="handleApplyContributor"
+              @click.stop.prevent="handleApplyContributorClick"
+              @mousedown.stop.prevent="handleMouseDown"
               :disabled="isApplying || applicationStatus === 'pending' || applicationStatus === 'approved'"
               :style="(isApplying || applicationStatus === 'pending' || applicationStatus === 'approved') ? 'pointer-events: none; cursor: not-allowed;' : ''"
             >
@@ -62,31 +63,18 @@
             </button>
           </div>
           
-          <!-- 未登录：显示二维码 -->
+          <!-- 未登录：显示登录按钮 -->
           <div
             v-else
-            class="qr-wrapper"
-            @mouseenter="showQR = true"
-            @mouseleave="showQR = false"
+            class="qr-wrapper-center"
           >
-            <router-link to="#" class="btn btn-outline-primary"
-              >申请成为贡献者</router-link
+            <button
+              type="button"
+              class="btn btn-apply-contributor"
+              @click="showLoginModal = true"
             >
-            <div v-if="showQR" class="qr-popover">
-              <img
-                class="qr-image"
-                :src="qrSrc"
-                alt="扫码成为贡献者"
-                @error="qrError = true"
-              />
-              <div class="qr-caption">
-                {{
-                  qrError
-                    ? "未找到二维码，请在 public/ 放置 qr-contributor.jpg"
-                    : "申请成为贡献者"
-                }}
-              </div>
-            </div>
+              <i class="bi bi-person-plus-fill me-2"></i> 申请成为贡献者
+            </button>
           </div>
         </div>
       </div>
@@ -123,9 +111,6 @@ export default defineComponent({
         grades: [],
       },
       resources: [],
-      showQR: false,
-      qrError: false,
-      qrSrc: process.env.BASE_URL + "qr-contributor.jpg",
       showLoginModal: false,
       isApplying: false, // 是否正在提交申请
     };
@@ -312,7 +297,8 @@ export default defineComponent({
   async mounted() {
     // 组件挂载后再次检查申请状态，确保数据已准备好
     if (this.canApplyContributor) {
-      await this.checkApplicationStatus();
+      await this.$store.dispatch('auth/checkContributorApplicationStatus');
+      console.log('[Home] mounted - 申请状态:', this.applicationStatus);
     }
   },
   
@@ -349,13 +335,43 @@ export default defineComponent({
     },
     
     
+    // 处理 mousedown 事件（在 click 之前触发，用于额外防护）
+    handleMouseDown(event) {
+      if (this.isApplying || this.applicationStatus === 'pending' || this.applicationStatus === 'approved') {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    },
+    
+    // 处理按钮点击（包装方法，用于阻止禁用状态下的点击）
+    handleApplyContributorClick(event) {
+      // 如果按钮处于禁用状态，阻止事件
+      const isDisabled = this.isApplying || this.applicationStatus === 'pending' || this.applicationStatus === 'approved';
+      
+      if (isDisabled) {
+        event.preventDefault();
+        event.stopPropagation();
+        console.log('[Home] 按钮处于禁用状态，阻止点击，状态:', this.applicationStatus);
+        return;
+      }
+      
+      // 调用实际的处理方法
+      this.handleApplyContributor();
+    },
+    
     // 处理申请成为贡献者
     async handleApplyContributor() {
+      // 首先检查状态，如果已申请，直接返回，不显示任何弹窗
+      const currentStatus = this.applicationStatus;
+      
+      if (currentStatus === 'pending' || currentStatus === 'approved') {
+        console.log('[Home] 已有申请，阻止点击，状态:', currentStatus);
+        return; // 直接返回，不显示任何提示
+      }
+      
       // 双重检查：防止在禁用状态下仍然被点击
-      if (this.isApplying || this.applicationStatus === 'pending' || this.applicationStatus === 'approved') {
-        if (this.applicationStatus === 'pending' || this.applicationStatus === 'approved') {
-          notification.info('您的申请正在审核中，请耐心等待');
-        }
+      if (this.isApplying) {
+        console.log('[Home] 正在提交中，阻止重复点击');
         return;
       }
       
@@ -381,16 +397,22 @@ export default defineComponent({
         console.log('[Home] 申请提交成功:', response.data);
         
         notification.success('已提交申请，等待管理员审核');
-        // 更新 store 中的状态
+        // 立即更新 store 中的状态并保存到 localStorage
         this.$store.dispatch('auth/setContributorApplicationStatus', 'pending');
+        console.log('[Home] 申请提交成功，状态已更新为 pending');
       } catch (error) {
         console.error('[Home] 提交申请失败:', error);
         
         // 处理 400 错误：已存在申请
         if (error.response?.status === 400) {
           notification.warning('你已有申请，请勿重复提交');
-          // 重新检查申请状态，确保前端状态同步
+          // 立即设置为 pending 状态，然后重新检查申请状态，确保前端状态同步
+          this.$store.dispatch('auth/setContributorApplicationStatus', 'pending');
+          // 使用 nextTick 确保状态更新后再继续
+          await this.$nextTick();
           await this.$store.dispatch('auth/checkContributorApplicationStatus');
+          console.log('[Home] 检测到已有申请，状态已更新:', this.applicationStatus);
+          // 不设置 isApplying = false，保持按钮禁用状态
           return;
         }
         
@@ -400,9 +422,10 @@ export default defineComponent({
                         error.message ||
                         '提交申请失败，请稍后重试';
         notification.error(errorMsg);
-      } finally {
+        // 其他错误时，重置 isApplying
         this.isApplying = false;
       }
+      // 注意：400 错误时已经在 catch 中 return，不会执行到这里
     },
   },
 });
@@ -450,37 +473,6 @@ export default defineComponent({
 }
 .upload-btn i {
   font-size: 18px;
-}
-
-.qr-wrapper {
-  position: relative;
-  display: inline-block;
-}
-
-.qr-popover {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  box-shadow: var(--shadow);
-  padding: 12px;
-  z-index: 10;
-}
-
-.qr-image {
-  width: 240px;
-  height: auto;
-  display: block;
-}
-
-.qr-caption {
-  text-align: center;
-  font-size: 14px;
-  color: var(--text-secondary, #666);
-  margin-top: 8px;
 }
 
 /* 申请成为贡献者按钮 - 更醒目的样式 */
