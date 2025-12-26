@@ -214,10 +214,11 @@ export default defineComponent({
 }
 
 .login-card {
-  background: #fff;
+  background: var(--surface, #fff);
   border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow, 0 10px 40px rgba(0, 0, 0, 0.1));
   overflow: hidden;
+  border: 1px solid var(--border, transparent);
 }
 
 .login-header {
