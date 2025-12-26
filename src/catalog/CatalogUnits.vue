@@ -565,13 +565,45 @@ export default defineComponent({
 
       this.creatingTask = true;
       try {
-        const response = await apiHttpClient.post("/api/tasks", {
-          task_type: "add_resources",
-          catalog_id: this.catalogId,
-          unit: unit.name,
-        });
+        // 尝试多个可能的 API 路径
+        let response = null;
+        const possiblePaths = [
+          "/api/tasks",      // 原始路径
+          "/my/tasks",       // 参考 /my/resources 的格式
+          "/api/my/tasks",   // 带 /api 前缀
+        ];
 
-        console.log("[CatalogUnits] 创建单元任务成功:", response.data);
+        let lastError = null;
+        for (const path of possiblePaths) {
+          try {
+            console.log(`[CatalogUnits] 尝试创建单元任务 API 路径: ${path}`);
+            response = await apiHttpClient.post(path, {
+              task_type: "add_resources",
+              catalog_id: this.catalogId,
+              unit: unit.name,
+            });
+            console.log(`[CatalogUnits] ${path} 创建单元任务成功:`, response.data);
+            break; // 成功则跳出循环
+          } catch (error) {
+            console.warn(`[CatalogUnits] ${path} 创建单元任务失败:`, error.response?.status, error.message);
+            lastError = error;
+            // 如果是 404，继续尝试下一个路径
+            if (error.response?.status === 404) {
+              continue;
+            }
+            // 其他错误直接抛出
+            throw error;
+          }
+        }
+
+        // 如果所有路径都失败，抛出最后一个错误
+        if (!response && lastError) {
+          throw lastError;
+        }
+
+        if (!response) {
+          throw new Error("无法连接到后端服务");
+        }
 
         // 显示成功提示
         const { notification } = await import("@/utils/notification");
@@ -579,9 +611,17 @@ export default defineComponent({
       } catch (error) {
         console.error("[CatalogUnits] 创建单元任务失败:", error);
         const { notification } = await import("@/utils/notification");
-        notification.error(
-          error.response?.data?.message || error.message || "创建任务失败"
-        );
+        
+        if (error.response?.status === 404) {
+          notification.warning(
+            "创建任务 API 不存在，请确认后端是否已实现该接口。\n" +
+            "尝试的路径：/api/tasks, /my/tasks, /api/my/tasks"
+          );
+        } else {
+          notification.error(
+            error.response?.data?.message || error.message || "创建任务失败"
+          );
+        }
       } finally {
         this.creatingTask = false;
       }
