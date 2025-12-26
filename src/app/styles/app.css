@@ -227,8 +227,8 @@ select:disabled {
       color: var(--text);
     }
     [data-theme="dark"] .dropdown-menu {
-      background-color: #1e222d;
-      border-color: var(--border);
+      background-color: #252a35;
+      border-color: rgba(255, 255, 255, 0.25);
     }
     [data-theme="dark"] .dropdown-item {
       color: #ffffff;
