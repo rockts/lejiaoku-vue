@@ -108,6 +108,7 @@ export default defineComponent({
     return {
       tasks: [],
       loading: false,
+      apiNotFound: false, // API 不存在标志
     };
   },
 
