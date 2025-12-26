@@ -10,18 +10,20 @@ import appRoutes from './app.routes';
 import postRoutes from '@/post/post.routes';
 import userRoutes from '@/user/user.routes';
 import adminRoutes from '@/admin/admin.routes';
+import catalogRoutes from '@/catalog/catalog.routes';
 
 /**
  * 创建路由器
  */
 
 const router = createRouter({
-  history: createWebHistory(),
+    history: createWebHistory(),
   routes: [
     ...appRoutes, 
     ...postRoutes, 
     ...userRoutes, 
     ...adminRoutes,
+    ...catalogRoutes,
     // 404 处理：所有未匹配的路由都跳转到首页
     {
       path: '/:pathMatch(.*)*',
