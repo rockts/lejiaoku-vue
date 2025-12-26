@@ -154,43 +154,9 @@ export default defineComponent({
       this.applyFilters();
     }, 600);
 
-    // 从 URL query 参数读取筛选条件
-    const query = this.$route.query;
-    if (query.category) {
-      this.filters.category = decodeURIComponent(query.category);
-    }
-    if (query.grade) {
-      this.filters.grade = decodeURIComponent(query.grade);
-    }
-    if (query.subject) {
-      this.filters.subject = decodeURIComponent(query.subject);
-    }
-    if (query.textbook_version) {
-      this.filters.textbook_version = decodeURIComponent(query.textbook_version);
-    }
-    if (query.volume) {
-      this.filters.volume = decodeURIComponent(query.volume);
-    }
-    if (query.chapter_keyword) {
-      this.filters.chapter_keyword = decodeURIComponent(query.chapter_keyword);
-    }
-    if (query.page) {
-      this.currentPage = parseInt(query.page) || 1;
-    }
-
-    // 初始加载时使用筛选参数
-    const params = {
-      page: this.currentPage,
-      limit: this.pageSize,
-    };
-    Object.keys(this.filters).forEach((key) => {
-      const value = this.filters[key];
-      if (value && String(value).trim()) {
-        params[key] = String(value).trim();
-      }
-    });
-    console.log("[PostList] created - 初始筛选参数:", params);
-    this.fetchFilteredResources(params);
+    // 初始加载
+    this.loadFiltersFromQuery();
+    this.loadResources();
   },
 
   computed: {
@@ -219,6 +185,31 @@ export default defineComponent({
       }
       return pages;
     },
+  },
+
+  watch: {
+    // 监听路由变化，当 URL query 参数变化时重新加载数据
+    '$route.query': {
+      handler(newQuery, oldQuery) {
+        // 检查 category 或其他筛选参数是否变化
+        const queryChanged = 
+          newQuery.category !== oldQuery?.category ||
+          newQuery.grade !== oldQuery?.grade ||
+          newQuery.subject !== oldQuery?.subject ||
+          newQuery.textbook_version !== oldQuery?.textbook_version ||
+          newQuery.volume !== oldQuery?.volume ||
+          newQuery.chapter_keyword !== oldQuery?.chapter_keyword ||
+          newQuery.page !== oldQuery?.page;
+        
+        if (queryChanged) {
+          console.log("[PostList] 检测到路由 query 参数变化，重新加载数据");
+          this.loadFiltersFromQuery();
+          this.loadResources();
+        }
+      },
+      deep: true,
+      immediate: false
+    }
   },
 
   methods: {
