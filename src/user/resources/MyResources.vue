@@ -156,6 +156,16 @@ export default defineComponent({
   background: white;
 }
 
+[data-theme="dark"] .table {
+  background: var(--surface, #1e222d) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .table td,
+[data-theme="dark"] .table th {
+  color: #ffffff !important;
+}
+
 .badge {
   font-size: 0.9em;
   padding: 0.4em 0.8em;
