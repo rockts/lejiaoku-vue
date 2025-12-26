@@ -162,7 +162,6 @@
             </button>
             <ul
               class="dropdown-menu dropdown-menu-end"
-              :class="{ show: showUserDropdown }"
             >
               <li class="dropdown-header">
                 <div class="user-info">
@@ -201,7 +200,6 @@
                 <router-link
                   :to="currentUser ? `/users/${currentUser.id}/resources` : '/me/resources'"
                   class="dropdown-item"
-                  @click="closeDropdown"
                 >
                   <i class="bi bi-file-earmark-text me-2"></i>我的资源
                 </router-link>
