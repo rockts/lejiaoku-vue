@@ -1,7 +1,13 @@
 <template>
   <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2><i class="bi bi-list-check me-2"></i>我的任务</h2>
+      <div>
+        <h2><i class="bi bi-list-check me-2"></i>我的任务</h2>
+        <p class="text-muted small mb-0">
+          <i class="bi bi-info-circle me-1"></i>
+          点击"查看"按钮跳转到教材章节页，在教材页面可以创建任务或上传资源
+        </p>
+      </div>
       <button 
         class="btn btn-outline-primary" 
         @click="fetchTasks"

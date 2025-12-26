@@ -49,6 +49,11 @@
           <i class="bi bi-info-circle me-2"></i>
           <strong>来自任务：</strong>你正在查看任务关联的教材
           <span v-if="targetUnit">，目标单元：<strong>{{ targetUnit }}</strong></span>
+          <div class="mt-2">
+            <router-link to="/me/tasks" class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-arrow-left me-1"></i>返回我的任务
+            </router-link>
+          </div>
         </div>
         
         <!-- Catalog 级行为按钮 -->
