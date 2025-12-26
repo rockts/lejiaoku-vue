@@ -134,7 +134,7 @@
             :disabled="!selectedCatalog"
           >
             <i class="bi bi-arrow-right-circle me-2"></i>
-            进入资源列表
+            查看章节
           </button>
         </div>
 
@@ -382,35 +382,36 @@ export default defineComponent({
 
     /**
      * 跳转到资源列表页
+     * 现在改为跳转到教材章节页
      */
     goToResources() {
       if (!this.selectedCatalog) {
         return;
       }
 
-      // 构建查询参数
-      const query = {};
-
-      // 优先使用 catalog_id（如果后端支持）
+      // 优先跳转到教材章节页（如果 catalog 有 id）
       if (this.selectedCatalog.id) {
-        query.catalog_id = this.selectedCatalog.id;
-      } else {
-        // 否则使用详细筛选参数
-        if (this.selectedCatalog.subject) {
-          query.subject = this.selectedCatalog.subject;
-        }
-        if (this.selectedCatalog.grade) {
-          query.grade = this.formatGrade(this.selectedCatalog.grade);
-        }
-        if (this.selectedCatalog.volume) {
-          query.volume = this.selectedCatalog.volume;
-        }
-        if (this.selectedCatalog.textbook_version) {
-          query.textbook_version = this.selectedCatalog.textbook_version;
-        }
+        this.$router.push({
+          path: `/catalog/${this.selectedCatalog.id}`,
+        });
+        return;
       }
 
-      // 跳转到资源列表页
+      // 如果没有 id，使用详细筛选参数跳转到资源列表页（兜底方案）
+      const query = {};
+      if (this.selectedCatalog.subject) {
+        query.subject = this.selectedCatalog.subject;
+      }
+      if (this.selectedCatalog.grade) {
+        query.grade = this.formatGrade(this.selectedCatalog.grade);
+      }
+      if (this.selectedCatalog.volume) {
+        query.volume = this.selectedCatalog.volume;
+      }
+      if (this.selectedCatalog.textbook_version) {
+        query.textbook_version = this.selectedCatalog.textbook_version;
+      }
+
       this.$router.push({
         path: "/resources",
         query,
