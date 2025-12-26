@@ -29,20 +29,30 @@ export default defineComponent({
   computed: {
     crumbs() {
       const routeName = this.$route.name;
+      const routePath = this.$route.path;
+      const query = this.$route.query;
       const list = [];
 
       switch (routeName) {
         case "resourceIndex":
-          list.push({ label: "资源列表", to: "/resources" });
+        case "PostIndex":
+          // 检查是否有 category 参数
+          if (query.category) {
+            const category = decodeURIComponent(query.category);
+            list.push({ label: "资源列表", to: "/posts" });
+            list.push({ label: category, to: "" });
+          } else {
+            list.push({ label: "资源列表", to: "/posts" });
+          }
           break;
         case "resourceShow":
-          list.push({ label: "资源列表", to: "/resources" });
+          list.push({ label: "资源列表", to: "/posts" });
           // Try to get title from route params or meta if available, otherwise generic
           // Since we don't have the resource title easily here without store access, generic is fine
           list.push({ label: "资源详情", to: "" });
           break;
         case "resourceCreate":
-          list.push({ label: "资源列表", to: "/resources" });
+          list.push({ label: "资源列表", to: "/posts" });
           list.push({ label: "上传资源", to: "" });
           break;
         case "classificationsIndex":

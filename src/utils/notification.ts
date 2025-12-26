@@ -39,12 +39,17 @@ class NotificationManager {
 
         const notification = document.createElement('div');
         notification.className = `notification notification-${type}`;
+        // 检测深色主题
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const bgColor = isDark ? 'var(--surface, #1e222d)' : 'white';
+        const textColor = isDark ? 'var(--text, #e6e9ef)' : '#333';
+        
         notification.style.cssText = `
       pointer-events: auto;
       margin-bottom: 12px;
       padding: 12px 16px;
       border: 1px solid;
-      background: white;
+      background: ${bgColor};
       border-left: 4px solid;
       display: flex;
       align-items: center;
@@ -55,6 +60,8 @@ class NotificationManager {
       transform: translateX(400px);
       transition: all 0.2s ease;
       font-size: 14px;
+      box-shadow: var(--shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
+      border-radius: 8px;
     `;
 
         // 设置边框颜色和图标
@@ -91,19 +98,21 @@ class NotificationManager {
         icon.textContent = icons[type];
 
         const content = document.createElement('span');
+        const contentColor = isDark ? 'var(--text, #e6e9ef)' : '#333';
         content.style.cssText = `
       flex: 1;
-      color: #333;
+      color: ${contentColor};
     `;
         content.textContent = message;
 
         const closeBtn = document.createElement('button');
         closeBtn.innerHTML = '×';
+        const closeColor = isDark ? 'var(--muted, #a0a7b7)' : '#999';
         closeBtn.style.cssText = `
       border: none;
       background: none;
       font-size: 20px;
-      color: #999;
+      color: ${closeColor};
       cursor: pointer;
       padding: 0;
       width: 20px;

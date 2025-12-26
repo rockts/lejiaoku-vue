@@ -135,9 +135,14 @@
                     <option value="editor">编辑</option>
                     <option value="admin">管理员</option>
                   </select>
-                  <span v-if="isCurrentUser(user.id)" class="current-user-badge">
-                    当前用户
-                  </span>
+                  <div class="role-badges">
+                    <span v-if="isCurrentUser(user.id)" class="badge rounded-pill text-bg-primary ms-2">
+                      当前用户
+                    </span>
+                    <span class="badge rounded-pill ms-2" :class="getRoleBadgeClass(user.role)">
+                      {{ getRoleText(user.role) }}
+                    </span>
+                  </div>
                 </div>
               </td>
               <td>
@@ -447,6 +452,16 @@ export default defineComponent({
       return roleMap[role] || role;
     },
 
+    getRoleBadgeClass(role) {
+      const badgeMap = {
+        'user': 'text-bg-secondary',
+        'contributor': 'text-bg-info',
+        'editor': 'text-bg-warning',
+        'admin': 'text-bg-danger'
+      };
+      return badgeMap[role] || 'text-bg-secondary';
+    },
+
     async deleteUser(userId, userName) {
       // 确认删除
       const confirmMessage = `确定要删除用户 "${userName}" (ID: ${userId}) 吗？\n\n此操作不可恢复！`;
@@ -735,6 +750,45 @@ export default defineComponent({
 .user-table tbody td {
   padding: 0.75rem;
   vertical-align: middle;
+  color: #212529;
+}
+
+/* 深色主题表格样式 */
+[data-theme="dark"] .user-table {
+  background: var(--surface, #1e222d) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .user-table thead {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+[data-theme="dark"] .user-table thead th {
+  color: #ffffff !important;
+  border-bottom-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+[data-theme="dark"] .user-table tbody td {
+  color: #ffffff !important;
+  border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .user-table tbody tr {
+  border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .user-table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .user-name,
+[data-theme="dark"] .user-nickname,
+[data-theme="dark"] .user-email {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .user-table small.text-muted {
+  color: rgba(255, 255, 255, 0.7) !important;
 }
 
 .user-id-badge {
@@ -768,6 +822,20 @@ export default defineComponent({
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.role-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.role-badges .badge {
+  font-size: 0.65rem;
+  padding: 0.15rem 0.4rem;
+  font-weight: 500;
 }
 
 .role-select {

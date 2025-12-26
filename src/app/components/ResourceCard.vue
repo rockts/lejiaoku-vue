@@ -35,9 +35,12 @@
       <span class="badge format">{{ item.format }}</span>
       <span class="muted">{{ textbookInfo }}</span>
     </div>
-    <!-- 教材信息和单元数 -->
-    <div class="resource-chapter" v-if="unitCount">
-      <i class="bi bi-bookmark"></i> {{ unitCount }}
+    <!-- 所属单元 -->
+    <div class="resource-unit" v-if="item.unit">
+      <i class="bi bi-bookmark"></i> 所属单元：{{ item.unit }}
+    </div>
+    <div class="resource-unit-pending" v-else-if="item.catalog_id">
+      <i class="bi bi-exclamation-circle"></i> <span class="text-muted">待整理</span>
     </div>
     <div class="resource-actions">
       <button class="btn btn-sm btn-outline-primary" @click.stop="onPreview">
@@ -120,14 +123,6 @@ export default defineComponent({
       const volume = info.volume || "";
       const subject = info.subject || this.item.subject || "-";
       return `${grade}${volume} · ${subject}`;
-    },
-    unitCount() {
-      // 显示单元数量
-      const structure =
-        this.item.catalog_info?.structure ||
-        this.item.auto_meta_result?.structure ||
-        [];
-      return structure.length > 0 ? `${structure.length} 个单元` : null;
     },
   },
   methods: {
@@ -300,7 +295,7 @@ export default defineComponent({
 .resource-card .resource-cover {
   width: 100%;
   height: 220px;
-  background: #fff;
+  background: var(--surface, #fff);
   border-radius: 8px;
   overflow: hidden;
   margin-bottom: 12px;
@@ -316,7 +311,7 @@ export default defineComponent({
   max-width: 100%;
   max-height: 100%;
   display: block;
-  background: #fff;
+  background: var(--surface, #fff);
   margin: auto;
   position: static;
 }
@@ -334,13 +329,13 @@ export default defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+  background: linear-gradient(135deg, var(--bg, #f5f7fa) 0%, var(--surface, #e8ecf1) 100%);
   border: none;
 }
 
 .resource-card .resource-cover .cover-placeholder i {
   font-size: 56px;
-  color: #94a3b8;
+  color: var(--muted, #94a3b8);
   opacity: 0.6;
 }
 .resource-title {
@@ -355,6 +350,7 @@ export default defineComponent({
   line-height: 1.4;
   min-height: 44px;
   max-height: 44px;
+  color: var(--text, #1f2937);
 }
 .resource-meta {
   margin-top: 6px;
@@ -397,6 +393,32 @@ export default defineComponent({
   min-height: 20px;
 }
 .resource-chapter i {
+  font-size: 11px;
+  flex-shrink: 0;
+}
+.resource-unit,
+.resource-unit-pending {
+  margin-top: 6px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-height: 20px;
+}
+.resource-unit {
+  color: var(--text, #212529);
+}
+.resource-unit i {
+  font-size: 11px;
+  flex-shrink: 0;
+}
+.resource-unit-pending {
+  color: var(--muted, #6c757d);
+}
+.resource-unit-pending i {
   font-size: 11px;
   flex-shrink: 0;
 }
@@ -456,7 +478,7 @@ export default defineComponent({
   font-size: 1.5rem;
   font-weight: 700;
   line-height: 1;
-  color: #000;
+  color: var(--text, #000);
   opacity: 0.5;
   cursor: pointer;
 }
@@ -467,7 +489,7 @@ export default defineComponent({
   padding: 1.5rem;
 }
 .modal-footer {
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid var(--border, #e9ecef);
   padding: 1rem 1.5rem;
   display: flex;
   justify-content: flex-end;
@@ -475,9 +497,10 @@ export default defineComponent({
 }
 .download-info {
   padding: 12px;
-  background: #f8f9fa;
+  background: var(--bg, #f8f9fa);
   border-radius: 8px;
   border-left: 3px solid var(--primary);
+  color: var(--text, #1f2937);
 }
 .modal-header .bi {
   margin-right: 8px;

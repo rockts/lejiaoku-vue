@@ -19,21 +19,50 @@
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
+          <!-- 教材目录 -->
           <li class="nav-item">
-            <router-link class="nav-link" to="/posts">资源 </router-link>
+            <router-link class="nav-link" to="/catalog">
+              <i class="bi bi-book-half"></i> 教材目录
+            </router-link>
+          </li>
+          <!-- 资源下拉菜单 -->
+          <li class="nav-item dropdown dropdown-hover">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              id="resourceDropdown"
+              role="button"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              资源
+            </a>
+            <div class="dropdown-menu" aria-labelledby="resourceDropdown">
+              <router-link class="dropdown-item" to="/posts">
+                <i class="bi bi-grid me-2"></i>全部资源
+              </router-link>
+              <div class="dropdown-divider"></div>
+              <router-link 
+                v-for="category in resourceCategories" 
+                :key="category"
+                class="dropdown-item" 
+                :to="`/posts?category=${encodeURIComponent(category)}`"
+              >
+                <i class="bi bi-file-earmark me-2"></i>{{ category }}
+              </router-link>
+            </div>
           </li>
 
           <!-- 管理后台：仅管理员可见，带下拉菜单 -->
           <li
             v-if="canAccessAdmin"
-            class="nav-item dropdown"
+            class="nav-item dropdown dropdown-hover"
           >
             <a
               class="nav-link dropdown-toggle"
               href="#"
               id="adminDropdown"
               role="button"
-              data-toggle="dropdown"
               aria-haspopup="true"
               aria-expanded="false"
             >
@@ -101,11 +130,10 @@
               <i class="bi bi-cloud-upload-fill"></i>
             </router-link>
           </li>
-                     <li class="nav-item dropdown">
+                     <li class="nav-item dropdown dropdown-hover">
                        <button
                          class="nav-link dropdown-toggle btn btn-link user-dropdown-btn"
                          type="button"
-                         @click="toggleDropdown"
                          aria-expanded="false"
                        >
                          <div class="user-avatar-wrapper">
@@ -118,29 +146,12 @@
                            />
                            <i v-else class="bi bi-person-circle user-avatar-icon"></i>
                          </div>
-                         <span class="user-name">{{ displayName }}</span>
-              <span
-                v-if="isAdmin"
-                class="badge badge-admin ms-1"
-              >
-                <i class="bi bi-shield-check me-1"></i>管理员
-              </span>
-              <span
-                v-else-if="currentUser.role === 'editor'"
-                class="badge badge-editor ms-1"
-              >
-                <i class="bi bi-pencil me-1"></i>编辑
-              </span>
-              <span
-                v-else-if="currentUser.role === 'contributor'"
-                class="badge badge-contributor ms-1"
-              >
-                <i class="bi bi-person-plus me-1"></i>贡献者
-              </span>
+                         <span class="user-name">
+                            {{ displayName }}
+                          </span>
             </button>
             <ul
               class="dropdown-menu dropdown-menu-end"
-              :class="{ show: showUserDropdown }"
             >
               <li class="dropdown-header">
                 <div class="user-info">
@@ -157,11 +168,26 @@
                   <div>
                     <div class="user-name-large">
                       {{ displayName }}
+                      <span
+                        v-if="isAdmin"
+                        class="badge badge-admin badge-inline-small"
+                      >
+                        管理员
+                      </span>
+                      <span
+                        v-else-if="currentUser.role === 'editor'"
+                        class="badge badge-editor badge-inline-small"
+                      >
+                        编辑
+                      </span>
+                      <span
+                        v-else-if="currentUser.role === 'contributor'"
+                        class="badge badge-contributor badge-inline-small"
+                      >
+                        贡献者
+                      </span>
                     </div>
                     <div class="user-email">{{ currentUser.email || '未设置邮箱' }}</div>
-                    <div v-if="currentUser.nickname" class="user-nickname text-muted small">
-                      <i class="bi bi-at"></i> {{ currentUser.nickname }}
-                    </div>
                   </div>
                 </div>
               </li>
@@ -179,7 +205,6 @@
                 <router-link
                   :to="currentUser ? `/users/${currentUser.id}/resources` : '/me/resources'"
                   class="dropdown-item"
-                  @click="closeDropdown"
                 >
                   <i class="bi bi-file-earmark-text me-2"></i>我的资源
                 </router-link>
@@ -242,6 +267,7 @@
 import { defineComponent } from "vue";
 import { mapGetters } from "vuex";
 import { API_BASE_URL } from "@/app/app.config";
+import { RESOURCE_CATEGORIES } from "@/utils/constants";
 import { apiHttpClient } from "@/app/app.service";
 import notification from "@/utils/notification";
 import HeaderSearch from "./form/HeaderSearch.vue";
@@ -260,6 +286,7 @@ export default defineComponent({
                  showUserDropdown: false,
                  avatarError: false, // 头像加载错误标志
                  isApplying: false, // 是否正在提交申请
+                 resourceCategories: RESOURCE_CATEGORIES, // 资源分类列表
                };
              },
   computed: {
@@ -675,6 +702,24 @@ export default defineComponent({
   border-top: 1px solid #e9ecef;
 }
 
+/* 深色主题下拉菜单样式 */
+[data-theme="dark"] .navbar-nav .nav-item.dropdown .dropdown-item {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .navbar-nav .nav-item.dropdown .dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .navbar-nav .nav-item.dropdown .dropdown-item i {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .navbar-nav .nav-item.dropdown .dropdown-divider {
+  border-top-color: rgba(255, 255, 255, 0.2);
+}
+
 nav {
   box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 5%), inset 0 -1px 0 rgb(0 0 0 / 10%);
   border-bottom: 1px solid rgba(0, 0, 0, 0.125);
@@ -720,6 +765,20 @@ nav {
 .btn-theme:hover {
   color: rgba(0, 0, 0, 0.9);
   background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* 深色主题下的主题切换按钮 */
+[data-theme="dark"] .btn-theme {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .btn-theme:hover {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .btn-theme i {
+  color: #ffffff !important;
 }
 
 /* 
@@ -810,6 +869,59 @@ nav {
   border-color: #1e7e34;
 }
 
+/* 右上角角标样式 */
+.user-name-with-badge,
+.user-name-large-with-badge {
+  position: relative;
+  display: inline-block;
+}
+
+.badge-corner {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.55rem;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  transform: scale(0.85);
+  transform-origin: top right;
+  z-index: 10;
+}
+
+.badge-corner-large {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  padding: 0.2rem 0.45rem;
+  font-size: 0.6rem;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  transform: scale(0.9);
+  transform-origin: top right;
+  z-index: 10;
+}
+
+.badge-corner i,
+.badge-corner-large i {
+  display: none;
+}
+
+/* 用户组标识 - 昵称下方独立显示 */
+.badge-inline-small {
+  display: inline-block;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.6rem;
+  font-weight: 600;
+  border-radius: 0.4rem;
+  line-height: 1.2;
+  margin-left: 0.25rem;
+}
+
 /* 下拉菜单 */
 .dropdown-menu {
   position: absolute;
@@ -874,11 +986,34 @@ nav {
   font-weight: 600;
   font-size: 1.1rem;
   margin-bottom: 0.25rem;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+[data-theme="dark"] .user-name-large {
+  color: #ffffff;
 }
 
 .user-email {
   font-size: 0.85rem;
-  opacity: 0.9;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 0.25rem;
+}
+
+[data-theme="dark"] .user-email {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.user-nickname {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+[data-theme="dark"] .user-nickname {
+  color: rgba(255, 255, 255, 0.8);
 }
 
 /* 下拉菜单项 */
@@ -901,5 +1036,28 @@ nav {
 
 .dropdown-divider {
   margin: 0.5rem 0;
+}
+
+/* 深色主题下拉菜单项 */
+[data-theme="dark"] .dropdown-item {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .dropdown-item i {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .dropdown-item.text-danger {
+  color: #ff6b6b !important;
+}
+
+[data-theme="dark"] .dropdown-item.text-danger:hover {
+  background-color: rgba(255, 107, 107, 0.2);
+  color: #ff6b6b !important;
 }
 </style>

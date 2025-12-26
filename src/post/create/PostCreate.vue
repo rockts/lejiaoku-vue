@@ -37,11 +37,11 @@
   <div v-else-if="canUpload" class="post-create-page">
     <div class="container post-create-page-body">
       <!-- 上传提示 -->
-        <div class="alert alert-info mb-4" role="alert">
-          <i class="bi bi-info-circle me-2"></i>
-          <strong>上传流程：</strong>填写标题和分类 → 选择文件 → 点击发布 →
+      <div class="alert alert-info mb-4" role="alert">
+        <i class="bi bi-info-circle me-2"></i>
+        <strong>上传流程：</strong>填写标题和分类 → 选择文件 → 点击发布 →
           系统自动解析教材信息 → 8秒后跳转到首页
-        </div>
+      </div>
 
       <form>
         <!-- 资源标题 -->
@@ -1365,7 +1365,7 @@ export default defineComponent({
             // 如果是 403 无权限错误，已经在全局拦截器中显示了"无权限"通知
             // 这里只显示信息提取失败的提示，避免重复通知
             if (error.response?.status !== 403) {
-              notification.warning(
+            notification.warning(
                 `教材信息提取失败，3秒后仍将跳转到详情页`,
                 3000
               );
@@ -1374,13 +1374,13 @@ export default defineComponent({
               notification.warning(
                 `教材信息自动提取功能暂不可用，资源已上传成功，3秒后跳转到详情页`,
                 3000
-              );
+            );
             }
           }
 
           // 绑定教材（如果有选择）
           try {
-            await this.bindTextbook(resourceId);
+          await this.bindTextbook(resourceId);
           } catch (error) {
             // 绑定教材失败不影响整体流程，只记录错误
             console.error("[PostCreate] 绑定教材失败:", error);
@@ -1465,7 +1465,7 @@ export default defineComponent({
       const types = ["Unit", "Lesson", "Subtopic"];
       return types[level] || "Section";
     },
-    
+
     // 处理申请成为贡献者
     async handleApplyContributor() {
       // 确认弹窗（带同意复选框）

@@ -25,16 +25,16 @@
             <div v-if="displayUser?.nickname" class="text-muted small mb-2">
               <i class="bi bi-at"></i> {{ displayUser.nickname }}
             </div>
-            <span v-if="displayUser?.role === 'admin'" class="badge bg-danger">
+            <span v-if="displayUser?.role === 'admin'" class="badge rounded-pill text-bg-danger">
               管理员
             </span>
-            <span v-else-if="displayUser?.role === 'editor'" class="badge bg-primary">
+            <span v-else-if="displayUser?.role === 'editor'" class="badge rounded-pill text-bg-warning">
               编辑
             </span>
-            <span v-else-if="displayUser?.role === 'contributor'" class="badge bg-success">
+            <span v-else-if="displayUser?.role === 'contributor'" class="badge rounded-pill text-bg-info">
               贡献者
             </span>
-            <span v-else class="badge user-badge">普通用户</span>
+            <span v-else class="badge rounded-pill text-bg-secondary">普通用户</span>
           </div>
         </div>
 
@@ -90,10 +90,10 @@
               <div class="col-md-6 mb-3">
                 <label class="form-label text-muted">角色</label>
                 <div class="form-control-plaintext">
-                  <span v-if="displayUser?.role === 'admin'" class="badge bg-danger">管理员</span>
-                  <span v-else-if="displayUser?.role === 'editor'" class="badge bg-primary">编辑</span>
-                  <span v-else-if="displayUser?.role === 'contributor'" class="badge bg-success">贡献者</span>
-                  <span v-else class="badge user-badge">普通用户</span>
+                  <span v-if="displayUser?.role === 'admin'" class="badge rounded-pill text-bg-danger">管理员</span>
+                  <span v-else-if="displayUser?.role === 'editor'" class="badge rounded-pill text-bg-warning">编辑</span>
+                  <span v-else-if="displayUser?.role === 'contributor'" class="badge rounded-pill text-bg-info">贡献者</span>
+                  <span v-else class="badge rounded-pill text-bg-secondary">普通用户</span>
                 </div>
               </div>
               <div class="col-12 mb-3" v-if="displayUser?.description">
@@ -155,21 +155,63 @@
               </div>
               <div class="mb-3">
                 <label class="form-label">头像</label>
-                <div class="avatar-upload-section">
+                <div 
+                  class="avatar-upload-section"
+                  :class="{ 'drag-active': avatarDragActive }"
+                  @dragover.prevent="avatarDragActive = true"
+                  @dragleave.prevent="avatarDragActive = false"
+                  @drop.prevent="handleAvatarDrop"
+                  @click="handleAvatarZoneClick"
+                >
                   <div class="avatar-preview mb-3">
+                    <div v-if="showCropModal" class="avatar-crop-container">
+                      <canvas ref="avatarCropCanvas" class="avatar-crop-canvas"></canvas>
+                      <div class="avatar-crop-controls">
+                        <div class="crop-zoom-control">
+                          <label>缩放: </label>
+                          <input 
+                            type="range" 
+                            v-model.number="cropZoom" 
+                            min="0.5" 
+                            max="3" 
+                            step="0.1"
+                            @input="updateCrop"
+                            class="crop-zoom-slider"
+                          />
+                          <span class="crop-zoom-value">{{ cropZoom.toFixed(1) }}x</span>
+                        </div>
+                        <div class="crop-buttons">
+                          <button 
+                            type="button" 
+                            class="btn btn-sm btn-secondary"
+                            @click.stop="cancelCrop"
+                          >
+                            取消
+                          </button>
+                          <button 
+                            type="button" 
+                            class="btn btn-sm btn-primary"
+                            @click.stop="confirmCrop"
+                          >
+                            确认裁剪
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                     <img
-                      v-if="avatarPreviewUrl || avatarDisplayUrl"
+                      v-else-if="avatarPreviewUrl || (avatarDisplayUrl && !avatarLoadError)"
                       :src="avatarPreviewUrl || avatarDisplayUrl"
                       alt="头像预览"
                       class="avatar-preview-image"
                       @error="handleAvatarError"
                     />
                     <div v-else class="avatar-placeholder">
-                      <i class="bi bi-person-circle"></i>
-                      <span>暂无头像</span>
+                      <i class="bi bi-cloud-upload upload-icon"></i>
+                      <span>拖拽图片到此处</span>
+                      <small>或点击选择文件</small>
                     </div>
                   </div>
-                  <div class="d-flex gap-2">
+                  <div class="d-flex gap-2" v-if="!showCropModal">
                     <input
                       type="file"
                       ref="avatarFileInput"
@@ -181,7 +223,7 @@
                     <button
                       type="button"
                       class="btn btn-outline-primary"
-                      @click="$refs.avatarFileInput.click()"
+                      @click.stop="$refs.avatarFileInput.click()"
                     >
                       <i class="bi bi-upload me-2"></i>选择图片
                     </button>
@@ -189,13 +231,13 @@
                       v-if="avatarPreviewUrl || avatarDisplayUrl"
                       type="button"
                       class="btn btn-outline-danger"
-                      @click="removeAvatar"
+                      @click.stop="removeAvatar"
                     >
                       <i class="bi bi-trash me-2"></i>移除
                     </button>
                   </div>
-                  <small class="text-muted d-block mt-2">
-                    支持 JPG、PNG、GIF 格式，建议尺寸 200x200 像素
+                  <small class="text-muted d-block mt-2" v-if="!showCropModal">
+                    支持 JPG、PNG、GIF 格式，建议尺寸 200×200 像素
                   </small>
                 </div>
               </div>
@@ -275,41 +317,46 @@
             </h5>
           </div>
           <div class="card-body">
-            <div class="list-group">
+            <div class="list-group security-list">
               <div
-                class="list-group-item d-flex justify-content-between align-items-center"
+                class="list-group-item security-item"
               >
-                <div>
+                <div class="security-content">
                   <h6 class="mb-1">登录密码</h6>
                   <small class="text-muted"
                     >定期更改密码可以提高账号安全性</small
                   >
                 </div>
-                <button
-                  class="btn btn-sm btn-outline-primary"
-                  @click="activeTab = 'password'"
-                >
-                  修改
-                </button>
+                <div class="security-action">
+                  <button
+                    class="btn btn-sm btn-outline-primary"
+                    @click="activeTab = 'password'"
+                  >
+                    修改
+                  </button>
+                </div>
               </div>
               <div
-                class="list-group-item d-flex justify-content-between align-items-center"
+                class="list-group-item security-item"
               >
-                <div>
+                <div class="security-content">
                   <h6 class="mb-1">邮箱验证</h6>
                   <small class="text-muted">{{ currentUser?.email }}</small>
                 </div>
-                <span class="badge bg-success">已验证</span>
+                <div class="security-action">
+                  <span class="badge bg-success">已验证</span>
+                </div>
               </div>
               <div
-                class="list-group-item d-flex justify-content-between align-items-center"
+                class="list-group-item security-item"
               >
-                <div>
+                <div class="security-content">
                   <h6 class="mb-1">账号注册时间</h6>
                   <small class="text-muted">{{
                     formatDate(currentUser?.created_at)
                   }}</small>
                 </div>
+                <div class="security-action"></div>
               </div>
             </div>
           </div>
@@ -359,6 +406,14 @@ export default defineComponent({
         newPassword: "",
         confirmPassword: "",
       },
+      // 拖拽和裁剪相关
+      avatarDragActive: false,
+      showCropModal: false,
+      cropImage: null,
+      cropZoom: 1,
+      cropX: 0,
+      cropY: 0,
+      cropSize: 200, // 裁剪区域大小
     };
   },
   computed: {
@@ -505,7 +560,26 @@ export default defineComponent({
     handleAvatarUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
+      this.processImageFile(file);
+    },
 
+    handleAvatarDrop(event) {
+      this.avatarDragActive = false;
+      const file = event.dataTransfer.files[0];
+      if (!file) return;
+      this.processImageFile(file);
+    },
+
+    handleAvatarZoneClick(event) {
+      // 如果点击的是上传区域本身（不是按钮），触发文件选择
+      if (event.target.classList.contains('avatar-upload-section') || 
+          event.target.classList.contains('avatar-placeholder') ||
+          event.target.closest('.avatar-placeholder')) {
+        this.$refs.avatarFileInput?.click();
+      }
+    },
+
+    processImageFile(file) {
       // 检查文件类型
       if (!file.type.startsWith("image/")) {
         notification.error("请选择图片文件");
@@ -520,12 +594,152 @@ export default defineComponent({
 
       this.avatarFile = file;
 
-      // 生成预览
+      // 加载图片用于裁剪
       const reader = new FileReader();
       reader.onload = (e) => {
-        this.avatarPreviewUrl = e.target.result;
+        const img = new Image();
+        img.onload = () => {
+          this.cropImage = img;
+          this.showCropModal = true;
+          this.$nextTick(() => {
+            this.initCrop();
+          });
+        };
+        img.src = e.target.result;
       };
       reader.readAsDataURL(file);
+    },
+
+    initCrop() {
+      if (!this.cropImage || !this.$refs.avatarCropCanvas) return;
+      
+      const canvas = this.$refs.avatarCropCanvas;
+      const ctx = canvas.getContext('2d');
+      
+      // 设置画布大小
+      canvas.width = 400;
+      canvas.height = 400;
+      
+      // 计算初始缩放，使图片适应画布
+      const scale = Math.min(
+        canvas.width / this.cropImage.width,
+        canvas.height / this.cropImage.height
+      ) * 0.8; // 留一些边距
+      
+      this.cropZoom = scale;
+      this.updateCrop();
+    },
+
+    updateCrop() {
+      if (!this.cropImage || !this.$refs.avatarCropCanvas) return;
+      
+      const canvas = this.$refs.avatarCropCanvas;
+      const ctx = canvas.getContext('2d');
+      
+      // 清空画布
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // 计算缩放后的图片尺寸
+      const scaledWidth = this.cropImage.width * this.cropZoom;
+      const scaledHeight = this.cropImage.height * this.cropZoom;
+      
+      // 计算居中位置
+      const x = (canvas.width - scaledWidth) / 2 + this.cropX;
+      const y = (canvas.height - scaledHeight) / 2 + this.cropY;
+      
+      // 绘制图片
+      ctx.drawImage(this.cropImage, x, y, scaledWidth, scaledHeight);
+      
+      // 绘制圆形裁剪区域
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(canvas.width / 2, canvas.height / 2, this.cropSize / 2, 0, Math.PI * 2);
+      ctx.strokeStyle = '#4f8cff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      
+      // 裁剪区域外的遮罩
+      ctx.globalCompositeOperation = 'destination-over';
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.beginPath();
+      ctx.arc(canvas.width / 2, canvas.height / 2, this.cropSize / 2, 0, Math.PI * 2);
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.fill();
+      ctx.restore();
+    },
+
+    confirmCrop() {
+      if (!this.cropImage || !this.$refs.avatarCropCanvas) return;
+      
+      const sourceCanvas = this.$refs.avatarCropCanvas;
+      const scaledWidth = this.cropImage.width * this.cropZoom;
+      const scaledHeight = this.cropImage.height * this.cropZoom;
+      
+      // 计算源图片在画布上的位置
+      const sourceX = (sourceCanvas.width - scaledWidth) / 2 + this.cropX;
+      const sourceY = (sourceCanvas.height - scaledHeight) / 2 + this.cropY;
+      
+      // 计算裁剪区域在源图片中的位置（相对于原始图片）
+      const cropCenterX = sourceCanvas.width / 2;
+      const cropCenterY = sourceCanvas.height / 2;
+      const cropLeft = cropCenterX - this.cropSize / 2;
+      const cropTop = cropCenterY - this.cropSize / 2;
+      
+      // 转换为原始图片坐标
+      const originalCropLeft = (cropLeft - sourceX) / this.cropZoom;
+      const originalCropTop = (cropTop - sourceY) / this.cropZoom;
+      const originalCropSize = this.cropSize / this.cropZoom;
+      
+      // 创建目标画布
+      const canvas = document.createElement('canvas');
+      canvas.width = this.cropSize;
+      canvas.height = this.cropSize;
+      const ctx = canvas.getContext('2d');
+      
+      // 创建圆形裁剪路径
+      ctx.beginPath();
+      ctx.arc(this.cropSize / 2, this.cropSize / 2, this.cropSize / 2, 0, Math.PI * 2);
+      ctx.clip();
+      
+      // 绘制裁剪后的图片
+      ctx.drawImage(
+        this.cropImage,
+        originalCropLeft,
+        originalCropTop,
+        originalCropSize,
+        originalCropSize,
+        0,
+        0,
+        this.cropSize,
+        this.cropSize
+      );
+      
+      // 转换为 blob 并更新预览
+      canvas.toBlob((blob) => {
+        if (blob) {
+          this.avatarFile = new File([blob], 'avatar.png', { type: 'image/png' });
+          this.avatarPreviewUrl = canvas.toDataURL('image/png');
+          this.showCropModal = false;
+          this.cropImage = null;
+          this.cropZoom = 1;
+          this.cropX = 0;
+          this.cropY = 0;
+        }
+      }, 'image/png', 0.9);
+    },
+
+    cancelCrop() {
+      this.showCropModal = false;
+      this.cropImage = null;
+      this.avatarFile = null;
+      this.avatarPreviewUrl = null;
+      this.cropZoom = 1;
+      this.cropX = 0;
+      this.cropY = 0;
+      if (this.$refs.avatarFileInput) {
+        this.$refs.avatarFileInput.value = '';
+      }
     },
 
     removeAvatar() {
@@ -1044,6 +1258,16 @@ export default defineComponent({
   background-color: #f8f9fa;
 }
 
+/* 深色主题下的上传区域 */
+[data-theme="dark"] .avatar-upload-section {
+  border-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .avatar-upload-section .text-muted {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
 .avatar-preview {
   display: flex;
   justify-content: center;
@@ -1070,11 +1294,112 @@ export default defineComponent({
   border-radius: 50%;
   background-color: #e9ecef;
   color: #6c757d;
+  cursor: pointer;
+  transition: all 0.3s;
 }
 
-.avatar-placeholder i {
-  font-size: 4rem;
+.avatar-placeholder:hover {
+  background-color: #dee2e6;
+  transform: scale(1.05);
+}
+
+.avatar-placeholder .upload-icon {
+  font-size: 3rem;
   margin-bottom: 0.5rem;
+}
+
+.avatar-placeholder span {
+  font-size: 0.875rem;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.avatar-placeholder small {
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-top: 0.25rem;
+}
+
+/* 深色主题下的占位符 */
+[data-theme="dark"] .avatar-placeholder {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="dark"] .avatar-placeholder:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="dark"] .avatar-placeholder .upload-icon {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="dark"] .avatar-placeholder span,
+[data-theme="dark"] .avatar-placeholder small {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* 拖拽激活状态 */
+.avatar-upload-section.drag-active {
+  border-color: var(--primary, #4f8cff);
+  background-color: rgba(79, 140, 255, 0.1);
+}
+
+[data-theme="dark"] .avatar-upload-section.drag-active {
+  border-color: var(--primary, #4f8cff);
+  background-color: rgba(79, 140, 255, 0.2);
+}
+
+/* 裁剪相关样式 */
+.avatar-crop-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.avatar-crop-canvas {
+  border: 2px solid var(--border, #dee2e6);
+  border-radius: 8px;
+  max-width: 100%;
+  cursor: move;
+}
+
+.avatar-crop-controls {
+  margin-top: 1rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.crop-zoom-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.crop-zoom-slider {
+  flex: 1;
+  max-width: 200px;
+}
+
+.crop-zoom-value {
+  min-width: 40px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.crop-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+[data-theme="dark"] .avatar-crop-canvas {
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .gap-2 {
@@ -1120,5 +1445,98 @@ export default defineComponent({
   background: #28a745 !important;
   color: white !important;
   border-color: #1e7e34;
+}
+
+/* 深色主题下的不可修改字段 */
+[data-theme="dark"] .form-control:disabled,
+[data-theme="dark"] input:disabled,
+[data-theme="dark"] .form-control[readonly] {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-theme="dark"] .form-control-plaintext {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+[data-theme="dark"] .form-label {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+[data-theme="dark"] small.text-muted {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* 账号安全列表样式 */
+.security-list {
+  border: none;
+}
+
+.security-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1rem;
+  border: 1px solid var(--border, #dee2e6);
+  border-radius: 0;
+  margin-bottom: 0;
+}
+
+.security-item:first-child {
+  border-top-left-radius: 0.375rem;
+  border-top-right-radius: 0.375rem;
+}
+
+.security-item:last-child {
+  border-bottom-left-radius: 0.375rem;
+  border-bottom-right-radius: 0.375rem;
+  margin-bottom: 0;
+}
+
+.security-item:not(:last-child) {
+  border-bottom: none;
+}
+
+.security-content {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.security-content h6 {
+  margin: 0 0 0.25rem 0;
+  font-weight: 600;
+  color: var(--text, #212529);
+  text-align: left;
+}
+
+.security-content small {
+  display: block;
+  color: var(--muted, #6c757d);
+  text-align: left;
+}
+
+.security-action {
+  flex-shrink: 0;
+  margin-left: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 80px;
+}
+
+/* 深色主题 */
+[data-theme="dark"] .security-item {
+  border-color: rgba(255, 255, 255, 0.15);
+  background-color: var(--surface, rgba(22,25,31,0.6));
+}
+
+[data-theme="dark"] .security-content h6 {
+  color: #ffffff;
+}
+
+[data-theme="dark"] .security-content small {
+  color: rgba(255, 255, 255, 0.7);
 }
 </style>

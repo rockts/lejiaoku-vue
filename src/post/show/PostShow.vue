@@ -2,7 +2,7 @@
 .cover {
   width: 150px;
   height: 200px;
-  background: #fff;
+  background: var(--surface, #fff);
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid var(--border, #e9ecef);
@@ -17,14 +17,14 @@
   object-fit: contain;
   object-position: center;
   display: block;
-  background: #fff;
+  background: var(--surface, #fff);
   margin: auto;
 }
 .resource-cover-full {
   width: 100%;
   max-width: 300px;
   height: 180px;
-  background: #fff;
+  background: var(--surface, #fff);
   border-radius: 8px;
   overflow: hidden;
   box-sizing: border-box;
@@ -40,7 +40,7 @@
   width: auto;
   height: auto;
   display: block;
-  background: #fff;
+  background: var(--surface, #fff);
   object-position: center;
   object-fit: contain;
 }
@@ -52,13 +52,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+  background: linear-gradient(135deg, var(--bg, #f5f7fa) 0%, var(--surface, #e8ecf1) 100%);
   border: none;
 }
 
 .resource-cover-full .cover-placeholder i {
   font-size: 64px;
-  color: #94a3b8;
+  color: var(--muted, #94a3b8);
   opacity: 0.6;
 }
 
@@ -183,11 +183,15 @@
           {{ catalogInfo.version }} · {{ catalogInfo.subject }} ·
           {{ catalogInfo.grade }} · {{ catalogInfo.volume }}
         </p>
-        <ul v-if="catalogInfo.units?.length" class="structure">
-          <li v-for="(unit, idx) in catalogInfo.units" :key="idx">
-            {{ unit }}
-          </li>
-        </ul>
+        <!-- 所属单元：使用 resource.unit 字段 -->
+        <div v-if="resource.unit" class="mb-2">
+          <strong>所属单元：</strong>
+          <span class="badge bg-primary">{{ resource.unit }}</span>
+        </div>
+        <div v-else-if="resource.catalog_id" class="mb-2">
+          <strong>所属单元：</strong>
+          <span class="badge bg-secondary">待整理</span>
+        </div>
       </section>
 
       <!-- 3. 教材结构（只读） -->
@@ -652,8 +656,8 @@ export default defineComponent({
   margin-bottom: 16px;
   border: 1px solid var(--border, #e9ecef);
   border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.04);
+  background: var(--surface, #fff);
+  box-shadow: var(--shadow, 0 6px 24px rgba(0, 0, 0, 0.04));
 }
 
 .section-header {
@@ -673,6 +677,7 @@ export default defineComponent({
   margin: 0 0 8px;
   font-size: 22px;
   font-weight: 700;
+  color: var(--text, #1f2937);
 }
 
 .meta {
@@ -691,24 +696,25 @@ export default defineComponent({
 }
 
 .tag {
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--bg, #f1f5f9);
+  color: var(--muted, #475569);
   padding: 4px 10px;
   border-radius: 999px;
   font-size: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border, #e2e8f0);
 }
 
 .section-title {
   margin: 0 0 8px;
   font-size: 16px;
   font-weight: 600;
+  color: var(--text, #1f2937);
 }
 
 .structure {
   margin: 0;
   padding-left: 18px;
-  color: #475569;
+  color: var(--text, #475569);
 }
 
 .structure li {
@@ -717,7 +723,7 @@ export default defineComponent({
 
 .text-body {
   margin: 0;
-  color: #1f2937;
+  color: var(--text, #1f2937);
   line-height: 1.6;
 }
 

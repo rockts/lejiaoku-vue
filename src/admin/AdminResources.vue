@@ -656,6 +656,7 @@ export default defineComponent({
 .table tbody td {
   padding: 0.75rem;
   vertical-align: middle;
+  color: #212529;
 }
 
 .table tbody tr {
@@ -664,6 +665,34 @@ export default defineComponent({
 
 .table tbody tr:hover {
   background-color: #f8f9fa;
+}
+
+/* 深色主题表格样式 */
+[data-theme="dark"] .table {
+  background: var(--surface, #1e222d) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .table thead {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+[data-theme="dark"] .table thead th {
+  color: #ffffff !important;
+  border-bottom-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+[data-theme="dark"] .table tbody td {
+  color: #ffffff !important;
+  border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .table tbody tr {
+  border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 .resource-title {

@@ -76,6 +76,7 @@ export default defineComponent({
   font-weight: 600;
   text-align: left;
   margin-bottom: 12px;
+  color: var(--text, #1f2937);
 }
 .grid {
   display: grid;

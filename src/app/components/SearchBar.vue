@@ -146,10 +146,10 @@ export default defineComponent({
 
 <style scoped>
 .hero-search {
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  padding: 60px 20px;
-  border-radius: 20px;
-  margin-bottom: 30px;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  margin-bottom: 0;
   text-align: center;
 }
 
@@ -165,10 +165,20 @@ export default defineComponent({
   margin-bottom: 10px;
 }
 
+[data-theme="dark"] .hero-title {
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
 .hero-subtitle {
   font-size: 1.2rem;
   color: #596b7e;
   margin-bottom: 40px;
+}
+
+[data-theme="dark"] .hero-subtitle {
+  color: #e0e4e8;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }
 
 .search-box-wrapper {

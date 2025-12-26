@@ -52,6 +52,21 @@
           </div>
         </div>
       </div>
+      
+      <div class="col-md-6 mb-4">
+        <div class="admin-card card-hover">
+          <div class="card-icon bg-info">
+            <i class="bi bi-book-half"></i>
+          </div>
+          <div class="card-content">
+            <h5 class="card-title">教材版本待确认</h5>
+            <p class="card-text text-muted">人工处理教材版本不确定的资源</p>
+            <router-link to="/admin/catalog-binding" class="btn btn-info">
+              <i class="bi bi-arrow-right-circle me-2"></i>进入处理
+            </router-link>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>

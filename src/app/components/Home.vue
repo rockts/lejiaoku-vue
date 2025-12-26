@@ -1,10 +1,17 @@
 <template>
-  <div class="home pt-3">
-    <div class="container">
-      <SearchBar
-        :filterState="filterState"
-        @update:filterState="onUpdateFilter"
-      />
+  <div class="home">
+    <!-- Hero 区域：全屏背景 -->
+    <div class="hero-section-fullwidth">
+      <div class="container">
+        <SearchBar
+          :filterState="filterState"
+          @update:filterState="onUpdateFilter"
+        />
+      </div>
+    </div>
+    
+    <!-- 内容区域：正常 container -->
+    <div class="container pt-3">
       <CategoryNav
         :activeCategory="filterState.category"
         @update:category="onUpdateCategory"
@@ -15,67 +22,73 @@
         @clearAll="clearAllFilters"
       />
       <ResourceList :resources="filteredResources" />
-      <div class="cta">
-        <div class="cta-title">
-          <template v-if="isAuthenticated">
-            想上传自己的教学资源？加入我们，成为教师贡献者
-          </template>
-          <template v-else>
-            登录后可上传和管理教学资源
-          </template>
-        </div>
-        <div class="cta-actions">
-          <!-- 上传按钮：仅 contributor / editor / admin 显示 -->
-          <div v-if="canUpload" class="qr-wrapper-center">
-            <router-link
-              to="/resources/create"
-              class="btn upload-btn"
-            >
-              <i class="bi bi-upload me-2"></i> 上传资源
-            </router-link>
+    </div>
+    
+    <!-- CTA 区域：全屏背景 -->
+    <div class="cta-section-fullwidth">
+      <div class="container">
+        <div class="cta">
+          <div class="cta-title">
+            <template v-if="isAuthenticated">
+              想上传自己的教学资源？加入我们，成为教师贡献者
+            </template>
+            <template v-else>
+              登录后可上传和管理教学资源
+            </template>
           </div>
-          
-          <!-- 申请成为贡献者按钮：已登录 && role === user（替换原来的二维码位置） -->
-          <div
-            v-else-if="canApplyContributor"
-            class="qr-wrapper qr-wrapper-center"
-          >
-            <button
-              type="button"
-              class="btn btn-apply-contributor"
-              :class="{
-                'btn-apply-contributor-disabled': isApplying || applicationStatus === 'pending' || applicationStatus === 'approved'
-              }"
-              @click.stop.prevent="handleApplyContributorClick"
-              @mousedown.stop.prevent="handleMouseDown"
-              :disabled="isApplying || applicationStatus === 'pending' || applicationStatus === 'approved'"
-              :style="(isApplying || applicationStatus === 'pending' || applicationStatus === 'approved') ? 'pointer-events: none; cursor: not-allowed;' : ''"
+          <div class="cta-actions">
+            <!-- 上传按钮：仅 contributor / editor / admin 显示 -->
+            <div v-if="canUpload" class="qr-wrapper-center">
+              <router-link
+                to="/resources/create"
+                class="btn upload-btn"
+              >
+                <i class="bi bi-upload me-2"></i> 上传资源
+              </router-link>
+            </div>
+            
+            <!-- 申请成为贡献者按钮：已登录 && role === user（替换原来的二维码位置） -->
+            <div
+              v-else-if="canApplyContributor"
+              class="qr-wrapper qr-wrapper-center"
             >
-              <span v-if="isApplying">
-                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                提交中...
-              </span>
-              <span v-else-if="applicationStatus === 'pending'">
-                <i class="bi bi-hourglass-split me-2"></i> 审核中
-              </span>
-              <span v-else>
+              <button
+                type="button"
+                class="btn btn-apply-contributor"
+                :class="{
+                  'btn-apply-contributor-disabled': isApplying || applicationStatus === 'pending' || applicationStatus === 'approved'
+                }"
+                @click.stop.prevent="handleApplyContributorClick"
+                @mousedown.stop.prevent="handleMouseDown"
+                :disabled="isApplying || applicationStatus === 'pending' || applicationStatus === 'approved'"
+                :style="(isApplying || applicationStatus === 'pending' || applicationStatus === 'approved') ? 'pointer-events: none; cursor: not-allowed;' : ''"
+              >
+                <span v-if="isApplying">
+                  <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                  提交中...
+                </span>
+                <span v-else-if="applicationStatus === 'pending'">
+                  <i class="bi bi-hourglass-split me-2"></i> 审核中
+                </span>
+                <span v-else>
+                  <i class="bi bi-person-plus-fill me-2"></i> 申请成为贡献者
+                </span>
+              </button>
+            </div>
+            
+            <!-- 未登录：显示登录按钮 -->
+            <div
+              v-else
+              class="qr-wrapper-center"
+            >
+              <button
+                type="button"
+                class="btn btn-apply-contributor"
+                @click="showLoginModal = true"
+              >
                 <i class="bi bi-person-plus-fill me-2"></i> 申请成为贡献者
-              </span>
-            </button>
-          </div>
-          
-          <!-- 未登录：显示登录按钮 -->
-          <div
-            v-else
-            class="qr-wrapper-center"
-          >
-            <button
-              type="button"
-              class="btn btn-apply-contributor"
-              @click="showLoginModal = true"
-            >
-              <i class="bi bi-person-plus-fill me-2"></i> 申请成为贡献者
-            </button>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -451,14 +464,97 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.cta {
-  margin: 32px 0;
-  padding: 20px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  box-shadow: var(--shadow);
+/* Hero 区域：全屏背景，带图案 */
+.hero-section-fullwidth {
+  width: 100%;
+  position: relative;
+  padding: 60px 0;
+  margin-bottom: 0;
+  overflow: hidden;
+  /* 浅色主题：渐变背景 + 柔和图案 */
+  background: linear-gradient(135deg, rgba(79, 140, 255, 0.1) 0%, rgba(155, 123, 255, 0.1) 100%);
+  /* 几何图案叠加 - 浅色主题使用更明显的图案 */
+  background-image: 
+    radial-gradient(circle at 15% 40%, rgba(79, 140, 255, 0.2) 0%, transparent 60%),
+    radial-gradient(circle at 85% 70%, rgba(155, 123, 255, 0.2) 0%, transparent 60%),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(79, 140, 255, 0.03) 10px,
+      rgba(79, 140, 255, 0.03) 20px
+    );
+  background-size: 100% 100%, 100% 100%, 40px 40px;
+  background-position: 0 0, 0 0, 0 0;
 }
+
+[data-theme="dark"] .hero-section-fullwidth {
+  /* 深色主题：使用更柔和的渐变和图案 */
+  background: linear-gradient(135deg, rgba(79, 140, 255, 0.15) 0%, rgba(155, 123, 255, 0.15) 100%);
+  /* 深色主题使用更柔和的图案，避免过于突兀 */
+  background-image: 
+    radial-gradient(circle at 15% 40%, rgba(79, 140, 255, 0.12) 0%, transparent 70%),
+    radial-gradient(circle at 85% 70%, rgba(155, 123, 255, 0.12) 0%, transparent 70%),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 15px,
+      rgba(255, 255, 255, 0.02) 15px,
+      rgba(255, 255, 255, 0.02) 16px
+    );
+  background-size: 100% 100%, 100% 100%, 50px 50px;
+}
+
+/* 内容区域：增强对比 */
+.home > .container.pt-3 {
+  background: var(--bg);
+  padding-top: 40px;
+  padding-bottom: 40px;
+  position: relative;
+  z-index: 1;
+}
+
+/* CTA 区域：全屏背景，带简洁图案 */
+.cta-section-fullwidth {
+  width: 100%;
+  position: relative;
+  padding: 50px 0;
+  margin-top: 0;
+  overflow: hidden;
+  /* 浅色主题：渐变背景 + 简洁的圆形图案 */
+  background: linear-gradient(135deg, rgba(79, 140, 255, 0.06) 0%, rgba(155, 123, 255, 0.06) 100%);
+  /* 使用简洁的圆形图案，位置与 Hero 区域不同 */
+  background-image: 
+    radial-gradient(circle at 75% 30%, rgba(79, 140, 255, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 25% 70%, rgba(155, 123, 255, 0.12) 0%, transparent 50%);
+  background-size: 500px 500px, 600px 600px;
+  background-position: calc(100% + 50px) -50px, -100px calc(100% + 50px);
+  background-repeat: no-repeat;
+  border-top: 2px solid var(--border);
+  border-bottom: 2px solid var(--border);
+}
+
+[data-theme="dark"] .cta-section-fullwidth {
+  /* 深色主题：使用更柔和的渐变和圆形图案 */
+  background: linear-gradient(135deg, rgba(79, 140, 255, 0.1) 0%, rgba(155, 123, 255, 0.1) 100%);
+  /* 深色主题使用更柔和的圆形图案 */
+  background-image: 
+    radial-gradient(circle at 75% 30%, rgba(79, 140, 255, 0.08) 0%, transparent 60%),
+    radial-gradient(circle at 25% 70%, rgba(155, 123, 255, 0.08) 0%, transparent 60%);
+  background-size: 600px 600px, 700px 700px;
+  background-position: calc(100% + 100px) -100px, -150px calc(100% + 100px);
+  background-repeat: no-repeat;
+}
+
+.cta {
+  margin: 0;
+  padding: 20px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
 .cta-title {
   font-size: 16px;
   margin-bottom: 12px;
