@@ -146,10 +146,10 @@ export default defineComponent({
 
 <style scoped>
 .hero-search {
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  padding: 60px 20px;
-  border-radius: 20px;
-  margin-bottom: 30px;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  margin-bottom: 0;
   text-align: center;
 }
 
