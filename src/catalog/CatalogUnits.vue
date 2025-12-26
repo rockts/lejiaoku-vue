@@ -58,6 +58,31 @@
           </button>
         </div>
         
+        <!-- 备用按钮：当 view_state 为空时，显示通用任务创建按钮 -->
+        <div v-else-if="!catalogInfo.view_state || catalogInfo.view_state === 'no_action'" class="catalog-action-top mb-4">
+          <div class="btn-group" role="group">
+            <button
+              class="btn btn-primary btn-lg"
+              @click="createCatalogTask('add_resources')"
+              :disabled="creatingTask"
+              title="为该教材创建补充资源任务"
+            >
+              <i class="bi bi-plus-circle me-2"></i>补充教材资源
+            </button>
+            <button
+              class="btn btn-outline-primary btn-lg"
+              @click="createCatalogTask('organize_units')"
+              :disabled="creatingTask"
+              title="为该教材创建整理单元任务"
+            >
+              <i class="bi bi-list-check me-2"></i>整理教材单元
+            </button>
+          </div>
+          <p class="text-muted small mt-2 mb-0">
+            <i class="bi bi-info-circle me-1"></i>后端未返回 view_state，显示通用任务创建按钮
+          </p>
+        </div>
+        
         <!-- 调试信息（开发时可见，帮助排查按钮显示问题） -->
         <div v-if="catalogInfo" class="alert alert-info mb-3" style="font-size: 0.875rem;">
           <strong>调试信息：</strong><br>
