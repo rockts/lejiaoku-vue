@@ -832,6 +832,13 @@ export default defineComponent({
   flex-wrap: wrap;
 }
 
+.role-badges .badge {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+  font-weight: 500;
+  color: #ffffff;
+}
+
 .role-select {
   min-width: 120px;
   font-size: 0.875rem;
