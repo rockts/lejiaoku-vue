@@ -697,6 +697,24 @@ export default defineComponent({
   border-top: 1px solid #e9ecef;
 }
 
+/* 深色主题下拉菜单样式 */
+[data-theme="dark"] .navbar-nav .nav-item.dropdown .dropdown-item {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .navbar-nav .nav-item.dropdown .dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .navbar-nav .nav-item.dropdown .dropdown-item i {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .navbar-nav .nav-item.dropdown .dropdown-divider {
+  border-top-color: rgba(255, 255, 255, 0.2);
+}
+
 nav {
   box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 5%), inset 0 -1px 0 rgb(0 0 0 / 10%);
   border-bottom: 1px solid rgba(0, 0, 0, 0.125);
@@ -942,5 +960,28 @@ nav {
 
 .dropdown-divider {
   margin: 0.5rem 0;
+}
+
+/* 深色主题下拉菜单项 */
+[data-theme="dark"] .dropdown-item {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .dropdown-item i {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .dropdown-item.text-danger {
+  color: #ff6b6b !important;
+}
+
+[data-theme="dark"] .dropdown-item.text-danger:hover {
+  background-color: rgba(255, 107, 107, 0.2);
+  color: #ff6b6b !important;
 }
 </style>

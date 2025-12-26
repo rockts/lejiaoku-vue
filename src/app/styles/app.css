@@ -321,18 +321,18 @@ select:disabled {
     }
     
     [data-theme="dark"] .dropdown-hover .dropdown-menu .dropdown-item {
-      color: #ffffff;
+      color: #ffffff !important;
     }
     
     [data-theme="dark"] .dropdown-hover .dropdown-menu .dropdown-item:hover,
     [data-theme="dark"] .dropdown-hover .dropdown-menu .dropdown-item:focus {
-      color: #ffffff;
+      color: #ffffff !important;
       background-color: rgba(255, 255, 255, 0.15);
     }
     
     [data-theme="dark"] .dropdown-hover .dropdown-menu .dropdown-item.active,
     [data-theme="dark"] .dropdown-hover .dropdown-menu .dropdown-item:active {
-      color: #ffffff;
+      color: #ffffff !important;
       background-color: var(--primary, #7aa2ff);
     }
     
@@ -341,7 +341,22 @@ select:disabled {
     }
     
     [data-theme="dark"] .dropdown-hover .dropdown-menu .dropdown-header {
-      color: #ffffff;
+      color: #ffffff !important;
+    }
+    
+    /* 确保所有下拉菜单项的文字在深色主题下都是白色 */
+    [data-theme="dark"] .dropdown-menu .dropdown-item {
+      color: #ffffff !important;
+    }
+    
+    [data-theme="dark"] .dropdown-menu .dropdown-item:hover,
+    [data-theme="dark"] .dropdown-menu .dropdown-item:focus {
+      color: #ffffff !important;
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+    
+    [data-theme="dark"] .dropdown-menu .dropdown-item i {
+      color: #ffffff !important;
     }
     
     .dropdown-hover:hover .dropdown-menu,
