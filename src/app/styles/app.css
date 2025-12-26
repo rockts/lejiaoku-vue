@@ -238,11 +238,30 @@ select:disabled {
       color: #ffffff;
     }
     [data-theme="dark"] .table {
-      color: var(--text);
+      color: #ffffff;
+      background-color: var(--surface, #1e222d);
     }
     [data-theme="dark"] .table td, 
     [data-theme="dark"] .table th {
-      border-color: var(--border);
+      border-color: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+    }
+    [data-theme="dark"] .table thead th {
+      background-color: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+      font-weight: 600;
+    }
+    [data-theme="dark"] .table tbody tr {
+      background-color: transparent;
+    }
+    [data-theme="dark"] .table tbody tr:hover {
+      background-color: rgba(255, 255, 255, 0.08);
+    }
+    [data-theme="dark"] .table tbody td {
+      color: #ffffff;
+    }
+    [data-theme="dark"] .table .text-muted {
+      color: rgba(255, 255, 255, 0.7) !important;
     }
     [data-theme="dark"] .breadcrumb-item.active {
       color: var(--muted);
@@ -269,8 +288,8 @@ select:disabled {
     }
     
     [data-theme="dark"] .dropdown-hover .dropdown-menu {
-      background-color: #1e222d;
-      border-color: rgba(255, 255, 255, 0.2);
+      background-color: #252a35;
+      border-color: rgba(255, 255, 255, 0.25);
       box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5), 0 0.25rem 0.5rem rgba(0, 0, 0, 0.4);
     }
     
