@@ -787,6 +787,12 @@ export default defineComponent({
 .catalog-units {
   min-height: calc(100vh - 200px);
   background: var(--bg, #ffffff);
+  margin-top: -76px; /* 抵消 #app 的 padding-top，让内容紧贴 topbar */
+  padding-top: 76px; /* 恢复必要的间距，但只给 container 内部 */
+}
+
+.catalog-units .container {
+  padding-top: 0.5rem !important; /* 只保留很小的上边距 */
 }
 
 .catalog-info-card .card {
