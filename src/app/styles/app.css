@@ -231,11 +231,11 @@ select:disabled {
       border-color: var(--border);
     }
     [data-theme="dark"] .dropdown-item {
-      color: var(--text);
+      color: #ffffff;
     }
     [data-theme="dark"] .dropdown-item:hover {
-      background-color: rgba(255,255,255,0.1);
-      color: var(--text);
+      background-color: rgba(255,255,255,0.15);
+      color: #ffffff;
     }
     [data-theme="dark"] .table {
       color: var(--text);
@@ -275,13 +275,13 @@ select:disabled {
     }
     
     [data-theme="dark"] .dropdown-hover .dropdown-menu .dropdown-item {
-      color: var(--text, #e6e9ef);
+      color: #ffffff;
     }
     
     [data-theme="dark"] .dropdown-hover .dropdown-menu .dropdown-item:hover,
     [data-theme="dark"] .dropdown-hover .dropdown-menu .dropdown-item:focus {
-      color: var(--text, #ffffff);
-      background-color: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      background-color: rgba(255, 255, 255, 0.15);
     }
     
     [data-theme="dark"] .dropdown-hover .dropdown-menu .dropdown-item.active,
@@ -291,11 +291,11 @@ select:disabled {
     }
     
     [data-theme="dark"] .dropdown-hover .dropdown-menu .dropdown-divider {
-      border-top-color: rgba(255, 255, 255, 0.15);
+      border-top-color: rgba(255, 255, 255, 0.2);
     }
     
     [data-theme="dark"] .dropdown-hover .dropdown-menu .dropdown-header {
-      color: var(--muted, #a0a7b7);
+      color: #ffffff;
     }
     
     .dropdown-hover:hover .dropdown-menu,
