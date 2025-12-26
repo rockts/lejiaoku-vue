@@ -71,8 +71,42 @@
       </div>
     </div>
 
-    <div v-if="loading">加载中...</div>
-    <div class="container">
+    <div v-if="loading" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">加载中...</span>
+      </div>
+      <p class="mt-3 text-muted">加载中...</p>
+    </div>
+    
+    <!-- 空状态占位符 -->
+    <div v-else-if="!loading && resources.length === 0" class="container">
+      <div class="empty-state text-center py-5">
+        <div class="empty-icon mb-4">
+          <i class="bi bi-inbox" style="font-size: 4rem; color: var(--muted, #6c757d);"></i>
+        </div>
+        <h4 class="empty-title mb-3" style="color: var(--text, #1f2937);">
+          {{ getEmptyStateTitle() }}
+        </h4>
+        <p class="empty-description text-muted mb-4" style="color: var(--muted, #6c757d);">
+          {{ getEmptyStateDescription() }}
+        </p>
+        <div class="empty-actions">
+          <button 
+            v-if="hasFilters" 
+            @click="clearFilters" 
+            class="btn btn-outline-primary me-2"
+          >
+            <i class="bi bi-arrow-counterclockwise me-1"></i>清除筛选条件
+          </button>
+          <router-link to="/" class="btn btn-primary">
+            <i class="bi bi-house me-1"></i>返回首页
+          </router-link>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 资源列表 -->
+    <div v-else class="container">
       <!-- <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4"> -->
       <PostListItem
         v-for="resource in resources"
@@ -184,6 +218,18 @@ export default defineComponent({
         pages.push(i);
       }
       return pages;
+    },
+
+    // 检查是否有筛选条件
+    hasFilters() {
+      return !!(
+        this.filters.category ||
+        this.filters.grade ||
+        this.filters.subject ||
+        this.filters.textbook_version ||
+        this.filters.volume ||
+        this.filters.chapter_keyword
+      );
     },
   },
 
@@ -343,6 +389,28 @@ export default defineComponent({
 
       // 滚动到顶部
       window.scrollTo({ top: 0, behavior: "smooth" });
+    },
+
+    // 获取空状态标题
+    getEmptyStateTitle() {
+      if (this.hasFilters) {
+        if (this.filters.category) {
+          return `暂无${this.filters.category}类型的资源`;
+        }
+        return "未找到符合条件的资源";
+      }
+      return "暂无资源";
+    },
+
+    // 获取空状态描述
+    getEmptyStateDescription() {
+      if (this.hasFilters) {
+        if (this.filters.category) {
+          return `当前筛选条件下没有找到${this.filters.category}类型的资源，请尝试调整筛选条件或返回首页浏览其他资源。`;
+        }
+        return "当前筛选条件下没有找到符合条件的资源，请尝试调整筛选条件或返回首页浏览其他资源。";
+      }
+      return "目前还没有资源，请稍后再来查看。";
     },
 
     async fetchFilteredResources(params) {
