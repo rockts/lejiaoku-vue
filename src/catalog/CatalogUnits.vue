@@ -208,6 +208,8 @@ export default defineComponent({
       catalogInfo: null,
       units: [], // 单元列表
       creatingTask: false, // 创建任务中
+      fromTaskId: null, // 来自任务的 ID
+      targetUnit: null, // 目标单元（如果有）
     };
   },
 
@@ -479,6 +481,54 @@ export default defineComponent({
         return gradeNames[grade] || `${grade}年级`;
       }
       return grade;
+    },
+
+    /**
+     * 检查是否从任务跳转过来
+     */
+    checkTaskContext() {
+      const query = this.$route.query;
+      if (query.from_task) {
+        this.fromTaskId = query.from_task;
+        this.targetUnit = query.unit || null;
+        console.log("[CatalogUnits] 从任务跳转过来:", {
+          taskId: this.fromTaskId,
+          targetUnit: this.targetUnit
+        });
+        
+        // 如果有目标单元，在数据加载完成后滚动到该单元
+        if (this.targetUnit && this.units.length > 0) {
+          this.$nextTick(() => {
+            setTimeout(() => {
+              this.scrollToUnit(this.targetUnit);
+            }, 500); // 等待数据加载
+          });
+        }
+      } else {
+        this.fromTaskId = null;
+        this.targetUnit = null;
+      }
+    },
+
+    /**
+     * 滚动到指定单元
+     */
+    scrollToUnit(unitName) {
+      const unitCards = document.querySelectorAll('.unit-card');
+      for (const card of unitCards) {
+        const title = card.querySelector('.unit-title');
+        if (title && title.textContent.includes(unitName)) {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // 添加高亮效果
+          card.style.border = '2px solid var(--primary, #0d6efd)';
+          card.style.boxShadow = '0 0 10px rgba(13, 110, 253, 0.3)';
+          setTimeout(() => {
+            card.style.border = '';
+            card.style.boxShadow = '';
+          }, 3000);
+          break;
+        }
+      }
     },
 
     /**
