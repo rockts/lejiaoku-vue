@@ -464,26 +464,69 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* Hero 区域：全屏背景 */
+/* Hero 区域：全屏背景，带图案 */
 .hero-section-fullwidth {
   width: 100%;
-  background: linear-gradient(135deg, rgba(79, 140, 255, 0.08) 0%, rgba(155, 123, 255, 0.08) 100%);
+  position: relative;
   padding: 60px 0;
   margin-bottom: 0;
+  overflow: hidden;
+  /* 渐变背景 */
+  background: linear-gradient(135deg, rgba(79, 140, 255, 0.12) 0%, rgba(155, 123, 255, 0.12) 100%);
+  /* 几何图案叠加 */
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(79, 140, 255, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(155, 123, 255, 0.15) 0%, transparent 50%),
+    linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.05) 30%, rgba(255, 255, 255, 0.05) 50%, transparent 50%, transparent 80%, rgba(255, 255, 255, 0.05) 80%, rgba(255, 255, 255, 0.05) 100%);
+  background-size: 100% 100%, 100% 100%, 60px 60px;
+  background-position: 0 0, 0 0, 0 0;
 }
 
 [data-theme="dark"] .hero-section-fullwidth {
-  background: linear-gradient(135deg, rgba(79, 140, 255, 0.12) 0%, rgba(155, 123, 255, 0.12) 100%);
+  background: linear-gradient(135deg, rgba(79, 140, 255, 0.18) 0%, rgba(155, 123, 255, 0.18) 100%);
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(79, 140, 255, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(155, 123, 255, 0.2) 0%, transparent 50%),
+    linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.03) 30%, rgba(255, 255, 255, 0.03) 50%, transparent 50%, transparent 80%, rgba(255, 255, 255, 0.03) 80%, rgba(255, 255, 255, 0.03) 100%);
+  background-size: 100% 100%, 100% 100%, 60px 60px;
 }
 
-/* CTA 区域：全屏背景 */
+/* 内容区域：增强对比 */
+.home > .container.pt-3 {
+  background: var(--bg);
+  padding-top: 40px;
+  padding-bottom: 40px;
+  position: relative;
+  z-index: 1;
+}
+
+/* CTA 区域：全屏背景，带图案 */
 .cta-section-fullwidth {
   width: 100%;
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  padding: 40px 0;
-  margin-top: 40px;
+  position: relative;
+  padding: 50px 0;
+  margin-top: 0;
+  overflow: hidden;
+  /* 渐变背景 */
+  background: linear-gradient(135deg, rgba(79, 140, 255, 0.1) 0%, rgba(155, 123, 255, 0.1) 100%);
+  /* 几何图案叠加 */
+  background-image: 
+    radial-gradient(circle at 80% 20%, rgba(79, 140, 255, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 20% 80%, rgba(155, 123, 255, 0.12) 0%, transparent 50%),
+    linear-gradient(-45deg, transparent 30%, rgba(255, 255, 255, 0.04) 30%, rgba(255, 255, 255, 0.04) 50%, transparent 50%, transparent 80%, rgba(255, 255, 255, 0.04) 80%, rgba(255, 255, 255, 0.04) 100%);
+  background-size: 100% 100%, 100% 100%, 50px 50px;
+  background-position: 0 0, 0 0, 0 0;
+  border-top: 2px solid var(--border);
+  border-bottom: 2px solid var(--border);
+}
+
+[data-theme="dark"] .cta-section-fullwidth {
+  background: linear-gradient(135deg, rgba(79, 140, 255, 0.15) 0%, rgba(155, 123, 255, 0.15) 100%);
+  background-image: 
+    radial-gradient(circle at 80% 20%, rgba(79, 140, 255, 0.18) 0%, transparent 50%),
+    radial-gradient(circle at 20% 80%, rgba(155, 123, 255, 0.18) 0%, transparent 50%),
+    linear-gradient(-45deg, transparent 30%, rgba(255, 255, 255, 0.02) 30%, rgba(255, 255, 255, 0.02) 50%, transparent 50%, transparent 80%, rgba(255, 255, 255, 0.02) 80%, rgba(255, 255, 255, 0.02) 100%);
+  background-size: 100% 100%, 100% 100%, 50px 50px;
 }
 
 .cta {
