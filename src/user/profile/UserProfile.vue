@@ -1087,6 +1087,25 @@ export default defineComponent({
   margin-bottom: 0.5rem;
 }
 
+.avatar-placeholder span {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+/* 深色主题下的占位符 */
+[data-theme="dark"] .avatar-placeholder {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="dark"] .avatar-placeholder i {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="dark"] .avatar-placeholder span {
+  color: rgba(255, 255, 255, 0.7);
+}
+
 .gap-2 {
   gap: 0.5rem;
 }
