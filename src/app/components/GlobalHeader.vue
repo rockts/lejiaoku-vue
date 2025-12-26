@@ -140,26 +140,8 @@
                            />
                            <i v-else class="bi bi-person-circle user-avatar-icon"></i>
                          </div>
-                         <span class="user-name user-name-with-badge">
+                         <span class="user-name">
                             {{ displayName }}
-                            <span
-                              v-if="isAdmin"
-                              class="badge badge-admin badge-corner"
-                            >
-                              管理员
-                            </span>
-                            <span
-                              v-else-if="currentUser.role === 'editor'"
-                              class="badge badge-editor badge-corner"
-                            >
-                              编辑
-                            </span>
-                            <span
-                              v-else-if="currentUser.role === 'contributor'"
-                              class="badge badge-contributor badge-corner"
-                            >
-                              贡献者
-                            </span>
                           </span>
             </button>
             <ul
@@ -180,23 +162,21 @@
                   <div>
                     <div class="user-name-large">
                       {{ displayName }}
-                    </div>
-                    <div class="user-role-badge-wrapper">
                       <span
                         v-if="isAdmin"
-                        class="badge badge-admin badge-inline"
+                        class="badge badge-admin badge-inline-small"
                       >
                         管理员
                       </span>
                       <span
                         v-else-if="currentUser.role === 'editor'"
-                        class="badge badge-editor badge-inline"
+                        class="badge badge-editor badge-inline-small"
                       >
                         编辑
                       </span>
                       <span
                         v-else-if="currentUser.role === 'contributor'"
-                        class="badge badge-contributor badge-inline"
+                        class="badge badge-contributor badge-inline-small"
                       >
                         贡献者
                       </span>
