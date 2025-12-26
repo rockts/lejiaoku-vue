@@ -19,8 +19,33 @@
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-          <li class="nav-item">
-            <router-link class="nav-link" to="/posts">资源 </router-link>
+          <!-- 资源下拉菜单 -->
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              id="resourceDropdown"
+              role="button"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              资源
+            </a>
+            <div class="dropdown-menu" aria-labelledby="resourceDropdown">
+              <router-link class="dropdown-item" to="/posts">
+                <i class="bi bi-grid me-2"></i>全部资源
+              </router-link>
+              <div class="dropdown-divider"></div>
+              <router-link 
+                v-for="category in resourceCategories" 
+                :key="category"
+                class="dropdown-item" 
+                :to="`/posts?category=${encodeURIComponent(category)}`"
+              >
+                <i class="bi bi-file-earmark me-2"></i>{{ category }}
+              </router-link>
+            </div>
           </li>
 
           <!-- 管理后台：仅管理员可见，带下拉菜单 -->
@@ -242,6 +267,7 @@
 import { defineComponent } from "vue";
 import { mapGetters } from "vuex";
 import { API_BASE_URL } from "@/app/app.config";
+import { RESOURCE_CATEGORIES } from "@/utils/constants";
 import { apiHttpClient } from "@/app/app.service";
 import notification from "@/utils/notification";
 import HeaderSearch from "./form/HeaderSearch.vue";
@@ -260,6 +286,7 @@ export default defineComponent({
                  showUserDropdown: false,
                  avatarError: false, // 头像加载错误标志
                  isApplying: false, // 是否正在提交申请
+                 resourceCategories: RESOURCE_CATEGORIES, // 资源分类列表
                };
              },
   computed: {

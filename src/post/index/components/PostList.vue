@@ -134,6 +134,7 @@ export default defineComponent({
   data() {
     return {
       filters: {
+        category: "",
         grade: "",
         subject: "",
         textbook_version: "",
@@ -153,8 +154,41 @@ export default defineComponent({
       this.applyFilters();
     }, 600);
 
-    // 初始加载时使用分页参数
-    this.fetchFilteredResources({ page: 1, limit: this.pageSize });
+    // 从 URL query 参数读取筛选条件
+    const query = this.$route.query;
+    if (query.category) {
+      this.filters.category = decodeURIComponent(query.category);
+    }
+    if (query.grade) {
+      this.filters.grade = decodeURIComponent(query.grade);
+    }
+    if (query.subject) {
+      this.filters.subject = decodeURIComponent(query.subject);
+    }
+    if (query.textbook_version) {
+      this.filters.textbook_version = decodeURIComponent(query.textbook_version);
+    }
+    if (query.volume) {
+      this.filters.volume = decodeURIComponent(query.volume);
+    }
+    if (query.chapter_keyword) {
+      this.filters.chapter_keyword = decodeURIComponent(query.chapter_keyword);
+    }
+    if (query.page) {
+      this.currentPage = parseInt(query.page) || 1;
+    }
+
+    // 初始加载时使用筛选参数
+    const params = {
+      page: this.currentPage,
+      limit: this.pageSize,
+    };
+    Object.keys(this.filters).forEach((key) => {
+      if (this.filters[key].trim()) {
+        params[key] = this.filters[key].trim();
+      }
+    });
+    this.fetchFilteredResources(params);
   },
 
   computed: {
@@ -197,15 +231,19 @@ export default defineComponent({
         limit: this.pageSize,
       };
 
+      const query = {};
       Object.keys(this.filters).forEach((key) => {
         if (this.filters[key].trim()) {
           params[key] = this.filters[key].trim();
+          query[key] = this.filters[key].trim();
         }
       });
 
       console.log("[PostList] 应用筛选，参数:", params);
 
       this.currentPage = 1;
+      // 更新 URL query 参数
+      this.$router.replace({ path: '/posts', query });
       // 调用 API 获取过滤后的资源
       this.fetchFilteredResources(params);
     },
