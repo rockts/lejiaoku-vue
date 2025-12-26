@@ -180,7 +180,7 @@
                       {{ displayName }}
                     </div>
                     <div class="user-email">{{ currentUser.email || '未设置邮箱' }}</div>
-                    <div v-if="currentUser.nickname" class="user-nickname text-muted small">
+                    <div v-if="currentUser.nickname" class="user-nickname">
                       <i class="bi bi-at"></i> {{ currentUser.nickname }}
                     </div>
                   </div>
@@ -896,11 +896,18 @@ nav {
   font-weight: 600;
   font-size: 1.1rem;
   margin-bottom: 0.25rem;
+  color: #ffffff;
 }
 
 .user-email {
   font-size: 0.85rem;
-  opacity: 0.9;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 0.25rem;
+}
+
+.user-nickname {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 /* 下拉菜单项 */
