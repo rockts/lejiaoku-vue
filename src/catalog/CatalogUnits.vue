@@ -25,6 +25,12 @@
       <div v-else-if="error" class="text-center py-5">
         <i class="bi bi-exclamation-triangle display-1 text-danger"></i>
         <p class="mt-3 text-danger">{{ error }}</p>
+        <p class="text-muted small mt-2">
+          可能的原因：后端接口不可用、网络连接问题、或 catalogId 不存在
+        </p>
+        <p class="text-muted small">
+          当前 catalogId: {{ catalogId }}
+        </p>
         <router-link to="/catalog" class="btn btn-primary mt-3">
           <i class="bi bi-arrow-left me-2"></i>返回教材目录
         </router-link>
@@ -53,8 +59,15 @@
         </div>
         
         <!-- 调试信息（开发时可见，帮助排查按钮显示问题） -->
-        <div v-if="catalogInfo.view_state" class="alert alert-info mb-3" style="font-size: 0.875rem;">
-          <strong>调试信息：</strong> view_state = "{{ catalogInfo.view_state }}", action_hint = "{{ catalogInfo.action_hint }}"
+        <div v-if="catalogInfo" class="alert alert-info mb-3" style="font-size: 0.875rem;">
+          <strong>调试信息：</strong><br>
+          catalogId: {{ catalogId }}<br>
+          view_state: {{ catalogInfo.view_state || '(null/undefined)' }}<br>
+          action_hint: {{ catalogInfo.action_hint || '(null/undefined)' }}<br>
+          units 数量: {{ units.length }}<br>
+          <span v-if="!catalogInfo.view_state || catalogInfo.view_state === 'no_action'" class="text-warning">
+            ⚠️ view_state 为空或为 'no_action'，所以 Catalog 级按钮不会显示
+          </span>
         </div>
 
         <!-- 教材信息展示（只读） -->
