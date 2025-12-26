@@ -76,12 +76,23 @@
               <p class="card-text text-muted mb-2" v-if="task.unit">
                 <strong>单元：</strong>{{ task.unit }}
               </p>
-              <p class="card-text mb-0">
+              <p class="card-text mb-2">
                 <small class="text-muted">
                   <i class="bi bi-clock me-1"></i>
                   创建时间：{{ formatDate(task.created_at) }}
                 </small>
               </p>
+              <div class="task-actions mt-2">
+                <small class="text-muted d-block mb-1">
+                  <i class="bi bi-info-circle me-1"></i>
+                  <span v-if="task.task_type === 'add_resources'">
+                    执行方式：点击"查看"按钮，在教材页面可以上传资源或补充资源
+                  </span>
+                  <span v-else-if="task.task_type === 'organize_units'">
+                    执行方式：点击"查看"按钮，在教材页面可以整理单元结构
+                  </span>
+                </small>
+              </div>
             </div>
             <div class="task-status ms-3 d-flex flex-column align-items-end gap-2">
               <span class="badge" :class="getStatusClass(task.status)">

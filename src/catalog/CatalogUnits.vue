@@ -46,11 +46,26 @@
       <div v-else-if="catalogInfo">
         <!-- 从任务跳转提示 -->
         <div v-if="fromTaskId" class="alert alert-info mb-3">
-          <i class="bi bi-info-circle me-2"></i>
-          <strong>来自任务：</strong>你正在查看任务关联的教材
-          <span v-if="targetUnit">，目标单元：<strong>{{ targetUnit }}</strong></span>
-          <div class="mt-2">
-            <router-link to="/me/tasks" class="btn btn-sm btn-outline-primary">
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="flex-grow-1">
+              <i class="bi bi-info-circle me-2"></i>
+              <strong>来自任务：</strong>你正在查看任务关联的教材
+              <span v-if="targetUnit">，目标单元：<strong>{{ targetUnit }}</strong></span>
+              <div class="mt-2">
+                <div v-if="!catalogInfo.view_state || catalogInfo.view_state === 'no_action'" class="task-guide">
+                  <p class="mb-1"><strong>如何执行任务：</strong></p>
+                  <ul class="mb-0 small">
+                    <li v-if="fromTaskId">
+                      <strong>补充教材资源：</strong>点击下方的"补充教材资源"按钮创建任务，或点击"上传资源"按钮直接上传资源
+                    </li>
+                    <li v-if="fromTaskId">
+                      <strong>整理教材单元：</strong>点击下方的"整理教材单元"按钮创建任务，然后上传包含单元信息的资源，系统会自动提取单元结构
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <router-link to="/me/tasks" class="btn btn-sm btn-outline-primary ms-3">
               <i class="bi bi-arrow-left me-1"></i>返回我的任务
             </router-link>
           </div>
