@@ -136,7 +136,7 @@
                     <option value="admin">管理员</option>
                   </select>
                   <div class="role-badges">
-                    <span v-if="isCurrentUser(user.id)" class="badge text-bg-primary ms-2">
+                    <span v-if="isCurrentUser(user.id)" class="badge bg-primary ms-2">
                       当前用户
                     </span>
                     <span class="badge ms-2" :class="getRoleBadgeClass(user.role)">
@@ -454,12 +454,12 @@ export default defineComponent({
 
     getRoleBadgeClass(role) {
       const badgeMap = {
-        'user': 'text-bg-secondary',
-        'contributor': 'text-bg-info',
-        'editor': 'text-bg-warning',
-        'admin': 'text-bg-danger'
+        'user': 'bg-secondary',
+        'contributor': 'bg-info',
+        'editor': 'bg-warning',
+        'admin': 'bg-danger'
       };
-      return badgeMap[role] || 'text-bg-secondary';
+      return badgeMap[role] || 'bg-secondary';
     },
 
     async deleteUser(userId, userName) {
