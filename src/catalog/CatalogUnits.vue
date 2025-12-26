@@ -199,6 +199,9 @@ export default defineComponent({
 
         // 2. 如果 catalog 接口返回了数据
         if (catalogData) {
+          console.log("[CatalogUnits] catalogData.view_state:", catalogData.view_state);
+          console.log("[CatalogUnits] catalogData.action_hint:", catalogData.action_hint);
+          
           this.catalogInfo = {
             id: catalogData.id || this.catalogId,
             subject: catalogData.subject,
@@ -210,15 +213,21 @@ export default defineComponent({
             view_state: catalogData.view_state || null,
             action_hint: catalogData.action_hint || null,
           };
+          
+          console.log("[CatalogUnits] catalogInfo.view_state:", this.catalogInfo.view_state);
 
           // 尝试从 catalog 数据中提取 units
           if (catalogData.units && Array.isArray(catalogData.units)) {
-            this.units = catalogData.units.map((u, idx) => ({
-              name: typeof u === "string" ? u : u.name || u.unit || u.title,
-              title: typeof u === "string" ? null : u.title || null,
-              index: idx,
-              unit_state: typeof u === "object" ? u.unit_state : null,
-            }));
+            this.units = catalogData.units.map((u, idx) => {
+              const unitObj = {
+                name: typeof u === "string" ? u : u.name || u.unit || u.title,
+                title: typeof u === "string" ? null : u.title || null,
+                index: idx,
+                unit_state: typeof u === "object" ? u.unit_state : null,
+              };
+              console.log(`[CatalogUnits] 单元 ${idx}:`, unitObj.name, "unit_state:", unitObj.unit_state);
+              return unitObj;
+            });
             console.log("[CatalogUnits] 从 catalog 数据中提取到单元:", this.units);
           } else if (catalogData.structure && Array.isArray(catalogData.structure)) {
             this.units = catalogData.structure.map((s, idx) => ({
