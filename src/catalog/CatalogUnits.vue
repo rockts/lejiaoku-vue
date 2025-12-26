@@ -411,6 +411,65 @@ export default defineComponent({
         query,
       });
     },
+
+    /**
+     * 创建 Catalog 级任务
+     */
+    async createCatalogTask(taskType) {
+      if (this.creatingTask) return;
+
+      this.creatingTask = true;
+      try {
+        const response = await apiHttpClient.post("/api/tasks", {
+          task_type: taskType,
+          catalog_id: this.catalogId,
+        });
+
+        console.log("[CatalogUnits] 创建任务成功:", response.data);
+
+        // 显示成功提示
+        const { notification } = await import("@/utils/notification");
+        notification.success("任务已加入我的任务");
+      } catch (error) {
+        console.error("[CatalogUnits] 创建任务失败:", error);
+        const { notification } = await import("@/utils/notification");
+        notification.error(
+          error.response?.data?.message || error.message || "创建任务失败"
+        );
+      } finally {
+        this.creatingTask = false;
+      }
+    },
+
+    /**
+     * 创建 Unit 级任务
+     */
+    async createUnitTask(unit) {
+      if (this.creatingTask) return;
+
+      this.creatingTask = true;
+      try {
+        const response = await apiHttpClient.post("/api/tasks", {
+          task_type: "add_resources",
+          catalog_id: this.catalogId,
+          unit: unit.name,
+        });
+
+        console.log("[CatalogUnits] 创建单元任务成功:", response.data);
+
+        // 显示成功提示
+        const { notification } = await import("@/utils/notification");
+        notification.success("任务已加入我的任务");
+      } catch (error) {
+        console.error("[CatalogUnits] 创建单元任务失败:", error);
+        const { notification } = await import("@/utils/notification");
+        notification.error(
+          error.response?.data?.message || error.message || "创建任务失败"
+        );
+      } finally {
+        this.creatingTask = false;
+      }
+    },
   },
 });
 </script>
