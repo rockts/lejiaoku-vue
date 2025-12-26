@@ -401,6 +401,14 @@ export default defineComponent({
         newPassword: "",
         confirmPassword: "",
       },
+      // 拖拽和裁剪相关
+      avatarDragActive: false,
+      showCropModal: false,
+      cropImage: null,
+      cropZoom: 1,
+      cropX: 0,
+      cropY: 0,
+      cropSize: 200, // 裁剪区域大小
     };
   },
   computed: {
@@ -547,7 +555,26 @@ export default defineComponent({
     handleAvatarUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
+      this.processImageFile(file);
+    },
 
+    handleAvatarDrop(event) {
+      this.avatarDragActive = false;
+      const file = event.dataTransfer.files[0];
+      if (!file) return;
+      this.processImageFile(file);
+    },
+
+    handleAvatarZoneClick(event) {
+      // 如果点击的是上传区域本身（不是按钮），触发文件选择
+      if (event.target.classList.contains('avatar-upload-section') || 
+          event.target.classList.contains('avatar-placeholder') ||
+          event.target.closest('.avatar-placeholder')) {
+        this.$refs.avatarFileInput?.click();
+      }
+    },
+
+    processImageFile(file) {
       // 检查文件类型
       if (!file.type.startsWith("image/")) {
         notification.error("请选择图片文件");
@@ -562,12 +589,136 @@ export default defineComponent({
 
       this.avatarFile = file;
 
-      // 生成预览
+      // 加载图片用于裁剪
       const reader = new FileReader();
       reader.onload = (e) => {
-        this.avatarPreviewUrl = e.target.result;
+        const img = new Image();
+        img.onload = () => {
+          this.cropImage = img;
+          this.showCropModal = true;
+          this.$nextTick(() => {
+            this.initCrop();
+          });
+        };
+        img.src = e.target.result;
       };
       reader.readAsDataURL(file);
+    },
+
+    initCrop() {
+      if (!this.cropImage || !this.$refs.avatarCropCanvas) return;
+      
+      const canvas = this.$refs.avatarCropCanvas;
+      const ctx = canvas.getContext('2d');
+      
+      // 设置画布大小
+      canvas.width = 400;
+      canvas.height = 400;
+      
+      // 计算初始缩放，使图片适应画布
+      const scale = Math.min(
+        canvas.width / this.cropImage.width,
+        canvas.height / this.cropImage.height
+      ) * 0.8; // 留一些边距
+      
+      this.cropZoom = scale;
+      this.updateCrop();
+    },
+
+    updateCrop() {
+      if (!this.cropImage || !this.$refs.avatarCropCanvas) return;
+      
+      const canvas = this.$refs.avatarCropCanvas;
+      const ctx = canvas.getContext('2d');
+      
+      // 清空画布
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // 计算缩放后的图片尺寸
+      const scaledWidth = this.cropImage.width * this.cropZoom;
+      const scaledHeight = this.cropImage.height * this.cropZoom;
+      
+      // 计算居中位置
+      const x = (canvas.width - scaledWidth) / 2 + this.cropX;
+      const y = (canvas.height - scaledHeight) / 2 + this.cropY;
+      
+      // 绘制图片
+      ctx.drawImage(this.cropImage, x, y, scaledWidth, scaledHeight);
+      
+      // 绘制圆形裁剪区域
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(canvas.width / 2, canvas.height / 2, this.cropSize / 2, 0, Math.PI * 2);
+      ctx.strokeStyle = '#4f8cff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      
+      // 裁剪区域外的遮罩
+      ctx.globalCompositeOperation = 'destination-over';
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.beginPath();
+      ctx.arc(canvas.width / 2, canvas.height / 2, this.cropSize / 2, 0, Math.PI * 2);
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.fill();
+      ctx.restore();
+    },
+
+    confirmCrop() {
+      if (!this.cropImage || !this.$refs.avatarCropCanvas) return;
+      
+      const canvas = document.createElement('canvas');
+      canvas.width = this.cropSize;
+      canvas.height = this.cropSize;
+      const ctx = canvas.getContext('2d');
+      
+      // 创建圆形裁剪路径
+      ctx.beginPath();
+      ctx.arc(this.cropSize / 2, this.cropSize / 2, this.cropSize / 2, 0, Math.PI * 2);
+      ctx.clip();
+      
+      // 计算源图片的裁剪区域
+      const sourceCanvas = this.$refs.avatarCropCanvas;
+      const scaledWidth = this.cropImage.width * this.cropZoom;
+      const scaledHeight = this.cropImage.height * this.cropZoom;
+      const sourceX = (sourceCanvas.width - scaledWidth) / 2 + this.cropX - (sourceCanvas.width / 2 - this.cropSize / 2);
+      const sourceY = (sourceCanvas.height - scaledHeight) / 2 + this.cropY - (sourceCanvas.height / 2 - this.cropSize / 2);
+      
+      // 绘制裁剪后的图片
+      ctx.drawImage(
+        this.cropImage,
+        sourceX / this.cropZoom,
+        sourceY / this.cropZoom,
+        this.cropSize / this.cropZoom,
+        this.cropSize / this.cropZoom,
+        0,
+        0,
+        this.cropSize,
+        this.cropSize
+      );
+      
+      // 转换为 blob 并更新预览
+      canvas.toBlob((blob) => {
+        if (blob) {
+          this.avatarFile = new File([blob], 'avatar.png', { type: 'image/png' });
+          this.avatarPreviewUrl = canvas.toDataURL('image/png');
+          this.showCropModal = false;
+          this.cropImage = null;
+        }
+      }, 'image/png', 0.9);
+    },
+
+    cancelCrop() {
+      this.showCropModal = false;
+      this.cropImage = null;
+      this.avatarFile = null;
+      this.avatarPreviewUrl = null;
+      this.cropZoom = 1;
+      this.cropX = 0;
+      this.cropY = 0;
+      if (this.$refs.avatarFileInput) {
+        this.$refs.avatarFileInput.value = '';
+      }
     },
 
     removeAvatar() {
