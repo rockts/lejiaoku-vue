@@ -667,6 +667,26 @@ export default defineComponent({
     confirmCrop() {
       if (!this.cropImage || !this.$refs.avatarCropCanvas) return;
       
+      const sourceCanvas = this.$refs.avatarCropCanvas;
+      const scaledWidth = this.cropImage.width * this.cropZoom;
+      const scaledHeight = this.cropImage.height * this.cropZoom;
+      
+      // 计算源图片在画布上的位置
+      const sourceX = (sourceCanvas.width - scaledWidth) / 2 + this.cropX;
+      const sourceY = (sourceCanvas.height - scaledHeight) / 2 + this.cropY;
+      
+      // 计算裁剪区域在源图片中的位置（相对于原始图片）
+      const cropCenterX = sourceCanvas.width / 2;
+      const cropCenterY = sourceCanvas.height / 2;
+      const cropLeft = cropCenterX - this.cropSize / 2;
+      const cropTop = cropCenterY - this.cropSize / 2;
+      
+      // 转换为原始图片坐标
+      const originalCropLeft = (cropLeft - sourceX) / this.cropZoom;
+      const originalCropTop = (cropTop - sourceY) / this.cropZoom;
+      const originalCropSize = this.cropSize / this.cropZoom;
+      
+      // 创建目标画布
       const canvas = document.createElement('canvas');
       canvas.width = this.cropSize;
       canvas.height = this.cropSize;
@@ -677,20 +697,13 @@ export default defineComponent({
       ctx.arc(this.cropSize / 2, this.cropSize / 2, this.cropSize / 2, 0, Math.PI * 2);
       ctx.clip();
       
-      // 计算源图片的裁剪区域
-      const sourceCanvas = this.$refs.avatarCropCanvas;
-      const scaledWidth = this.cropImage.width * this.cropZoom;
-      const scaledHeight = this.cropImage.height * this.cropZoom;
-      const sourceX = (sourceCanvas.width - scaledWidth) / 2 + this.cropX - (sourceCanvas.width / 2 - this.cropSize / 2);
-      const sourceY = (sourceCanvas.height - scaledHeight) / 2 + this.cropY - (sourceCanvas.height / 2 - this.cropSize / 2);
-      
       // 绘制裁剪后的图片
       ctx.drawImage(
         this.cropImage,
-        sourceX / this.cropZoom,
-        sourceY / this.cropZoom,
-        this.cropSize / this.cropZoom,
-        this.cropSize / this.cropZoom,
+        originalCropLeft,
+        originalCropTop,
+        originalCropSize,
+        originalCropSize,
         0,
         0,
         this.cropSize,
@@ -704,6 +717,9 @@ export default defineComponent({
           this.avatarPreviewUrl = canvas.toDataURL('image/png');
           this.showCropModal = false;
           this.cropImage = null;
+          this.cropZoom = 1;
+          this.cropX = 0;
+          this.cropY = 0;
         }
       }, 'image/png', 0.9);
     },
