@@ -51,9 +51,13 @@
                     <span style="font-weight: bold">教材：</span
                     >{{ textbookInfo }}
                   </li>
-                  <li v-if="unitCount">
-                    <span style="font-weight: bold">单元数：</span
-                    >{{ unitCount }}
+                  <li v-if="item.unit">
+                    <span style="font-weight: bold">所属单元：</span
+                    >{{ item.unit }}
+                  </li>
+                  <li v-else-if="item.catalog_id">
+                    <span style="font-weight: bold">所属单元：</span
+                    ><span class="text-muted">待整理</span>
                   </li>
                 </ul>
               </div>
@@ -352,14 +356,6 @@ export default defineComponent({
       return version
         ? `${version} · ${grade}${volume} · ${subject}`
         : `${grade}${volume} · ${subject}`;
-    },
-    unitCount() {
-      // 显示单元数量
-      const structure =
-        this.item.catalog_info?.structure ||
-        this.item.auto_meta_result?.structure ||
-        [];
-      return structure.length > 0 ? `${structure.length} 个` : null;
     },
   },
 });
