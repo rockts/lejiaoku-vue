@@ -174,6 +174,8 @@ export default defineComponent({
         textbook_version: "",
         volume: "",
         chapter_keyword: "",
+        catalog_id: "", // 教材目录ID
+        unit: "", // 单元名称
       },
       currentPage: 1,
       pageSize: 30,
@@ -296,6 +298,16 @@ export default defineComponent({
       } else {
         this.filters.chapter_keyword = "";
       }
+      if (query.catalog_id) {
+        this.filters.catalog_id = decodeURIComponent(query.catalog_id);
+      } else {
+        this.filters.catalog_id = "";
+      }
+      if (query.unit) {
+        this.filters.unit = decodeURIComponent(query.unit);
+      } else {
+        this.filters.unit = "";
+      }
       if (query.page) {
         this.currentPage = parseInt(query.page) || 1;
       } else {
@@ -353,6 +365,8 @@ export default defineComponent({
         textbook_version: "",
         volume: "",
         chapter_keyword: "",
+        catalog_id: "",
+        unit: "",
       };
       this.currentPage = 1;
       console.log("[PostList] 清除筛选");
