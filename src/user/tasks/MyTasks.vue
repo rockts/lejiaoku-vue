@@ -206,7 +206,12 @@ export default defineComponent({
 
         // 过滤掉用户已删除的任务（从 localStorage 读取）
         const deletedTaskIds = this.getDeletedTaskIds();
+        const beforeFilter = this.tasks.length;
         this.tasks = this.tasks.filter(task => !deletedTaskIds.includes(String(task.id)));
+        const afterFilter = this.tasks.length;
+        if (beforeFilter !== afterFilter) {
+          console.log(`[MyTasks] 过滤掉 ${beforeFilter - afterFilter} 个已删除的任务`);
+        }
 
         console.log("[MyTasks] 任务数量:", this.tasks.length);
       } catch (error) {
@@ -408,11 +413,10 @@ export default defineComponent({
         const { notification } = await import("@/utils/notification");
         
         if (error.response?.status === 404) {
-          // 如果 API 不存在，直接从前端列表中移除（临时方案）
+          // 如果 API 不存在，保存到 localStorage，这样刷新后也不会显示
+          this.addDeletedTaskId(task.id);
           this.tasks = this.tasks.filter(t => t.id !== task.id);
-          notification.info(
-            "后端删除接口暂未实现，已从前端列表中移除。刷新页面后任务会重新出现。"
-          );
+          notification.success("任务已删除（本地记录，刷新后不会显示）");
         } else {
           notification.error(
             error.response?.data?.message || error.message || "删除任务失败"
@@ -420,6 +424,35 @@ export default defineComponent({
         }
       } finally {
         this.deletingTaskId = null;
+      }
+    },
+
+    /**
+     * 获取已删除的任务 ID 列表（从 localStorage）
+     */
+    getDeletedTaskIds() {
+      try {
+        const deleted = localStorage.getItem('deleted_task_ids');
+        return deleted ? JSON.parse(deleted) : [];
+      } catch (error) {
+        console.error("[MyTasks] 读取已删除任务列表失败:", error);
+        return [];
+      }
+    },
+
+    /**
+     * 添加已删除的任务 ID（保存到 localStorage）
+     */
+    addDeletedTaskId(taskId) {
+      try {
+        const deleted = this.getDeletedTaskIds();
+        if (!deleted.includes(String(taskId))) {
+          deleted.push(String(taskId));
+          localStorage.setItem('deleted_task_ids', JSON.stringify(deleted));
+          console.log("[MyTasks] 已保存删除的任务 ID:", taskId);
+        }
+      } catch (error) {
+        console.error("[MyTasks] 保存已删除任务列表失败:", error);
       }
     },
   },
