@@ -317,17 +317,17 @@
             </h5>
           </div>
           <div class="card-body">
-            <div class="list-group">
+            <div class="list-group security-list">
               <div
-                class="list-group-item d-flex justify-content-between align-items-center"
+                class="list-group-item security-item"
               >
-                <div class="flex-grow-1">
+                <div class="security-content">
                   <h6 class="mb-1">登录密码</h6>
                   <small class="text-muted"
                     >定期更改密码可以提高账号安全性</small
                   >
                 </div>
-                <div class="ms-3 flex-shrink-0">
+                <div class="security-action">
                   <button
                     class="btn btn-sm btn-outline-primary"
                     @click="activeTab = 'password'"
@@ -337,26 +337,26 @@
                 </div>
               </div>
               <div
-                class="list-group-item d-flex justify-content-between align-items-center"
+                class="list-group-item security-item"
               >
-                <div class="flex-grow-1">
+                <div class="security-content">
                   <h6 class="mb-1">邮箱验证</h6>
                   <small class="text-muted">{{ currentUser?.email }}</small>
                 </div>
-                <div class="ms-3 flex-shrink-0">
+                <div class="security-action">
                   <span class="badge bg-success">已验证</span>
                 </div>
               </div>
               <div
-                class="list-group-item d-flex justify-content-between align-items-center"
+                class="list-group-item security-item"
               >
-                <div class="flex-grow-1">
+                <div class="security-content">
                   <h6 class="mb-1">账号注册时间</h6>
                   <small class="text-muted">{{
                     formatDate(currentUser?.created_at)
                   }}</small>
                 </div>
-                <div class="ms-3 flex-shrink-0"></div>
+                <div class="security-action"></div>
               </div>
             </div>
           </div>
