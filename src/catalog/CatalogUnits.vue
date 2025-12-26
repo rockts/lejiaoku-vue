@@ -1,6 +1,6 @@
 <template>
-  <div class="catalog-units" style="margin-top: 0;">
-    <div class="container pt-1 pb-3">
+  <div class="catalog-units">
+    <div class="container pb-3">
       <!-- 面包屑导航 -->
       <nav aria-label="breadcrumb" class="mb-2">
         <ol class="breadcrumb mb-0">
