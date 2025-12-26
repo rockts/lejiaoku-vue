@@ -899,15 +899,27 @@ nav {
   color: #ffffff;
 }
 
+[data-theme="dark"] .user-name-large {
+  color: #ffffff;
+}
+
 .user-email {
   font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.95);
   margin-bottom: 0.25rem;
 }
 
+[data-theme="dark"] .user-email {
+  color: rgba(255, 255, 255, 0.9);
+}
+
 .user-nickname {
   font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.85);
+}
+
+[data-theme="dark"] .user-nickname {
+  color: rgba(255, 255, 255, 0.8);
 }
 
 /* 下拉菜单项 */
