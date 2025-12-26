@@ -19,6 +19,12 @@
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
+          <!-- 教材目录 -->
+          <li class="nav-item">
+            <router-link class="nav-link" to="/catalog">
+              <i class="bi bi-book-half"></i> 教材目录
+            </router-link>
+          </li>
           <!-- 资源下拉菜单 -->
           <li class="nav-item dropdown dropdown-hover">
             <a
