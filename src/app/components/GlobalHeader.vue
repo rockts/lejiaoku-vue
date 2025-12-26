@@ -909,18 +909,14 @@ nav {
 }
 
 /* 用户组标识 - 昵称下方独立显示 */
-.user-role-badge-wrapper {
-  margin-top: 0.25rem;
-  margin-bottom: 0.25rem;
-}
-
-.badge-inline {
+.badge-inline-small {
   display: inline-block;
-  padding: 0.2rem 0.5rem;
-  font-size: 0.65rem;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.6rem;
   font-weight: 600;
-  border-radius: 0.5rem;
+  border-radius: 0.4rem;
   line-height: 1.2;
+  margin-left: 0.25rem;
 }
 
 /* 下拉菜单 */
@@ -988,6 +984,10 @@ nav {
   font-size: 1.1rem;
   margin-bottom: 0.25rem;
   color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 [data-theme="dark"] .user-name-large {
