@@ -332,6 +332,85 @@ export default defineComponent({
         }
       });
     },
+
+    /**
+     * 删除任务
+     */
+    async deleteTask(task) {
+      if (!task.id) {
+        console.warn("[MyTasks] 任务没有 ID，无法删除:", task);
+        return;
+      }
+
+      const { notification } = await import("@/utils/notification");
+      const confirmed = await notification.confirm(
+        `确定要删除任务"${this.getTaskTypeText(task.task_type)}"吗？`,
+        {
+          requireAgreement: false,
+        }
+      );
+
+      if (!confirmed) return;
+
+      this.deletingTaskId = task.id;
+      try {
+        // 尝试多个可能的 API 路径
+        let response = null;
+        const possiblePaths = [
+          `/api/tasks/${task.id}`,      // 标准 RESTful 路径
+          `/my/tasks/${task.id}`,       // 参考 /my/resources 的格式
+          `/api/my/tasks/${task.id}`,   // 带 /api 前缀
+        ];
+
+        let lastError = null;
+        for (const path of possiblePaths) {
+          try {
+            console.log(`[MyTasks] 尝试删除任务 API 路径: ${path}`);
+            response = await apiHttpClient.delete(path);
+            console.log(`[MyTasks] ${path} 删除任务成功:`, response.data);
+            break; // 成功则跳出循环
+          } catch (error) {
+            console.warn(`[MyTasks] ${path} 删除任务失败:`, error.response?.status, error.message);
+            lastError = error;
+            // 如果是 404，继续尝试下一个路径
+            if (error.response?.status === 404) {
+              continue;
+            }
+            // 其他错误直接抛出
+            throw error;
+          }
+        }
+
+        // 如果所有路径都失败，抛出最后一个错误
+        if (!response && lastError) {
+          throw lastError;
+        }
+
+        if (!response) {
+          throw new Error("无法连接到后端服务");
+        }
+
+        // 从列表中移除任务
+        this.tasks = this.tasks.filter(t => t.id !== task.id);
+        notification.success("任务已删除");
+      } catch (error) {
+        console.error("[MyTasks] 删除任务失败:", error);
+        const { notification } = await import("@/utils/notification");
+        
+        if (error.response?.status === 404) {
+          notification.warning(
+            "删除任务 API 不存在，请确认后端是否已实现该接口。\n" +
+            "尝试的路径：/api/tasks/:id, /my/tasks/:id, /api/my/tasks/:id"
+          );
+        } else {
+          notification.error(
+            error.response?.data?.message || error.message || "删除任务失败"
+          );
+        }
+      } finally {
+        this.deletingTaskId = null;
+      }
+    },
   },
 });
 </script>
