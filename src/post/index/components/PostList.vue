@@ -184,10 +184,12 @@ export default defineComponent({
       limit: this.pageSize,
     };
     Object.keys(this.filters).forEach((key) => {
-      if (this.filters[key].trim()) {
-        params[key] = this.filters[key].trim();
+      const value = this.filters[key];
+      if (value && String(value).trim()) {
+        params[key] = String(value).trim();
       }
     });
+    console.log("[PostList] created - 初始筛选参数:", params);
     this.fetchFilteredResources(params);
   },
 
@@ -233,9 +235,10 @@ export default defineComponent({
 
       const query = {};
       Object.keys(this.filters).forEach((key) => {
-        if (this.filters[key].trim()) {
-          params[key] = this.filters[key].trim();
-          query[key] = this.filters[key].trim();
+        const value = this.filters[key];
+        if (value && String(value).trim()) {
+          params[key] = String(value).trim();
+          query[key] = String(value).trim();
         }
       });
 
@@ -277,9 +280,10 @@ export default defineComponent({
 
       const query = { page: String(page) };
       Object.keys(this.filters).forEach((key) => {
-        if (this.filters[key].trim()) {
-          params[key] = this.filters[key].trim();
-          query[key] = this.filters[key].trim();
+        const value = this.filters[key];
+        if (value && String(value).trim()) {
+          params[key] = String(value).trim();
+          query[key] = String(value).trim();
         }
       });
 
