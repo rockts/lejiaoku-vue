@@ -178,8 +178,26 @@
                     <i v-else class="bi bi-person-circle user-avatar-large-icon"></i>
                   </div>
                   <div>
-                    <div class="user-name-large">
+                    <div class="user-name-large user-name-large-with-badge">
                       {{ displayName }}
+                      <span
+                        v-if="isAdmin"
+                        class="badge badge-admin badge-corner-large"
+                      >
+                        管理员
+                      </span>
+                      <span
+                        v-else-if="currentUser.role === 'editor'"
+                        class="badge badge-editor badge-corner-large"
+                      >
+                        编辑
+                      </span>
+                      <span
+                        v-else-if="currentUser.role === 'contributor'"
+                        class="badge badge-contributor badge-corner-large"
+                      >
+                        贡献者
+                      </span>
                     </div>
                     <div class="user-email">{{ currentUser.email || '未设置邮箱' }}</div>
                     <div v-if="currentUser.nickname" class="user-nickname">
@@ -864,6 +882,48 @@ nav {
   background: #28a745;
   color: white;
   border-color: #1e7e34;
+}
+
+/* 右上角角标样式 */
+.user-name-with-badge,
+.user-name-large-with-badge {
+  position: relative;
+  display: inline-block;
+}
+
+.badge-corner {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.55rem;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  transform: scale(0.85);
+  transform-origin: top right;
+  z-index: 10;
+}
+
+.badge-corner-large {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  padding: 0.2rem 0.45rem;
+  font-size: 0.6rem;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  transform: scale(0.9);
+  transform-origin: top right;
+  z-index: 10;
+}
+
+.badge-corner i,
+.badge-corner-large i {
+  display: none;
 }
 
 /* 下拉菜单 */
