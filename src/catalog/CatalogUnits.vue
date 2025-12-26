@@ -787,8 +787,8 @@ export default defineComponent({
 .catalog-units {
   min-height: calc(100vh - 200px);
   background: var(--bg, #ffffff);
-  margin-top: -76px; /* 抵消 #app 的 padding-top，让内容紧贴 topbar */
-  padding-top: 78px; /* 恢复必要的间距（76px topbar + 2px 小间距） */
+  margin-top: -76px; /* 抵消 #app 的 padding-top: 76px，让内容紧贴 topbar */
+  padding-top: 78px; /* 恢复必要间距：76px（topbar高度）+ 2px（小间距） */
 }
 
 .catalog-units .container {
@@ -796,7 +796,7 @@ export default defineComponent({
 }
 
 .catalog-units .breadcrumb {
-  margin-top: 0.5rem; /* 只给面包屑保留很小的上边距 */
+  margin-top: 0.25rem; /* 只给面包屑保留很小的上边距（约 4px） */
   margin-bottom: 0.5rem;
 }
 
