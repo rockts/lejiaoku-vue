@@ -155,21 +155,63 @@
               </div>
               <div class="mb-3">
                 <label class="form-label">头像</label>
-                <div class="avatar-upload-section">
+                <div 
+                  class="avatar-upload-section"
+                  :class="{ 'drag-active': avatarDragActive }"
+                  @dragover.prevent="avatarDragActive = true"
+                  @dragleave.prevent="avatarDragActive = false"
+                  @drop.prevent="handleAvatarDrop"
+                  @click="handleAvatarZoneClick"
+                >
                   <div class="avatar-preview mb-3">
+                    <div v-if="showCropModal" class="avatar-crop-container">
+                      <canvas ref="avatarCropCanvas" class="avatar-crop-canvas"></canvas>
+                      <div class="avatar-crop-controls">
+                        <div class="crop-zoom-control">
+                          <label>缩放: </label>
+                          <input 
+                            type="range" 
+                            v-model.number="cropZoom" 
+                            min="0.5" 
+                            max="3" 
+                            step="0.1"
+                            @input="updateCrop"
+                            class="crop-zoom-slider"
+                          />
+                          <span class="crop-zoom-value">{{ cropZoom.toFixed(1) }}x</span>
+                        </div>
+                        <div class="crop-buttons">
+                          <button 
+                            type="button" 
+                            class="btn btn-sm btn-secondary"
+                            @click.stop="cancelCrop"
+                          >
+                            取消
+                          </button>
+                          <button 
+                            type="button" 
+                            class="btn btn-sm btn-primary"
+                            @click.stop="confirmCrop"
+                          >
+                            确认裁剪
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                     <img
-                      v-if="avatarPreviewUrl || (avatarDisplayUrl && !avatarLoadError)"
+                      v-else-if="avatarPreviewUrl || (avatarDisplayUrl && !avatarLoadError)"
                       :src="avatarPreviewUrl || avatarDisplayUrl"
                       alt="头像预览"
                       class="avatar-preview-image"
                       @error="handleAvatarError"
                     />
                     <div v-else class="avatar-placeholder">
-                      <i class="bi bi-person-circle"></i>
-                      <span>暂无头像</span>
+                      <i class="bi bi-cloud-upload upload-icon"></i>
+                      <span>拖拽图片到此处</span>
+                      <small>或点击选择文件</small>
                     </div>
                   </div>
-                  <div class="d-flex gap-2">
+                  <div class="d-flex gap-2" v-if="!showCropModal">
                     <input
                       type="file"
                       ref="avatarFileInput"
@@ -181,7 +223,7 @@
                     <button
                       type="button"
                       class="btn btn-outline-primary"
-                      @click="$refs.avatarFileInput.click()"
+                      @click.stop="$refs.avatarFileInput.click()"
                     >
                       <i class="bi bi-upload me-2"></i>选择图片
                     </button>
@@ -189,13 +231,13 @@
                       v-if="avatarPreviewUrl || avatarDisplayUrl"
                       type="button"
                       class="btn btn-outline-danger"
-                      @click="removeAvatar"
+                      @click.stop="removeAvatar"
                     >
                       <i class="bi bi-trash me-2"></i>移除
                     </button>
                   </div>
-                  <small class="text-muted d-block mt-2">
-                    支持 JPG、PNG、GIF 格式，建议尺寸 200x200 像素
+                  <small class="text-muted d-block mt-2" v-if="!showCropModal">
+                    支持 JPG、PNG、GIF 格式，建议尺寸 200×200 像素
                   </small>
                 </div>
               </div>
@@ -1080,16 +1122,30 @@ export default defineComponent({
   border-radius: 50%;
   background-color: #e9ecef;
   color: #6c757d;
+  cursor: pointer;
+  transition: all 0.3s;
 }
 
-.avatar-placeholder i {
-  font-size: 4rem;
+.avatar-placeholder:hover {
+  background-color: #dee2e6;
+  transform: scale(1.05);
+}
+
+.avatar-placeholder .upload-icon {
+  font-size: 3rem;
   margin-bottom: 0.5rem;
 }
 
 .avatar-placeholder span {
   font-size: 0.875rem;
   color: #6c757d;
+  font-weight: 500;
+}
+
+.avatar-placeholder small {
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-top: 0.25rem;
 }
 
 /* 深色主题下的占位符 */
@@ -1098,12 +1154,80 @@ export default defineComponent({
   color: rgba(255, 255, 255, 0.7);
 }
 
-[data-theme="dark"] .avatar-placeholder i {
+[data-theme="dark"] .avatar-placeholder:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="dark"] .avatar-placeholder .upload-icon {
   color: rgba(255, 255, 255, 0.7);
 }
 
-[data-theme="dark"] .avatar-placeholder span {
+[data-theme="dark"] .avatar-placeholder span,
+[data-theme="dark"] .avatar-placeholder small {
   color: rgba(255, 255, 255, 0.7);
+}
+
+/* 拖拽激活状态 */
+.avatar-upload-section.drag-active {
+  border-color: var(--primary, #4f8cff);
+  background-color: rgba(79, 140, 255, 0.1);
+}
+
+[data-theme="dark"] .avatar-upload-section.drag-active {
+  border-color: var(--primary, #4f8cff);
+  background-color: rgba(79, 140, 255, 0.2);
+}
+
+/* 裁剪相关样式 */
+.avatar-crop-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.avatar-crop-canvas {
+  border: 2px solid var(--border, #dee2e6);
+  border-radius: 8px;
+  max-width: 100%;
+  cursor: move;
+}
+
+.avatar-crop-controls {
+  margin-top: 1rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.crop-zoom-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.crop-zoom-slider {
+  flex: 1;
+  max-width: 200px;
+}
+
+.crop-zoom-value {
+  min-width: 40px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.crop-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+[data-theme="dark"] .avatar-crop-canvas {
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .gap-2 {
