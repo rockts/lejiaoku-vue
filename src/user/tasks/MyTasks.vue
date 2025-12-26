@@ -204,6 +204,10 @@ export default defineComponent({
           }
         }
 
+        // 过滤掉用户已删除的任务（从 localStorage 读取）
+        const deletedTaskIds = this.getDeletedTaskIds();
+        this.tasks = this.tasks.filter(task => !deletedTaskIds.includes(String(task.id)));
+
         console.log("[MyTasks] 任务数量:", this.tasks.length);
       } catch (error) {
         console.error("[MyTasks] 获取任务列表失败:", error);
