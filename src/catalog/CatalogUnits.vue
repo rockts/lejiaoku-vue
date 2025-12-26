@@ -149,9 +149,24 @@
           <div v-if="units.length === 0" class="text-center py-5">
             <i class="bi bi-inbox display-1 text-muted"></i>
             <p class="mt-3 text-muted">该教材暂无单元信息</p>
-            <p class="text-muted small">
+            <p class="text-muted small mb-4">
               可能该教材尚未绑定资源，或资源中未包含单元信息
             </p>
+            <div class="d-flex justify-content-center gap-3">
+              <button
+                class="btn btn-primary"
+                @click="createCatalogTask('organize_units')"
+                :disabled="creatingTask"
+              >
+                <i class="bi bi-list-check me-2"></i>创建整理单元任务
+              </button>
+              <router-link
+                to="/resources/create"
+                class="btn btn-outline-primary"
+              >
+                <i class="bi bi-cloud-upload me-2"></i>上传资源
+              </router-link>
+            </div>
           </div>
 
           <div v-else class="units-grid">
