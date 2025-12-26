@@ -239,51 +239,56 @@ select:disabled {
     }
     /* 浅色主题表格样式 - 确保文字可见 */
     .table {
-      color: #212529;
+      color: #212529 !important;
     }
     .table td,
     .table th {
-      color: #212529;
+      color: #212529 !important;
     }
     .table tbody td {
-      color: #212529;
+      color: #212529 !important;
+    }
+    .table thead th {
+      color: #212529 !important;
     }
     
-    /* 深色主题表格样式 */
+    /* 深色主题表格样式 - 强制白色文字 */
     [data-theme="dark"] .table {
-      color: #ffffff;
-      background-color: var(--surface, #1e222d);
+      color: #ffffff !important;
+      background-color: var(--surface, #1e222d) !important;
     }
     [data-theme="dark"] .table td, 
     [data-theme="dark"] .table th {
-      border-color: rgba(255, 255, 255, 0.15);
-      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.15) !important;
+      color: #ffffff !important;
     }
-    [data-theme="dark"] .table thead th {
-      background-color: rgba(255, 255, 255, 0.05);
-      color: #ffffff;
+    [data-theme="dark"] .table thead th,
+    [data-theme="dark"] .table thead.table-light th {
+      background-color: rgba(255, 255, 255, 0.05) !important;
+      color: #ffffff !important;
       font-weight: 600;
     }
     [data-theme="dark"] .table tbody tr {
-      background-color: transparent;
+      background-color: transparent !important;
     }
     [data-theme="dark"] .table tbody tr:hover {
-      background-color: rgba(255, 255, 255, 0.08);
+      background-color: rgba(255, 255, 255, 0.08) !important;
     }
     [data-theme="dark"] .table tbody td {
-      color: #ffffff;
+      color: #ffffff !important;
     }
-    [data-theme="dark"] .table tbody td:not(.btn):not(.badge) {
-      color: #ffffff;
+    [data-theme="dark"] .table tbody td strong {
+      color: #ffffff !important;
     }
     [data-theme="dark"] .table-striped tbody tr:nth-of-type(odd) {
-      background-color: rgba(255, 255, 255, 0.03);
+      background-color: rgba(255, 255, 255, 0.03) !important;
     }
     [data-theme="dark"] .table-striped tbody tr:nth-of-type(even) {
-      background-color: transparent;
+      background-color: transparent !important;
     }
-    [data-theme="dark"] .table .text-muted {
-      color: rgba(255, 255, 255, 0.7);
+    [data-theme="dark"] .table .text-muted,
+    [data-theme="dark"] .table small.text-muted {
+      color: rgba(255, 255, 255, 0.7) !important;
     }
     [data-theme="dark"] .breadcrumb-item.active {
       color: var(--muted);
