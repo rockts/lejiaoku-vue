@@ -5,6 +5,7 @@ import AdminIndex from './AdminIndex.vue';
 import AdminUsers from './AdminUsers.vue';
 import AdminResources from './AdminResources.vue';
 import AdminContributorApplications from './AdminContributorApplications.vue';
+import AdminCatalogBinding from './AdminCatalogBinding.vue';
 
 export default [
     {
@@ -26,5 +27,10 @@ export default [
         path: '/admin/contributor-applications',
         name: 'AdminContributorApplications',
         component: AdminContributorApplications,
+    },
+    {
+        path: '/admin/catalog-binding',
+        name: 'AdminCatalogBinding',
+        component: AdminCatalogBinding,
     },
 ];
