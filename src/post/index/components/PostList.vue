@@ -307,6 +307,6 @@ export default defineComponent({
 
 <style scoped>
 .filter-panel {
-  border: 1px solid #dee2e6;
+  border: 1px solid var(--border, #dee2e6);
 }
 </style>

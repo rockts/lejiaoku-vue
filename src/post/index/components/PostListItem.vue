@@ -379,7 +379,7 @@ export default defineComponent({
 .cover {
   width: 100%;
   height: 220px;
-  background: #fff;
+  background: var(--surface, #fff);
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid var(--border, #e9ecef);
@@ -393,7 +393,7 @@ export default defineComponent({
   max-width: 100%;
   max-height: 100%;
   display: block;
-  background: #fff;
+  background: var(--surface, #fff);
   margin: auto;
   object-fit: contain;
   object-position: center;
@@ -420,13 +420,13 @@ export default defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+  background: linear-gradient(135deg, var(--bg, #f5f7fa) 0%, var(--surface, #e8ecf1) 100%);
   border: none;
 }
 
 .cover .cover-placeholder i {
   font-size: 56px;
-  color: #94a3b8;
+  color: var(--muted, #94a3b8);
   opacity: 0.6;
 }
 
@@ -442,13 +442,13 @@ export default defineComponent({
 }
 
 .resource-title-link {
-  color: #0d6efd;
+  color: var(--primary, #0d6efd);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .resource-item-clickable:hover .resource-title-link {
-  color: #0a58ca;
+  color: var(--primary, #0a58ca);
   text-decoration: underline;
 }
 </style>

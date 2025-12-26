@@ -300,7 +300,7 @@ export default defineComponent({
 .resource-card .resource-cover {
   width: 100%;
   height: 220px;
-  background: #fff;
+  background: var(--surface, #fff);
   border-radius: 8px;
   overflow: hidden;
   margin-bottom: 12px;
@@ -316,7 +316,7 @@ export default defineComponent({
   max-width: 100%;
   max-height: 100%;
   display: block;
-  background: #fff;
+  background: var(--surface, #fff);
   margin: auto;
   position: static;
 }
@@ -334,13 +334,13 @@ export default defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+  background: linear-gradient(135deg, var(--bg, #f5f7fa) 0%, var(--surface, #e8ecf1) 100%);
   border: none;
 }
 
 .resource-card .resource-cover .cover-placeholder i {
   font-size: 56px;
-  color: #94a3b8;
+  color: var(--muted, #94a3b8);
   opacity: 0.6;
 }
 .resource-title {
@@ -355,6 +355,7 @@ export default defineComponent({
   line-height: 1.4;
   min-height: 44px;
   max-height: 44px;
+  color: var(--text, #1f2937);
 }
 .resource-meta {
   margin-top: 6px;
@@ -456,7 +457,7 @@ export default defineComponent({
   font-size: 1.5rem;
   font-weight: 700;
   line-height: 1;
-  color: #000;
+  color: var(--text, #000);
   opacity: 0.5;
   cursor: pointer;
 }
@@ -467,7 +468,7 @@ export default defineComponent({
   padding: 1.5rem;
 }
 .modal-footer {
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid var(--border, #e9ecef);
   padding: 1rem 1.5rem;
   display: flex;
   justify-content: flex-end;
@@ -475,9 +476,10 @@ export default defineComponent({
 }
 .download-info {
   padding: 12px;
-  background: #f8f9fa;
+  background: var(--bg, #f8f9fa);
   border-radius: 8px;
   border-left: 3px solid var(--primary);
+  color: var(--text, #1f2937);
 }
 .modal-header .bi {
   margin-right: 8px;
