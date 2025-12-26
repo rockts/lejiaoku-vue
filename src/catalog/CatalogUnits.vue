@@ -1,14 +1,14 @@
 <template>
   <div class="catalog-units">
-    <div class="container py-4">
+    <div class="container py-3">
       <!-- 面包屑导航 -->
-      <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
+      <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb mb-0">
           <li class="breadcrumb-item">
             <router-link to="/catalog">教材目录</router-link>
           </li>
           <li class="breadcrumb-item active" aria-current="page">
-            {{ catalogInfo.displayName || "教材章节" }}
+            {{ catalogInfo.displayName || `教材 #${catalogId}` }}
           </li>
         </ol>
       </nav>
@@ -92,32 +92,40 @@
         </div>
         
         <!-- 备用按钮：当 view_state 为空时，显示通用任务创建按钮 -->
-        <div v-else-if="!catalogInfo.view_state || catalogInfo.view_state === 'no_action'" class="catalog-action-top mb-4">
-          <div class="alert alert-light border mb-3">
+        <div v-else-if="!catalogInfo.view_state || catalogInfo.view_state === 'no_action'" class="catalog-action-top mb-3">
+          <div class="alert alert-light border">
             <h6 class="alert-heading mb-2">
-              <i class="bi bi-lightbulb me-2"></i>下一步操作
+              <i class="bi bi-lightbulb me-2"></i>执行任务
             </h6>
-            <p class="mb-2">该教材暂无单元信息，建议先整理单元结构，再补充资源内容。</p>
-            <div class="btn-group" role="group">
+            <p class="mb-2 small">该教材暂无单元信息，建议先整理单元结构，再补充资源内容。</p>
+            <div class="d-flex gap-2 mb-2">
               <button
-                class="btn btn-primary btn-lg"
-                @click="createCatalogTask('add_resources')"
-                :disabled="creatingTask"
-                title="为该教材创建补充资源任务"
+                class="btn btn-primary"
+                @click="goToUpload"
+                title="直接上传资源（推荐）"
               >
-                <i class="bi bi-plus-circle me-2"></i>补充教材资源
+                <i class="bi bi-cloud-upload me-2"></i>上传资源
               </button>
               <button
-                class="btn btn-outline-primary btn-lg"
+                class="btn btn-outline-primary"
                 @click="createCatalogTask('organize_units')"
                 :disabled="creatingTask"
-                title="为该教材创建整理单元任务"
+                title="创建整理单元任务"
               >
                 <i class="bi bi-list-check me-2"></i>整理教材单元
               </button>
+              <button
+                class="btn btn-outline-secondary"
+                @click="createCatalogTask('add_resources')"
+                :disabled="creatingTask"
+                title="创建补充资源任务"
+              >
+                <i class="bi bi-plus-circle me-2"></i>补充资源
+              </button>
             </div>
-            <p class="text-muted small mt-2 mb-0">
-              <i class="bi bi-info-circle me-1"></i>点击按钮创建任务，任务会加入"我的任务"列表
+            <p class="text-muted small mb-0">
+              <i class="bi bi-info-circle me-1"></i>
+              <strong>推荐：</strong>直接点击"上传资源"按钮，上传包含单元信息的资源文件，系统会自动提取并整理单元结构
             </p>
           </div>
         </div>
