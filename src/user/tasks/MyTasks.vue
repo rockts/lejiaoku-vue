@@ -404,9 +404,10 @@ export default defineComponent({
         const { notification } = await import("@/utils/notification");
         
         if (error.response?.status === 404) {
-          notification.warning(
-            "删除任务 API 不存在，请确认后端是否已实现该接口。\n" +
-            "尝试的路径：/api/tasks/:id, /my/tasks/:id, /api/my/tasks/:id"
+          // 如果 API 不存在，直接从前端列表中移除（临时方案）
+          this.tasks = this.tasks.filter(t => t.id !== task.id);
+          notification.info(
+            "后端删除接口暂未实现，已从前端列表中移除。刷新页面后任务会重新出现。"
           );
         } else {
           notification.error(
