@@ -200,6 +200,7 @@ export default defineComponent({
           }
         } catch (error) {
           console.warn("[CatalogUnits] Catalog API 失败，尝试从资源中提取:", error);
+          // 如果接口不存在或失败，catalogData 保持为 null，后续会从资源中提取
         }
 
         // 2. 如果 catalog 接口返回了数据
@@ -256,6 +257,7 @@ export default defineComponent({
           }
         } else {
           // catalog 接口失败，从资源中提取
+          console.log("[CatalogUnits] Catalog API 未返回数据，从资源中提取");
           this.catalogInfo = {
             id: this.catalogId,
             subject: null,
@@ -264,6 +266,8 @@ export default defineComponent({
             textbook_version: null,
             education_level: null,
             displayName: `教材 #${this.catalogId}`,
+            view_state: null, // 从资源中提取时，view_state 为 null
+            action_hint: null,
           };
           await this.extractUnitsFromResources();
         }
