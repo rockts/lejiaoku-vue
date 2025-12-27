@@ -878,9 +878,15 @@ export default defineComponent({
       });
 
       // 如果资源已绑定教材目录，设置 selectedCatalogId
+      // 优先使用 catalog_id，如果没有则尝试从 catalog_info 查找
       if (this.resource?.catalog_id) {
         this.selectedCatalogId = this.resource.catalog_id;
         console.log("[PostEdit] 已设置 selectedCatalogId:", this.selectedCatalogId);
+      } else if (this.resource?.catalog_info) {
+        // 如果有 catalog_info 但没有 catalog_id，尝试查找
+        // 注意：这里不等待异步结果，但会在 findCatalogIdByInfo 中设置
+        // 为了确保 hasCatalogBindingForFields 判断正确，我们依赖 resource.catalog_info 的存在
+        console.log("[PostEdit] 资源有 catalog_info 但没有 catalog_id，将尝试查找");
       }
 
       // 检查单元信息输入框显示条件
@@ -1525,7 +1531,8 @@ export default defineComponent({
         // 如果资源已绑定教材目录，不应该发送 grade、subject、version 等字段
         // 这些信息应该由 catalog_info 管理，避免覆盖
         // 只有在未绑定教材目录时，才允许用户手动填写这些字段
-        const hasCatalogBindingForFields = this.resource?.catalog_id || this.resource?.catalog_info || this.selectedCatalogId;
+        // 重要：即使 selectedCatalogId 为 null，只要 resource.catalog_id 或 resource.catalog_info 存在，就认为已绑定
+        const hasCatalogBindingForFields = !!(this.resource?.catalog_id || this.resource?.catalog_info || this.selectedCatalogId);
         
         if (!hasCatalogBindingForFields) {
           // 未绑定教材目录，允许手动填写这些字段
@@ -1541,6 +1548,13 @@ export default defineComponent({
         } else {
           // 已绑定教材目录，不发送这些字段，避免覆盖 catalog_info
           console.log("[PostEdit] 资源已绑定教材目录，跳过 grade/subject/version 字段的提交");
+          console.log("[PostEdit] JSON 提交绑定状态检查:", {
+            catalog_id: this.resource?.catalog_id,
+            has_catalog_info: !!this.resource?.catalog_info,
+            catalog_info: this.resource?.catalog_info,
+            selectedCatalogId: this.selectedCatalogId,
+            hasCatalogBindingForFields
+          });
         }
         
         // chapter_info 可以独立更新（不受教材目录绑定影响）
@@ -1666,11 +1680,20 @@ export default defineComponent({
             formData.append("source_attribution", updateData.source_attribution || "");
           }
           // 如果资源已绑定教材目录，不发送 grade、subject、version 字段
-          const hasCatalogBindingForFields = this.resource?.catalog_id || this.resource?.catalog_info || this.selectedCatalogId;
+          // 重要：即使 selectedCatalogId 为 null，只要 resource.catalog_id 或 resource.catalog_info 存在，就认为已绑定
+          const hasCatalogBindingForFields = !!(this.resource?.catalog_id || this.resource?.catalog_info || this.selectedCatalogId);
           if (!hasCatalogBindingForFields) {
             if (updateData.grade) formData.append("grade", updateData.grade);
             if (updateData.subject) formData.append("subject", updateData.subject);
             if (updateData.version) formData.append("version", updateData.version);
+          } else {
+            console.log("[PostEdit] FormData 提交：资源已绑定教材目录，跳过 grade/subject/version 字段");
+            console.log("[PostEdit] FormData 绑定状态检查:", {
+              catalog_id: this.resource?.catalog_id,
+              has_catalog_info: !!this.resource?.catalog_info,
+              selectedCatalogId: this.selectedCatalogId,
+              hasCatalogBindingForFields
+            });
           }
           if (updateData.chapter_info) formData.append("chapter_info", updateData.chapter_info);
           
