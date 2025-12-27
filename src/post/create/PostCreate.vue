@@ -414,18 +414,17 @@
               <div class="col-12">
                 <label class="form-label small" :class="{'text-muted': !(routeCatalogId || textbookCatalogId), 'text-warning': (routeCatalogId || textbookCatalogId)}">
                   章节 / 单元 / 课
-                  <span v-if="routeCatalogId || textbookCatalogId" class="text-warning">*</span>
-                  <span v-else class="text-muted">（可选）</span>
+                  <span v-if="!(routeCatalogId || textbookCatalogId)" class="text-muted">（可选）</span>
                   <i
                     class="bi bi-info-circle text-muted"
-                    title="如：第一章、第三单元、第5课等。如果是整本教材，可留空"
+                    title="如：第一章、第三单元、第5课等。如果留空，系统会自动标记为「整本教材」"
                   ></i>
                 </label>
                 <input
                   type="text"
                   class="form-control"
                   v-model="chapterInfo"
-                  placeholder="如：第一章、第三单元、第5课等（整本教材可留空）"
+                  placeholder="如：第一单元（留空则自动标记为「整本教材」）"
                   :required="false"
                 />
               </div>
@@ -433,14 +432,55 @@
                 <p class="small mb-0" :class="{'text-warning': (routeCatalogId || textbookCatalogId), 'text-muted': !(routeCatalogId || textbookCatalogId)}">
                   <i class="bi bi-info-circle"></i>
                   <span v-if="routeCatalogId || textbookCatalogId">
-                    💡 已绑定教材：如果是某个单元，请填写单元信息；如果是整本教材，可留空（系统会自动标记为「整本教材」）
+                    💡 已绑定教材：填写单元信息；留空则自动标记为「整本教材」
                   </span>
                   <span v-else>
-                    系统会尝试自动识别，也可手动输入或修改
+                  系统会尝试自动识别，也可手动输入或修改
                   </span>
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- 资源出处（可选） -->
+        <div class="mb-4 card shadow-sm">
+          <div class="card-header bg-white">
+            <h6 class="mb-0">
+              <i class="bi bi-tag"></i> 资源出处（可选）
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="position-relative">
+              <input
+                v-model="sourceAttribution"
+                type="text"
+                class="form-control"
+                placeholder="如：xx教育、某某出版社等"
+                maxlength="100"
+                @input="onSourceAttributionInput"
+                @focus="showSourceAttributionSuggestions = true"
+                @blur="hideSourceAttributionSuggestions"
+              />
+              <!-- 自动完成建议列表 -->
+              <div
+                v-if="showSourceAttributionSuggestions && sourceAttributionSuggestions.length > 0"
+                class="autocomplete-suggestions"
+              >
+                <div
+                  v-for="(suggestion, index) in sourceAttributionSuggestions"
+                  :key="index"
+                  class="autocomplete-item"
+                  @mousedown="selectSourceAttribution(suggestion)"
+                >
+                  {{ suggestion }}
+                </div>
+              </div>
+            </div>
+            <small class="text-muted d-block mt-2">
+              <i class="bi bi-info-circle me-1"></i>
+              用于标注资源的原始来源，最多 100 个字符
+            </small>
           </div>
         </div>
 
@@ -579,6 +619,10 @@ export default defineComponent({
       version: "",
       chapterInfo: "", // 章节信息（可选）
       description: "",
+      sourceAttribution: "", // 资源出处（可选）
+      // 资源出处自动完成
+      showSourceAttributionSuggestions: false,
+      sourceAttributionSuggestions: [],
       file: null,
       cover: null,
       coverPreviewUrl: null,
@@ -646,11 +690,20 @@ export default defineComponent({
     const catalogId = this.$route.query.catalog_id;
     const unit = this.$route.query.unit;
     
-    if (catalogId) {
-      this.routeCatalogId = catalogId;
-      this.textbookCatalogId = Number(catalogId);
-      console.log("[PostCreate] 从路由参数获取 catalog_id:", catalogId);
+    // 必须要有 catalog_id 参数
+    if (!catalogId) {
+      console.warn("[PostCreate] 缺少 catalog_id 参数，重定向到教材目录");
+      const { notification } = await import("@/utils/notification");
+      notification.warning("上传资源必须绑定到教材目录，请先选择教材");
+      this.$router.push({ path: '/catalog' });
+      return;
     }
+    
+    this.routeCatalogId = String(catalogId); // 保持为字符串，与 URL 参数一致
+    this.textbookCatalogId = Number(catalogId);
+    console.log("[PostCreate] 从路由参数获取 catalog_id:", catalogId);
+    console.log("[PostCreate] routeCatalogId (字符串):", this.routeCatalogId);
+    console.log("[PostCreate] textbookCatalogId (数字):", this.textbookCatalogId);
     
     if (unit) {
       this.routeUnit = unit;
@@ -1367,6 +1420,11 @@ export default defineComponent({
           formData.append("description", this.description);
         }
 
+        // 添加资源出处（可选）
+        if (this.sourceAttribution && this.sourceAttribution.trim()) {
+          formData.append("source_attribution", this.sourceAttribution.trim());
+        }
+
         // 添加章节信息（可选）
         if (this.chapterInfo) {
           formData.append("chapter_info", this.chapterInfo);
@@ -1374,7 +1432,8 @@ export default defineComponent({
         }
 
         // 确定要绑定的 catalog_id（优先级：路由参数 > 手动选择）
-        const catalogIdToBind = this.routeCatalogId || this.textbookCatalogId;
+        // 根据文档，catalog_id 应该是数字，所以优先使用 textbookCatalogId（数字）
+        const catalogIdToBind = this.textbookCatalogId || (this.routeCatalogId ? Number(this.routeCatalogId) : null);
         
         // 确定要传递的 unit（优先级：路由参数 > 章节信息）
         const unitToBind = this.routeUnit || (this.chapterInfo ? this.chapterInfo : null);
@@ -1407,42 +1466,41 @@ export default defineComponent({
           });
         }
 
-        // 如果绑定了教材，提示用户填写单元（但允许整本教材的情况）
-        if (catalogIdToBind && !unitToBind) {
-          // 询问用户是否是整本教材
-          const { notification: notificationModule } = await import("@/utils/notification");
-          const isFullTextbook = await notificationModule.confirm(
-            "该资源已绑定教材。\n\n" +
-            "如果是整本教材，请点击「确定」继续上传（单元将标记为「整本教材」）。\n\n" +
-            "如果是某个单元的内容，请点击「取消」并填写「章节/单元/课」字段。",
-            {
-              requireAgreement: false,
-              confirmText: "是整本教材",
-              cancelText: "填写单元"
-            }
-          );
-          
-          if (isFullTextbook) {
-            // 整本教材，使用特殊标记
-            formData.append("unit", "整本教材");
-            console.log("[PostCreate] 整本教材，使用特殊标记");
-          } else {
-            // 用户选择填写单元，阻止提交
+        // 添加 catalog_id（如果存在）
+        // 根据文档，catalog_id 应该是数字，FormData 需要字符串
+        if (catalogIdToBind) {
+          // 确保是数字，然后转换为字符串（FormData 需要字符串）
+          const catalogIdValue = Number(catalogIdToBind);
+          if (isNaN(catalogIdValue)) {
+            console.error("[PostCreate] 错误：catalog_id 不是有效数字:", catalogIdToBind);
+            notification.error("教材目录ID格式错误，请重新选择");
             this.isSubmitting = false;
             return;
           }
+          formData.append("catalog_id", String(catalogIdValue));
+          console.log("[PostCreate] 添加 catalog_id 到 FormData:", catalogIdValue, "(数字，转换为字符串)", "来源:", this.routeCatalogId ? "路由参数" : "手动选择");
+          console.log("[PostCreate] routeCatalogId:", this.routeCatalogId, "textbookCatalogId:", this.textbookCatalogId, "catalogIdToBind:", catalogIdToBind);
+        } else {
+          console.warn("[PostCreate] 警告：没有 catalog_id 要绑定！");
+          console.warn("[PostCreate] routeCatalogId:", this.routeCatalogId, "textbookCatalogId:", this.textbookCatalogId);
         }
 
-        // 添加 catalog_id（如果存在）
+        // 添加 unit：如果绑定了教材目录但单元留空，自动设置为"整本教材"
         if (catalogIdToBind) {
-          formData.append("catalog_id", catalogIdToBind);
-          console.log("[PostCreate] 添加 catalog_id:", catalogIdToBind, "来源:", this.routeCatalogId ? "路由参数" : "手动选择");
-        }
-
-        // 添加 unit（如果存在）
-        if (unitToBind) {
-          formData.append("unit", unitToBind);
-          console.log("[PostCreate] 添加 unit:", unitToBind, "来源:", this.routeUnit ? "路由参数" : "章节信息");
+          // 如果绑定了教材目录
+          if (unitToBind && unitToBind.trim()) {
+            // 有填写单元，使用填写的值
+            formData.append("unit", unitToBind.trim());
+            console.log("[PostCreate] 添加 unit:", unitToBind.trim(), "来源:", this.routeUnit ? "路由参数" : "章节信息");
+          } else {
+            // 单元留空，自动设置为"整本教材"
+            formData.append("unit", "整本教材");
+            console.log("[PostCreate] 单元留空，自动设置为「整本教材」");
+          }
+        } else if (unitToBind && unitToBind.trim()) {
+          // 没有绑定教材目录，但有填写单元，也添加
+          formData.append("unit", unitToBind.trim());
+          console.log("[PostCreate] 添加 unit:", unitToBind.trim(), "来源:", this.routeUnit ? "路由参数" : "章节信息");
         }
 
         // 添加文件（如果有）
@@ -1495,6 +1553,21 @@ export default defineComponent({
         });
 
         console.log("[PostCreate] 创建成功:", response.data);
+        console.log("[PostCreate] 响应中的 catalog_id:", response.data?.catalog_id || response.data?.data?.catalog_id);
+        console.log("[PostCreate] 提交的 catalog_id:", catalogIdToBind);
+        
+        // 如果资源出处有值，保存到历史记录
+        if (this.sourceAttribution && this.sourceAttribution.trim()) {
+          this.saveSourceAttributionToHistory(this.sourceAttribution);
+        }
+        
+        // 检查响应中是否包含 catalog_id
+        const responseCatalogId = response.data?.catalog_id || response.data?.data?.catalog_id;
+        if (catalogIdToBind && !responseCatalogId) {
+          console.warn("[PostCreate] 警告：提交了 catalog_id 但响应中没有返回，可能后端没有保存");
+        } else if (catalogIdToBind && responseCatalogId) {
+          console.log("[PostCreate] 确认：catalog_id 已保存，响应值:", responseCatalogId);
+        }
 
         const resourceId = response.data.id || response.data.insertId;
 
@@ -1544,7 +1617,7 @@ export default defineComponent({
           // 这里只处理手动选择教材的情况（没有路由参数时）
           if (!this.routeCatalogId && this.textbookCatalogId) {
             try {
-              await this.bindTextbook(resourceId);
+          await this.bindTextbook(resourceId);
             } catch (error) {
               // 绑定教材失败不影响整体流程，只记录错误
               console.error("[PostCreate] 绑定教材失败:", error);
@@ -1565,13 +1638,13 @@ export default defineComponent({
           
           const checkAndJump = () => {
             if (this.aiRecognized || waitedTime >= maxWaitTime) {
-              console.log(
+            console.log(
                 "[PostCreate] 跳转到资源详情页，resourceId:",
                 resourceId,
                 "AI识别状态:",
                 this.aiRecognized ? "已完成" : "超时"
-              );
-              this.$router.push(`/resources/${resourceId}`);
+            );
+            this.$router.push(`/resources/${resourceId}`);
             } else {
               waitedTime += checkInterval;
               setTimeout(checkAndJump, checkInterval);
@@ -1681,6 +1754,81 @@ export default defineComponent({
                         '提交申请失败，请稍后重试';
         notification.error(errorMsg);
       }
+    },
+
+    /**
+     * 获取资源出处历史记录
+     */
+    getSourceAttributionHistory() {
+      try {
+        const history = localStorage.getItem('source_attribution_history');
+        return history ? JSON.parse(history) : [];
+      } catch (error) {
+        console.error("[PostCreate] 获取资源出处历史记录失败:", error);
+        return [];
+      }
+    },
+
+    /**
+     * 保存资源出处到历史记录
+     */
+    saveSourceAttributionToHistory(value) {
+      if (!value || !value.trim()) return;
+      
+      try {
+        const history = this.getSourceAttributionHistory();
+        const trimmedValue = value.trim();
+        
+        // 移除重复项
+        const filteredHistory = history.filter(item => item !== trimmedValue);
+        
+        // 添加到最前面
+        filteredHistory.unshift(trimmedValue);
+        
+        // 只保留最近20条记录
+        const limitedHistory = filteredHistory.slice(0, 20);
+        
+        localStorage.setItem('source_attribution_history', JSON.stringify(limitedHistory));
+      } catch (error) {
+        console.error("[PostCreate] 保存资源出处历史记录失败:", error);
+      }
+    },
+
+    /**
+     * 资源出处输入事件
+     */
+    onSourceAttributionInput() {
+      const value = this.sourceAttribution || '';
+      if (!value.trim()) {
+        this.sourceAttributionSuggestions = [];
+        return;
+      }
+
+      const history = this.getSourceAttributionHistory();
+      const lowerValue = value.toLowerCase();
+      
+      // 过滤匹配的历史记录
+      this.sourceAttributionSuggestions = history.filter(item => 
+        item.toLowerCase().includes(lowerValue)
+      ).slice(0, 5); // 最多显示5条建议
+    },
+
+    /**
+     * 选择资源出处建议
+     */
+    selectSourceAttribution(suggestion) {
+      this.sourceAttribution = suggestion;
+      this.showSourceAttributionSuggestions = false;
+    },
+
+    /**
+     * 隐藏资源出处建议列表
+     */
+    hideSourceAttributionSuggestions() {
+      // 延迟隐藏，以便点击建议项时能触发
+      setTimeout(() => {
+        this.showSourceAttributionSuggestions = false;
+      }, 200);
     },
   },
 });

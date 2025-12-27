@@ -34,10 +34,16 @@
       <span class="badge category">{{ item.category }}</span>
       <span class="badge format">{{ item.format }}</span>
       <span class="muted">{{ textbookInfo }}</span>
+      <span v-if="item.source_attribution" class="badge bg-info ms-1" style="font-size: 0.75rem;">
+        📌 {{ item.source_attribution }}
+      </span>
     </div>
     <!-- 所属单元 -->
     <div class="resource-unit" v-if="item.unit">
       <i class="bi bi-bookmark"></i> 所属单元：{{ item.unit }}
+      <span v-if="item.unit_index" class="text-muted small ms-1">
+        (序号: {{ item.unit_index }})
+      </span>
     </div>
     <div class="resource-unit-pending" v-else-if="item.catalog_id">
       <i class="bi bi-exclamation-circle"></i> <span class="text-muted">待整理</span>
@@ -119,10 +125,40 @@ export default defineComponent({
     textbookInfo() {
       // 优先使用 catalog_info，fallback 到 auto_meta_result
       const info = this.item.catalog_info || this.item.auto_meta_result || {};
-      const grade = info.grade || this.item.grade || "-";
+      let grade = info.grade || this.item.grade || "";
       const volume = info.volume || "";
       const subject = info.subject || this.item.subject || "-";
-      return `${grade}${volume} · ${subject}`;
+      
+      // 格式化年级：如果是数字，转换为"X年级"
+      if (typeof grade === "number") {
+        const gradeNames = [
+          "",
+          "一年级",
+          "二年级",
+          "三年级",
+          "四年级",
+          "五年级",
+          "六年级",
+          "七年级",
+          "八年级",
+          "九年级",
+          "高一",
+          "高二",
+          "高三",
+        ];
+        grade = gradeNames[grade] || `${grade}年级`;
+      } else if (grade && !grade.includes("年级") && !grade.includes("年")) {
+        // 如果是字符串但不包含"年级"，添加"年级"
+        grade = `${grade}年级`;
+      }
+      
+      // 组合显示：年级 + 上下册 + 学科
+      const parts = [];
+      if (grade) parts.push(grade);
+      if (volume) parts.push(volume);
+      if (subject) parts.push(subject);
+      
+      return parts.length > 0 ? parts.join(" · ") : "-";
     },
   },
   methods: {
@@ -156,18 +192,18 @@ export default defineComponent({
           if (m) {
             const filename = m[1]; // 完整文件名，例如 "1766517324895-cover.jpg"
             // 根据文档，格式应该是：/uploads/cover/resized/{filename}-thumbnail
-            candidates.push(
+              candidates.push(
               `/uploads/cover/resized/${filename}-thumbnail`
-            );
-          }
+              );
+            }
         }
       }
       if (this.item?.cover?.id) {
         // 使用 API 路径（需要 API_BASE_URL）
         if (API_BASE_URL) {
-          candidates.push(
-            `${API_BASE_URL}/covers/${this.item.cover.id}?size=thumbnail`
-          );
+        candidates.push(
+          `${API_BASE_URL}/covers/${this.item.cover.id}?size=thumbnail`
+        );
         }
       }
 

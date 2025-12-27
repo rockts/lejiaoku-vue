@@ -17,7 +17,7 @@
                 <i
                   v-else
                   class="bi bi-person-circle avatar-icon"
-                ></i>
+            ></i>
               </div>
             </div>
             <h5 class="mt-3">{{ displayUser?.username || displayUser?.name || '未知用户' }}</h5>
@@ -328,12 +328,12 @@
                   >
                 </div>
                 <div class="security-action">
-                  <button
-                    class="btn btn-sm btn-outline-primary"
-                    @click="activeTab = 'password'"
-                  >
-                    修改
-                  </button>
+                <button
+                  class="btn btn-sm btn-outline-primary"
+                  @click="activeTab = 'password'"
+                >
+                  修改
+                </button>
                 </div>
               </div>
               <div
@@ -344,7 +344,7 @@
                   <small class="text-muted">{{ currentUser?.email }}</small>
                 </div>
                 <div class="security-action">
-                  <span class="badge bg-success">已验证</span>
+                <span class="badge bg-success">已验证</span>
                 </div>
               </div>
               <div
@@ -434,43 +434,57 @@ export default defineComponent({
     avatarDisplayUrl() {
       // 优先使用预览URL（上传后立即显示）
       if (this.avatarPreviewUrl) {
-        // 有预览URL时，重置错误标志
-        this.avatarLoadError = false;
         return this.avatarPreviewUrl;
+      }
+      
+      // 如果头像加载失败，不返回URL
+      if (this.avatarLoadError) {
+        return null;
       }
       
       const user = this.displayUser;
       
       if (user?.avatar_url && String(user.avatar_url).trim() !== '') {
-        // 如果用户有头像URL，重置错误标志
-        if (this.avatarLoadError) {
-          this.avatarLoadError = false;
-        }
         
         let url = String(user.avatar_url).trim();
         
+        // 使用固定的时间戳（基于用户ID），避免每次访问都生成新的URL
+        const cacheKey = `avatar_url_${user.id}`;
+        let cachedTimestamp = sessionStorage.getItem(cacheKey);
+        if (!cachedTimestamp) {
+          cachedTimestamp = String(Date.now());
+          sessionStorage.setItem(cacheKey, cachedTimestamp);
+        }
+        
         // 如果是完整URL，直接返回（添加时间戳防止缓存）
         if (url.startsWith("http://") || url.startsWith("https://")) {
-          return `${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
+          return `${url}${url.includes('?') ? '&' : '?'}t=${cachedTimestamp}`;
         }
         
         // 如果是相对路径（以/开头），直接使用（通过代理访问）
         if (url.startsWith("/")) {
-          const finalUrl = `${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
+          const finalUrl = `${url}${url.includes('?') ? '&' : '?'}t=${cachedTimestamp}`;
           return finalUrl;
         }
         
         // 其他情况，添加API基础URL
         const API_BASE_URL = process.env.VUE_APP_API_BASE_URL || "";
-        const finalUrl = `${API_BASE_URL}${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
+        const finalUrl = `${API_BASE_URL}${url}${url.includes('?') ? '&' : '?'}t=${cachedTimestamp}`;
         return finalUrl;
       }
       
       // 如果没有 avatar_url，尝试使用默认的头像路径（即使后端没有返回 avatar_url，也可能有头像文件）
       // 根据 API 文档，头像访问路径是 /api/users/:userId/avatar
-      if (user?.id) {
-        const defaultAvatarUrl = `/api/users/${user.id}/avatar?t=${Date.now()}`;
-        console.log("[UserProfile] avatarDisplayUrl - 使用默认头像路径:", defaultAvatarUrl);
+      // 注意：如果头像加载失败，不要不断重试，使用固定的时间戳
+      if (user?.id && !this.avatarLoadError) {
+        // 使用用户ID作为缓存键的一部分，避免用户切换时使用旧缓存
+        const cacheKey = `avatar_${user.id}`;
+        const cachedTimestamp = sessionStorage.getItem(cacheKey);
+        const timestamp = cachedTimestamp || Date.now();
+        if (!cachedTimestamp) {
+          sessionStorage.setItem(cacheKey, String(timestamp));
+        }
+        const defaultAvatarUrl = `/api/users/${user.id}/avatar?t=${timestamp}`;
         return defaultAvatarUrl;
       }
       
@@ -489,7 +503,7 @@ export default defineComponent({
       handler(newVal, oldVal) {
         if (newVal !== oldVal && newVal) {
           this.fetchUser();
-        }
+    }
       },
       immediate: false,
     },
@@ -752,9 +766,17 @@ export default defineComponent({
     },
 
     handleAvatarError(event) {
-      console.error("[UserProfile] 头像加载失败:", event.target.src);
+      // 只在开发环境输出日志
+      if (process.env.NODE_ENV === 'development') {
+        console.warn("[UserProfile] 头像加载失败，停止重试");
+      }
       // 标记头像加载失败，显示默认图标
       this.avatarLoadError = true;
+      // 清除缓存的时间戳，避免不断重试
+      if (this.displayUser?.id) {
+        sessionStorage.removeItem(`avatar_${this.displayUser.id}`);
+        sessionStorage.removeItem(`avatar_url_${this.displayUser.id}`);
+      }
       // 隐藏图片
       if (event.target) {
         event.target.style.display = 'none';
@@ -938,8 +960,8 @@ export default defineComponent({
                 },
               });
               console.log("[UserProfile] 头像URL已保存到用户资料:", avatarUrl);
-              
-              // 更新本地用户信息
+
+        // 更新本地用户信息
               const updatedUser = updateResponse.data.user || updateResponse.data;
               
               // 无论响应中是否有用户信息，都直接更新 profileUser
@@ -958,8 +980,8 @@ export default defineComponent({
               // 更新 store 和 localStorage
               if (updatedUser) {
                 updatedUser.avatar_url = avatarUrl;
-                localStorage.setItem("user_info", JSON.stringify(updatedUser));
-                this.$store.commit("auth/setUser", updatedUser);
+        localStorage.setItem("user_info", JSON.stringify(updatedUser));
+        this.$store.commit("auth/setUser", updatedUser);
               } else {
                 // 如果响应中没有用户信息，从 store 获取并更新
                 const currentUser = this.$store.state.auth.user;

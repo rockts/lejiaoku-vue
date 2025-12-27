@@ -2,11 +2,11 @@
   <div class="home">
     <!-- Hero 区域：全屏背景 -->
     <div class="hero-section-fullwidth">
-      <div class="container">
-        <SearchBar
-          :filterState="filterState"
-          @update:filterState="onUpdateFilter"
-        />
+    <div class="container">
+      <SearchBar
+        :filterState="filterState"
+        @update:filterState="onUpdateFilter"
+      />
       </div>
     </div>
     
@@ -27,28 +27,29 @@
     <!-- CTA 区域：全屏背景 -->
     <div class="cta-section-fullwidth">
       <div class="container">
-        <div class="cta">
-          <div class="cta-title">
+      <div class="cta">
+        <div class="cta-title">
             <template v-if="isAuthenticated">
-              想上传自己的教学资源？加入我们，成为教师贡献者
+          想上传自己的教学资源？加入我们，成为教师贡献者
             </template>
             <template v-else>
               登录后可上传和管理教学资源
             </template>
-          </div>
-          <div class="cta-actions">
+        </div>
+        <div class="cta-actions">
             <!-- 上传按钮：仅 contributor / editor / admin 显示 -->
+            <!-- 已删除：上传资源必须从教材目录页面进入 -->
             <div v-if="canUpload" class="qr-wrapper-center">
               <router-link
-                to="/resources/create"
+                to="/catalog"
                 class="btn upload-btn"
               >
-                <i class="bi bi-upload me-2"></i> 上传资源
+                <i class="bi bi-upload me-2"></i> 前往教材目录上传资源
               </router-link>
             </div>
             
             <!-- 申请成为贡献者按钮：已登录 && role === user（替换原来的二维码位置） -->
-            <div
+          <div
               v-else-if="canApplyContributor"
               class="qr-wrapper qr-wrapper-center"
             >
@@ -62,7 +63,7 @@
                 @mousedown.stop.prevent="handleMouseDown"
                 :disabled="isApplying || applicationStatus === 'pending' || applicationStatus === 'approved'"
                 :style="(isApplying || applicationStatus === 'pending' || applicationStatus === 'approved') ? 'pointer-events: none; cursor: not-allowed;' : ''"
-              >
+            >
                 <span v-if="isApplying">
                   <span class="spinner-border spinner-border-sm me-2" role="status"></span>
                   提交中...
@@ -74,7 +75,7 @@
                   <i class="bi bi-person-plus-fill me-2"></i> 申请成为贡献者
                 </span>
               </button>
-            </div>
+              </div>
             
             <!-- 未登录：显示登录按钮 -->
             <div

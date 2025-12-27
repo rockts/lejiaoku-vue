@@ -135,10 +135,20 @@
               </td>
               <td>
                 <div class="resource-title">
-                  <strong>{{ resource.title || '无标题' }}</strong>
-                  <small v-if="resource.category" class="text-muted d-block">
-                    {{ resource.category }}
-                  </small>
+                  <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <strong>{{ resource.title || '无标题' }}</strong>
+                    <button
+                      v-if="isCatalogBound(resource)"
+                      @click="showCatalogInfo(resource)"
+                      class="catalog-bound-indicator"
+                      title="点击查看绑定信息"
+                    >
+                      <i class="bi bi-bookmark-check-fill"></i>
+                    </button>
+                  </div>
+                  <div v-if="resource.category" class="resource-meta mt-1">
+                    <span class="resource-category">{{ resource.category }}</span>
+                  </div>
                 </div>
               </td>
               <td>
@@ -167,6 +177,16 @@
                     title="查看资源详情"
                   >
                     <i class="bi bi-eye me-1"></i>查看
+                  </router-link>
+                  
+                  <!-- 编辑资源链接 -->
+                  <router-link
+                    :to="`/resources/${resource.id}/edit`"
+                    class="btn btn-sm btn-primary"
+                    target="_blank"
+                    title="编辑资源"
+                  >
+                    <i class="bi bi-pencil me-1"></i>编辑
                   </router-link>
                   
                   <template v-if="resource.status === 'pending'">
@@ -210,6 +230,118 @@
         </table>
       </div>
     </div>
+
+    <!-- 教材目录绑定信息模态框 -->
+    <div
+      v-if="showCatalogModal"
+      class="modal-backdrop"
+      @click="closeCatalogModal"
+    >
+      <div class="catalog-modal" @click.stop>
+        <div class="catalog-modal-header">
+          <h5 class="catalog-modal-title">
+            <i class="bi bi-bookmark-check-fill me-2"></i>
+            教材目录绑定信息
+          </h5>
+          <button
+            type="button"
+            class="catalog-modal-close"
+            @click="closeCatalogModal"
+          >
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+        <div class="catalog-modal-body">
+          <div v-if="selectedResource && isCatalogBound(selectedResource)">
+            <!-- 资源基本信息 -->
+            <div class="info-section">
+              <div class="info-label">资源标题</div>
+              <div class="info-value">{{ selectedResource.title || '无标题' }}</div>
+            </div>
+
+            <!-- 教材目录信息 -->
+            <div v-if="selectedResource.catalog_info" class="info-section">
+              <div class="info-label">
+                <i class="bi bi-book me-1"></i>教材目录
+              </div>
+              <div class="catalog-info-grid">
+                <div class="catalog-info-item" v-if="selectedResource.catalog_info.education_level">
+                  <span class="info-item-label">学段</span>
+                  <span class="info-item-value">{{ selectedResource.catalog_info.education_level }}</span>
+                </div>
+                <div class="catalog-info-item" v-if="selectedResource.catalog_info.subject">
+                  <span class="info-item-label">学科</span>
+                  <span class="info-item-value">{{ selectedResource.catalog_info.subject }}</span>
+                </div>
+                <div class="catalog-info-item" v-if="selectedResource.catalog_info.grade">
+                  <span class="info-item-label">年级</span>
+                  <span class="info-item-value">{{ selectedResource.catalog_info.grade }}年级</span>
+                </div>
+                <div class="catalog-info-item" v-if="selectedResource.catalog_info.volume">
+                  <span class="info-item-label">册别</span>
+                  <span class="info-item-value">{{ selectedResource.catalog_info.volume }}</span>
+                </div>
+                <div class="catalog-info-item" v-if="selectedResource.catalog_info.textbook_version">
+                  <span class="info-item-label">版本</span>
+                  <span class="info-item-value">{{ selectedResource.catalog_info.textbook_version }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 单元信息 -->
+            <div v-if="selectedResource.unit" class="info-section">
+              <div class="info-label">
+                <i class="bi bi-list-ul me-1"></i>所属单元
+              </div>
+              <div class="info-value">
+                <span class="unit-badge">{{ selectedResource.unit }}</span>
+                <span v-if="selectedResource.unit_index" class="unit-index">
+                  (序号: {{ selectedResource.unit_index }})
+                </span>
+              </div>
+            </div>
+
+            <!-- 目录ID -->
+            <div v-if="selectedResource.catalog_id || selectedResource.catalogId" class="info-section">
+              <div class="info-label">
+                <i class="bi bi-hash me-1"></i>目录ID
+              </div>
+              <div class="info-value">
+                <code class="catalog-id">{{ selectedResource.catalog_id || selectedResource.catalogId }}</code>
+                <router-link
+                  :to="`/catalog/${selectedResource.catalog_id || selectedResource.catalogId}`"
+                  target="_blank"
+                  class="btn btn-sm btn-outline-primary ms-2"
+                >
+                  <i class="bi bi-box-arrow-up-right me-1"></i>查看目录
+                </router-link>
+              </div>
+            </div>
+
+            <!-- 如果没有 catalog_info，显示基本信息 -->
+            <div v-else class="info-section">
+              <div class="info-label">绑定信息</div>
+              <div class="info-value text-muted">
+                {{ getCatalogInfo(selectedResource) || '已绑定，但详细信息不可用' }}
+              </div>
+            </div>
+          </div>
+          <div v-else class="text-center text-muted py-4">
+            <i class="bi bi-exclamation-circle display-4"></i>
+            <p class="mt-3">该资源未绑定教材目录</p>
+          </div>
+        </div>
+        <div class="catalog-modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            @click="closeCatalogModal"
+          >
+            关闭
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -228,6 +360,8 @@ export default defineComponent({
       statusFilter: "",
       processing: {},
       deleting: {},
+      showCatalogModal: false,
+      selectedResource: null,
     };
   },
 
@@ -251,6 +385,11 @@ export default defineComponent({
 
   created() {
     this.fetchResources();
+  },
+
+  beforeUnmount() {
+    // 组件销毁前恢复背景滚动
+    document.body.style.overflow = '';
   },
 
   methods: {
@@ -418,6 +557,59 @@ export default defineComponent({
       } catch (error) {
         return "未知";
       }
+    },
+
+    /**
+     * 判断资源是否已绑定教材目录
+     */
+    isCatalogBound(resource) {
+      return !!(resource.catalog_id || resource.catalog_info || resource.catalogId);
+    },
+
+    /**
+     * 获取教材目录信息显示文本
+     */
+    getCatalogInfo(resource) {
+      if (resource.catalog_info) {
+        const info = resource.catalog_info;
+        const parts = [];
+        if (info.education_level) parts.push(info.education_level);
+        if (info.subject) parts.push(info.subject);
+        if (info.grade) parts.push(`${info.grade}年级`);
+        if (info.volume) parts.push(info.volume);
+        if (info.textbook_version) parts.push(info.textbook_version);
+        return parts.join(' · ') || null;
+      }
+      
+      // 如果没有 catalog_info，尝试从其他字段构建
+      const parts = [];
+      if (resource.subject) parts.push(resource.subject);
+      if (resource.grade) parts.push(resource.grade);
+      if (resource.textbook || resource.textbook_version) {
+        parts.push(resource.textbook || resource.textbook_version);
+      }
+      
+      return parts.length > 0 ? parts.join(' · ') : null;
+    },
+
+    /**
+     * 显示教材目录绑定信息
+     */
+    showCatalogInfo(resource) {
+      this.selectedResource = resource;
+      this.showCatalogModal = true;
+      // 阻止背景滚动
+      document.body.style.overflow = 'hidden';
+    },
+
+    /**
+     * 关闭教材目录绑定信息模态框
+     */
+    closeCatalogModal() {
+      this.showCatalogModal = false;
+      this.selectedResource = null;
+      // 恢复背景滚动
+      document.body.style.overflow = '';
     },
 
     async deleteResource(resourceId, resourceTitle) {
@@ -696,7 +888,307 @@ export default defineComponent({
 }
 
 .resource-title {
-  max-width: 400px;
+  max-width: 500px;
+}
+
+/* 已绑定教材目录标识样式 */
+.catalog-bound-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+}
+
+.catalog-bound-indicator:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.5);
+  background: linear-gradient(135deg, #7c8ef0 0%, #8b6dd4 100%);
+}
+
+.catalog-bound-indicator:active {
+  transform: scale(0.95);
+}
+
+.catalog-bound-indicator i {
+  font-size: 0.75rem;
+}
+
+/* 资源元信息样式 */
+.resource-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.resource-category {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  background: #f0f0f0;
+  color: #6c757d;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* 模态框样式 */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.catalog-modal {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.catalog-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.catalog-modal-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.catalog-modal-close {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.catalog-modal-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+.catalog-modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.catalog-modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.info-section {
+  margin-bottom: 1.5rem;
+}
+
+.info-section:last-child {
+  margin-bottom: 0;
+}
+
+.info-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.info-value {
+  font-size: 1rem;
+  color: #212529;
+  word-break: break-word;
+}
+
+.catalog-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.catalog-info-item {
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 3px solid #667eea;
+}
+
+.info-item-label {
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.info-item-value {
+  font-size: 0.95rem;
+  color: #212529;
+  font-weight: 600;
+}
+
+.unit-badge {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  background: #e7f3ff;
+  color: #0066cc;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.unit-index {
+  color: #6c757d;
+  font-size: 0.875rem;
+  margin-left: 0.5rem;
+}
+
+.catalog-id {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  background: #f8f9fa;
+  color: #495057;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+}
+
+/* 深色主题适配 */
+[data-theme="dark"] .catalog-modal {
+  background: #1e222d;
+  color: #ffffff;
+}
+
+[data-theme="dark"] .catalog-modal-header {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .catalog-modal-body {
+  color: #ffffff;
+}
+
+[data-theme="dark"] .catalog-modal-footer {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .info-label {
+  color: #b0b0b0;
+}
+
+[data-theme="dark"] .info-value {
+  color: #ffffff;
+}
+
+[data-theme="dark"] .catalog-info-item {
+  background: rgba(255, 255, 255, 0.05);
+  border-left-color: #7c8ef0;
+}
+
+[data-theme="dark"] .info-item-label {
+  color: #b0b0b0;
+}
+
+[data-theme="dark"] .info-item-value {
+  color: #ffffff;
+}
+
+[data-theme="dark"] .unit-badge {
+  background: rgba(0, 102, 204, 0.2);
+  color: #66b3ff;
+}
+
+[data-theme="dark"] .catalog-id {
+  background: rgba(255, 255, 255, 0.1);
+  color: #b0b0b0;
+}
+
+/* 深色主题适配 */
+[data-theme="dark"] .catalog-bound-badge {
+  background: linear-gradient(135deg, #7c8ef0 0%, #9b6dd4 100%);
+  box-shadow: 0 1px 3px rgba(124, 142, 240, 0.4);
+}
+
+[data-theme="dark"] .catalog-bound-badge:hover {
+  box-shadow: 0 2px 6px rgba(124, 142, 240, 0.5);
+}
+
+[data-theme="dark"] .resource-category {
+  background: rgba(255, 255, 255, 0.1);
+  color: #b0b0b0;
+}
+
+[data-theme="dark"] .catalog-info {
+  background: rgba(0, 102, 204, 0.15);
+  color: #66b3ff;
+  border-left-color: #66b3ff;
 }
 
 .badge {

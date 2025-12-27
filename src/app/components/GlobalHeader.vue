@@ -19,8 +19,8 @@
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-          <!-- 教材目录 -->
-          <li class="nav-item">
+          <!-- 教材目录：仅已登录用户可见 -->
+          <li v-if="isAuthenticated" class="nav-item">
             <router-link class="nav-link" to="/catalog">
               <i class="bi bi-book-half"></i> 教材目录
             </router-link>
@@ -81,7 +81,7 @@
               </router-link>
               <router-link class="dropdown-item" to="/admin/contributor-applications">
                 <i class="bi bi-person-check me-2"></i>贡献者申请
-              </router-link>
+            </router-link>
             </div>
           </li>
         </ul>
@@ -121,7 +121,8 @@
         <!-- 已登录：显示用户菜单 -->
         <ul v-if="isAuthenticated && currentUser" class="navbar-nav ms-auto">
           <!-- 上传资源按钮：contributor / editor / admin 显示 -->
-          <li v-if="canUpload" class="nav-item">
+          <!-- 已删除：上传资源必须从教材目录页面进入 -->
+          <!-- <li v-if="canUpload" class="nav-item">
             <router-link
               to="/resources/create"
               class="btn btn-upload"
@@ -129,13 +130,13 @@
             >
               <i class="bi bi-cloud-upload-fill"></i>
             </router-link>
-          </li>
+          </li> -->
                      <li class="nav-item dropdown dropdown-hover">
-                       <button
-                         class="nav-link dropdown-toggle btn btn-link user-dropdown-btn"
-                         type="button"
-                         aria-expanded="false"
-                       >
+            <button
+              class="nav-link dropdown-toggle btn btn-link user-dropdown-btn"
+              type="button"
+              aria-expanded="false"
+            >
                          <div class="user-avatar-wrapper">
                            <img
                              v-if="userAvatarUrl && !avatarError"
@@ -148,7 +149,7 @@
                          </div>
                          <span class="user-name">
                             {{ displayName }}
-                          </span>
+              </span>
             </button>
             <ul
               class="dropdown-menu dropdown-menu-end"
@@ -284,17 +285,17 @@ export default defineComponent({
   name: "GlobalHeader",
   props: ["user"],
   emits: ["show-login"],
-             data() {
-               return {
-                 theme: "light",
-                 showLoginModal: false,
-                 showRegisterModal: false,
-                 showUserDropdown: false,
+  data() {
+    return {
+      theme: "light",
+      showLoginModal: false,
+      showRegisterModal: false,
+      showUserDropdown: false,
                  avatarError: false, // 头像加载错误标志
                  isApplying: false, // 是否正在提交申请
                  resourceCategories: RESOURCE_CATEGORIES, // 资源分类列表
-               };
-             },
+    };
+  },
   computed: {
     ...mapGetters({
       isAuthenticated: "auth/isAuthenticated",
@@ -358,44 +359,71 @@ export default defineComponent({
     userAvatarUrl() {
       const user = this.currentUser;
       if (!user || !user.id) {
-        this.avatarError = false; // 重置错误标志
         return null;
       }
       
-      console.log("[GlobalHeader] userAvatarUrl - 用户 ID:", user.id);
-      console.log("[GlobalHeader] userAvatarUrl - user.avatar_url:", user.avatar_url);
-      
-      // 如果用户有 avatar_url，重置错误标志并返回URL
-      if (user.avatar_url && String(user.avatar_url).trim() !== '') {
-        // 如果之前有错误，但用户现在有头像URL，重置错误标志
-        if (this.avatarError) {
-          this.avatarError = false;
-        }
-        
-        let url = String(user.avatar_url).trim();
-        // 如果是完整URL，直接返回
-        if (url.startsWith("http://") || url.startsWith("https://")) {
-          return `${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
-        }
-        // 如果是相对路径，直接使用
-        if (url.startsWith("/")) {
-          return `${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
-        }
-        // 其他情况，添加API基础URL
-        const baseURL = API_BASE_URL || "";
-        return `${baseURL}${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
+      // 如果头像加载失败，不返回URL（让模板显示默认图标）
+      if (this.avatarError) {
+        return null;
       }
       
-      // 如果没有 avatar_url，尝试使用默认的头像路径（即使后端没有返回 avatar_url，也可能有头像文件）
+      // 如果用户有 avatar_url，返回URL
+      if (user.avatar_url && String(user.avatar_url).trim() !== '') {
+        let url = String(user.avatar_url).trim();
+        
+        // 使用固定的时间戳（基于用户ID），避免每次访问都生成新的URL
+        const cacheKey = `avatar_url_${user.id}`;
+        let cachedTimestamp = sessionStorage.getItem(cacheKey);
+        if (!cachedTimestamp) {
+          cachedTimestamp = String(Date.now());
+          sessionStorage.setItem(cacheKey, cachedTimestamp);
+        }
+        
+        // 如果是完整URL，直接返回
+        if (url.startsWith("http://") || url.startsWith("https://")) {
+          const finalUrl = `${url}${url.includes('?') ? '&' : '?'}t=${cachedTimestamp}`;
+          if (process.env.NODE_ENV === 'development') {
+            console.log("[GlobalHeader] 头像URL（完整URL）:", finalUrl);
+          }
+          return finalUrl;
+        }
+        
+        // 如果是相对路径（以/开头），直接使用（通过代理访问）
+        if (url.startsWith("/")) {
+          const finalUrl = `${url}${url.includes('?') ? '&' : '?'}t=${cachedTimestamp}`;
+          if (process.env.NODE_ENV === 'development') {
+            console.log("[GlobalHeader] 头像URL（相对路径）:", finalUrl, "原始 avatar_url:", user.avatar_url);
+          }
+          return finalUrl;
+        }
+        
+        // 其他情况，添加API基础URL
+        const baseURL = API_BASE_URL || "";
+        const finalUrl = `${baseURL}${url}${url.includes('?') ? '&' : '?'}t=${cachedTimestamp}`;
+        if (process.env.NODE_ENV === 'development') {
+          console.log("[GlobalHeader] 头像URL（其他）:", finalUrl);
+        }
+        return finalUrl;
+      }
+      
+      // 如果没有 avatar_url，尝试使用默认的头像路径
       // 根据 API 文档，头像访问路径是 /api/users/:userId/avatar
       if (user.id) {
-        const defaultAvatarUrl = `/api/users/${user.id}/avatar?t=${Date.now()}`;
-        console.log("[GlobalHeader] userAvatarUrl - 使用默认头像路径:", defaultAvatarUrl);
+        // 使用用户ID作为缓存键的一部分，避免用户切换时使用旧缓存
+        const cacheKey = `avatar_${user.id}`;
+        const cachedTimestamp = sessionStorage.getItem(cacheKey);
+        const timestamp = cachedTimestamp || Date.now();
+        if (!cachedTimestamp) {
+          sessionStorage.setItem(cacheKey, String(timestamp));
+        }
+        const defaultAvatarUrl = `/api/users/${user.id}/avatar?t=${timestamp}`;
+        if (process.env.NODE_ENV === 'development') {
+          console.log("[GlobalHeader] 头像URL（默认路径）:", defaultAvatarUrl, "用户 avatar_url:", user.avatar_url);
+        }
         return defaultAvatarUrl;
       }
       
-      // 如果都没有，返回 null 以显示默认图标
-      this.avatarError = false; // 重置错误标志
+      // 如果没有用户ID，返回 null 以显示默认图标
       return null;
     },
 
@@ -410,30 +438,38 @@ export default defineComponent({
   watch: {
     // 监听 currentUser 的变化，特别是用户 ID 的变化
     'currentUser.id'(newId, oldId) {
-      console.log("[GlobalHeader] 检测到用户 ID 变化:", { oldId, newId });
       if (oldId && newId && String(oldId) !== String(newId)) {
-        console.log("[GlobalHeader] 用户切换，强制刷新数据");
-        // 用户切换，强制刷新数据
+        // 用户切换，重置头像错误标志并刷新数据
+        this.avatarError = false;
+        // 清除旧用户的头像缓存
+        if (oldId) {
+          sessionStorage.removeItem(`avatar_${oldId}`);
+          sessionStorage.removeItem(`avatar_url_${oldId}`);
+        }
         this.refreshUserData();
       }
     },
-    // 监听 currentUser 对象的变化
+    // 监听 currentUser 对象的变化（只在用户ID变化时处理）
     currentUser: {
       handler(newUser, oldUser) {
         if (newUser && oldUser && String(newUser.id) !== String(oldUser.id)) {
-          console.log("[GlobalHeader] 检测到用户切换（通过对象监听）:", { 
-            oldUserId: oldUser.id, 
-            newUserId: newUser.id,
-            oldNickname: oldUser.nickname,
-            newNickname: newUser.nickname
-          });
+          // 用户切换，重置头像错误标志
+          this.avatarError = false;
+          // 清除旧用户的头像缓存
+          if (oldUser?.id) {
+            sessionStorage.removeItem(`avatar_${oldUser.id}`);
+            sessionStorage.removeItem(`avatar_url_${oldUser.id}`);
+          }
         }
       },
-      deep: true,
-      immediate: true
+      deep: false, // 改为 false，避免深度监听导致频繁触发
+      immediate: false // 改为 false，避免初始化时触发
     }
   },
   async mounted() {
+    // 组件挂载时，重置头像错误标志，让头像重新尝试加载
+    this.avatarError = false;
+    
     // 组件挂载时，如果已登录但 currentUser 为空，尝试刷新用户数据
     if (this.isAuthenticated && !this.currentUser) {
       this.refreshUserData();
@@ -446,9 +482,6 @@ export default defineComponent({
         const parsedStoredUser = JSON.parse(storedUserInfo);
         const storeUserId = this.currentUser?.id;
         const storedUserId = parsedStoredUser?.id;
-        
-        console.log("[GlobalHeader] mounted - localStorage 用户 ID:", storedUserId);
-        console.log("[GlobalHeader] mounted - store 用户 ID:", storeUserId);
         
         if (storeUserId && storedUserId && String(storeUserId) !== String(storedUserId)) {
           console.log("[GlobalHeader] 检测到 localStorage 和 store 中的用户 ID 不一致，同步数据");
@@ -639,10 +672,18 @@ export default defineComponent({
     },
 
     handleAvatarError(event) {
-      console.error("[GlobalHeader] 头像加载失败:", event.target.src);
+      // 只在开发环境输出日志
+      if (process.env.NODE_ENV === 'development') {
+        console.warn("[GlobalHeader] 头像加载失败，显示默认图标");
+      }
       // 标记头像加载失败，显示默认图标
       this.avatarError = true;
-      // 隐藏图片
+      // 清除缓存的时间戳，避免不断重试
+      if (this.currentUser?.id) {
+        sessionStorage.removeItem(`avatar_${this.currentUser.id}`);
+        sessionStorage.removeItem(`avatar_url_${this.currentUser.id}`);
+      }
+      // 隐藏图片元素（Vue 会自动显示 v-else 中的默认图标）
       if (event.target) {
         event.target.style.display = 'none';
       }

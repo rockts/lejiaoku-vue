@@ -17,11 +17,11 @@ import catalogRoutes from '@/catalog/catalog.routes';
  */
 
 const router = createRouter({
-    history: createWebHistory(),
+  history: createWebHistory(),
   routes: [
-    ...appRoutes, 
-    ...postRoutes, 
-    ...userRoutes, 
+    ...appRoutes,
+    ...postRoutes,
+    ...userRoutes,
     ...adminRoutes,
     ...catalogRoutes,
     // 404 处理：所有未匹配的路由都跳转到首页
@@ -86,6 +86,15 @@ router.beforeEach((to, from, next) => {
       next({ path: '/' });
       return;
     }
+  }
+
+  // 检查上传资源页面必须要有 catalog_id 参数
+  if (to.path === '/resources/create' && !to.query.catalog_id) {
+    console.log('[Router] 上传资源页面缺少 catalog_id 参数，重定向到教材目录');
+    const { notification } = require('@/utils/notification');
+    notification.warning('上传资源必须绑定到教材目录，请先选择教材');
+    next({ path: '/catalog' });
+    return;
   }
 
   // 检查 admin 权限

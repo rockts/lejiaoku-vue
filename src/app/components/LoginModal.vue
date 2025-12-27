@@ -194,7 +194,7 @@ export default defineComponent({
           console.error("[LoginModal] 获取完整用户信息失败:", error);
           // 如果获取失败，使用登录接口返回的用户数据
           localStorage.setItem("user_info", JSON.stringify(user));
-          this.$store.commit("auth/setUser", user);
+        this.$store.commit("auth/setUser", user);
         }
 
         notification.success("登录成功！");

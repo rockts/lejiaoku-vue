@@ -145,7 +145,7 @@ export const authStoreModule: Module<AuthStoreState, RootState> = {
             localStorage.removeItem('contributor_application_status');
             commit('logout');
         },
-        
+
         // 检查贡献者申请状态
         async checkContributorApplicationStatus({ commit, state, rootState }) {
             if (!state.isAuthenticated || state.user?.role !== 'user') {

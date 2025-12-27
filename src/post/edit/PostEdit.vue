@@ -54,15 +54,28 @@
           </div>
         </div>
 
-        <!-- 教材信息 -->
-        <div class="card shadow-sm mb-4">
+        <!-- 教材信息（仅在未绑定教材目录时显示） -->
+        <div v-if="!resource?.catalog_info && !resource?.catalog_id && !selectedCatalogId" class="card shadow-sm mb-4">
           <div class="card-header bg-white">
             <h5 class="mb-0"><i class="bi bi-book"></i> 教材信息（可选）</h5>
+            <small class="text-muted d-block mt-1">已绑定教材目录的资源，教材信息由教材目录管理，无需手动填写</small>
           </div>
           <div class="card-body">
             <div class="row g-3">
               <div class="col-md-3">
-                <label class="form-label">年级</label>
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                  <label class="form-label mb-0">年级</label>
+                  <button
+                    v-if="editForm.grade"
+                    type="button"
+                    class="btn btn-sm btn-link text-danger p-0"
+                    @click="editForm.grade = ''"
+                    title="清空"
+                    style="font-size: 0.75rem;"
+                  >
+                    <i class="bi bi-x-circle"></i>
+                  </button>
+                </div>
                 <input
                   v-model="editForm.grade"
                   type="text"
@@ -71,7 +84,19 @@
                 />
               </div>
               <div class="col-md-3">
-                <label class="form-label">学科</label>
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                  <label class="form-label mb-0">学科</label>
+                  <button
+                    v-if="editForm.subject"
+                    type="button"
+                    class="btn btn-sm btn-link text-danger p-0"
+                    @click="editForm.subject = ''"
+                    title="清空"
+                    style="font-size: 0.75rem;"
+                  >
+                    <i class="bi bi-x-circle"></i>
+                  </button>
+                </div>
                 <input
                   v-model="editForm.subject"
                   type="text"
@@ -80,7 +105,19 @@
                 />
               </div>
               <div class="col-md-3">
-                <label class="form-label">教材版本</label>
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                  <label class="form-label mb-0">教材版本</label>
+                  <button
+                    v-if="editForm.textbook"
+                    type="button"
+                    class="btn btn-sm btn-link text-danger p-0"
+                    @click="editForm.textbook = ''"
+                    title="清空"
+                    style="font-size: 0.75rem;"
+                  >
+                    <i class="bi bi-x-circle"></i>
+                  </button>
+                </div>
                 <input
                   v-model="editForm.textbook"
                   type="text"
@@ -89,13 +126,301 @@
                 />
               </div>
               <div class="col-md-3">
-                <label class="form-label">章节信息</label>
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                  <label class="form-label mb-0">章节信息</label>
+                  <button
+                    v-if="editForm.chapter_info"
+                    type="button"
+                    class="btn btn-sm btn-link text-danger p-0"
+                    @click="editForm.chapter_info = ''"
+                    title="清空"
+                    style="font-size: 0.75rem;"
+                  >
+                    <i class="bi bi-x-circle"></i>
+                  </button>
+                </div>
                 <input
                   v-model="editForm.chapter_info"
                   type="text"
                   class="form-control"
                   placeholder="如：第一章"
                 />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 资源出处（可选） -->
+        <div class="card shadow-sm mb-4">
+          <div class="card-header bg-white">
+            <h5 class="mb-0"><i class="bi bi-tag"></i> 资源出处（可选）</h5>
+          </div>
+          <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between mb-1">
+              <label class="form-label mb-0">资源出处</label>
+              <button
+                v-if="editForm.source_attribution"
+                type="button"
+                class="btn btn-sm btn-link text-danger p-0"
+                @click="editForm.source_attribution = ''"
+                title="清空"
+                style="font-size: 0.75rem;"
+              >
+                <i class="bi bi-x-circle"></i>
+              </button>
+            </div>
+            <div class="position-relative">
+              <input
+                v-model="editForm.source_attribution"
+                type="text"
+                class="form-control"
+                placeholder="如：xx教育、某某出版社等"
+                maxlength="100"
+                @input="onSourceAttributionInput"
+                @focus="showSourceAttributionSuggestions = true"
+                @blur="hideSourceAttributionSuggestions"
+              />
+              <!-- 自动完成建议列表 -->
+              <div
+                v-if="showSourceAttributionSuggestions && sourceAttributionSuggestions.length > 0"
+                class="autocomplete-suggestions"
+              >
+                <div
+                  v-for="(suggestion, index) in sourceAttributionSuggestions"
+                  :key="index"
+                  class="autocomplete-item"
+                  @mousedown="selectSourceAttribution(suggestion)"
+                >
+                  {{ suggestion }}
+                </div>
+              </div>
+            </div>
+            <small class="text-muted d-block mt-2">
+              <i class="bi bi-info-circle me-1"></i>
+              用于标注资源的原始来源，最多 100 个字符
+            </small>
+          </div>
+        </div>
+
+        <!-- 教材目录绑定 -->
+        <div class="card shadow-sm mb-4">
+          <div class="card-header bg-white">
+            <h5 class="mb-0"><i class="bi bi-link-45deg"></i> 教材目录绑定（可选）</h5>
+          </div>
+          <div class="card-body">
+            <!-- 当前绑定的教材目录 -->
+            <div v-if="(resource?.catalog_info && !isUnbindingCatalog) || (selectedCatalogId && matchedCatalog)" class="current-catalog mb-3 p-3 bg-light rounded">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <p class="mb-1"><strong>当前绑定：</strong></p>
+                  <!-- 如果已确认绑定新的教材目录，显示新的绑定信息 -->
+                  <p v-if="selectedCatalogId && matchedCatalog" class="mb-0">
+                    {{ matchedCatalog.education_level }}
+                    {{ matchedCatalog.subject }}
+                    {{ formatGrade(matchedCatalog.grade) }}年级
+                    {{ matchedCatalog.volume }}
+                    {{ matchedCatalog.textbook_version }}
+                  </p>
+                  <!-- 否则显示原有的绑定信息 -->
+                  <p v-else-if="resource?.catalog_info" class="mb-0">
+                    {{ resource.catalog_info.education_level }}
+                    {{ resource.catalog_info.subject }}
+                    {{ formatGrade(resource.catalog_info.grade) }}年级
+                    {{ resource.catalog_info.volume }}
+                    {{ resource.catalog_info.textbook_version }}
+                  </p>
+                  <p v-if="editForm.unit" class="mb-0 mt-1 text-muted small">
+                    <i class="bi bi-list-ul me-1"></i>所属单元：{{ editForm.unit }}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  class="btn btn-outline-danger btn-sm"
+                  @click="unbindCatalog"
+                >
+                  <i class="bi bi-x-circle me-1"></i>解除绑定
+                </button>
+              </div>
+            </div>
+
+            <!-- 教材目录选择器（分步筛选） -->
+            <div class="catalog-selector">
+              <label class="form-label mb-3 fw-semibold">
+                <i class="bi bi-funnel me-2"></i>选择教材目录：
+              </label>
+              
+              <div class="catalog-filter-row">
+                <!-- 学段选择 -->
+                <div class="filter-item">
+                  <label class="filter-label">
+                    <i class="bi bi-mortarboard me-1"></i>学段
+                  </label>
+                  <select
+                    v-model="catalogFilter.education_level"
+                    class="form-select"
+                    @change="onFilterChange"
+                  >
+                    <option value="">-- 请选择 --</option>
+                    <option value="小学">小学</option>
+                    <option value="初中">初中</option>
+                  </select>
+                </div>
+
+                <!-- 学科选择 -->
+                <div class="filter-item">
+                  <label class="filter-label">
+                    <i class="bi bi-book me-1"></i>学科
+                  </label>
+                  <select
+                    v-model="catalogFilter.subject"
+                    class="form-select"
+                    @change="onFilterChange"
+                    :disabled="!catalogFilter.education_level"
+                  >
+                    <option value="">-- 请选择 --</option>
+                    <option
+                      v-for="subject in availableSubjects"
+                      :key="subject"
+                      :value="subject"
+                    >
+                      {{ subject }}
+                    </option>
+                  </select>
+                </div>
+
+                <!-- 年级选择 -->
+                <div class="filter-item">
+                  <label class="filter-label">
+                    <i class="bi bi-123 me-1"></i>年级
+                  </label>
+                  <select
+                    v-model="catalogFilter.grade"
+                    class="form-select"
+                    @change="onFilterChange"
+                    :disabled="!catalogFilter.subject"
+                  >
+                    <option value="">-- 请选择 --</option>
+                    <option
+                      v-for="grade in availableGrades"
+                      :key="grade"
+                      :value="grade"
+                    >
+                      {{ formatGrade(grade) }}年级
+                    </option>
+                  </select>
+                </div>
+
+                <!-- 册别选择 -->
+                <div class="filter-item">
+                  <label class="filter-label">
+                    <i class="bi bi-stack me-1"></i>册别
+                  </label>
+                  <select
+                    v-model="catalogFilter.volume"
+                    class="form-select"
+                    @change="onFilterChange"
+                    :disabled="!catalogFilter.grade"
+                  >
+                    <option value="">-- 请选择 --</option>
+                    <option
+                      v-for="volume in availableVolumes"
+                      :key="volume"
+                      :value="volume"
+                    >
+                      {{ volume }}
+                    </option>
+                  </select>
+                </div>
+
+                <!-- 版本选择 -->
+                <div class="filter-item">
+                  <label class="filter-label">
+                    <i class="bi bi-tag me-1"></i>版本
+                  </label>
+                  <select
+                    v-model="catalogFilter.textbook_version"
+                    class="form-select"
+                    @change="onFilterChange"
+                    :disabled="!catalogFilter.volume"
+                  >
+                    <option value="">-- 请选择 --</option>
+                    <option
+                      v-for="version in availableVersions"
+                      :key="version"
+                      :value="version"
+                    >
+                      {{ version }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- 显示匹配的教材目录 -->
+              <div v-if="matchedCatalog" class="catalog-match-result mt-3">
+                <div class="match-success">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="flex-grow-1">
+                      <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                        <strong class="text-success">已匹配到教材目录</strong>
+                      </div>
+                      <div class="catalog-info-display">
+                        <span class="catalog-badge">{{ matchedCatalog.education_level }}</span>
+                        <span class="catalog-badge">{{ matchedCatalog.subject }}</span>
+                        <span class="catalog-badge">{{ formatGrade(matchedCatalog.grade) }}年级</span>
+                        <span class="catalog-badge">{{ matchedCatalog.volume }}</span>
+                        <span class="catalog-badge">{{ matchedCatalog.textbook_version }}</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      class="btn btn-success btn-sm ms-3"
+                      @click="confirmCatalogSelection"
+                    >
+                      <i class="bi bi-check-lg me-1"></i>确认绑定
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div v-else-if="allFiltersSelected && !matchedCatalog" class="catalog-match-result mt-3">
+                <div class="match-warning">
+                  <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                  <span>未找到匹配的教材目录，请检查选择是否正确</span>
+                </div>
+              </div>
+
+              <small v-if="loadingCatalogs" class="text-muted d-block mt-2">
+                <i class="bi bi-arrow-repeat spinner-border spinner-border-sm me-1"></i>
+                正在加载教材目录...
+              </small>
+            </div>
+
+            <!-- 单元信息（如果资源有 unit 字段或已绑定教材目录则显示） -->
+            <div v-if="editForm.unit || selectedCatalogId || resource?.catalog_info || resource?.catalog_id" class="unit-info">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">
+                    所属单元
+                  </label>
+                  <input
+                    v-model="editForm.unit"
+                    type="text"
+                    class="form-control"
+                    placeholder="如：第一单元（留空则自动标记为「整本教材」）"
+                  />
+                  <small class="text-muted">绑定教材目录后，填写所属单元；留空则自动标记为「整本教材」</small>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">单元序号（可选）</label>
+                  <input
+                    v-model.number="editForm.unit_index"
+                    type="number"
+                    class="form-control"
+                    placeholder="如：1"
+                    min="1"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -131,16 +456,16 @@
                 <label class="form-label mb-2">当前封面</label>
                 <div class="cover-preview-box">
                   <div v-if="editForm.cover_url || coverPreviewUrl" class="cover-preview-content">
-                    <img
+                  <img
                       :src="coverPreviewUrl || editForm.cover_url"
                       class="cover-preview-image"
                       alt="封面预览"
                       @error="handleCoverImageError"
-                    />
+                  />
                     <div class="cover-preview-overlay">
-                      <a
+                    <a
                         :href="editForm.cover_url || coverPreviewUrl"
-                        target="_blank"
+                      target="_blank"
                         class="btn btn-sm btn-light"
                         title="新窗口预览"
                       >
@@ -340,17 +665,37 @@ export default defineComponent({
         textbook: "",
         chapter_info: "",
         cover_url: "",
+        unit: "",
+        unit_index: null,
+        source_attribution: "",
       },
       coverFile: null,
       coverPreviewUrl: null,
       coverDragActive: false,
       uploadingCover: false,
       coverUploadProgress: 0,
+      // 资源出处自动完成
+      showSourceAttributionSuggestions: false,
+      sourceAttributionSuggestions: [],
+      // 教材目录绑定相关
+      catalogs: [],
+      selectedCatalogId: null,
+      isUnbindingCatalog: false, // 用户是否点击了"解除绑定"按钮
+      loadingCatalogs: false,
+      // 分步筛选相关
+      catalogFilter: {
+        education_level: "",
+        subject: "",
+        grade: "",
+        volume: "",
+        textbook_version: "",
+      },
     };
   },
 
   async mounted() {
     await this.fetchResource();
+    await this.loadCatalogs();
   },
 
   computed: {
@@ -360,6 +705,110 @@ export default defineComponent({
         this.editForm.title.trim() &&
         this.editForm.category
       );
+    },
+
+    // 根据筛选条件过滤后的教材目录
+    filteredCatalogs() {
+      let filtered = this.catalogs;
+      
+      if (this.catalogFilter.education_level) {
+        filtered = filtered.filter(c => c.education_level === this.catalogFilter.education_level);
+      }
+      if (this.catalogFilter.subject) {
+        filtered = filtered.filter(c => c.subject === this.catalogFilter.subject);
+      }
+      if (this.catalogFilter.grade) {
+        filtered = filtered.filter(c => c.grade === this.catalogFilter.grade);
+      }
+      if (this.catalogFilter.volume) {
+        filtered = filtered.filter(c => c.volume === this.catalogFilter.volume);
+      }
+      if (this.catalogFilter.textbook_version) {
+        filtered = filtered.filter(c => c.textbook_version === this.catalogFilter.textbook_version);
+      }
+      
+      return filtered;
+    },
+
+    // 可用的学科列表（根据学段筛选）
+    availableSubjects() {
+      if (!this.catalogFilter.education_level) return [];
+      
+      const filtered = this.catalogs.filter(
+        c => c.education_level === this.catalogFilter.education_level
+      );
+      const subjects = [...new Set(filtered.map(c => c.subject).filter(Boolean))];
+      return subjects.sort();
+    },
+
+    // 可用的年级列表（根据学段和学科筛选）
+    availableGrades() {
+      if (!this.catalogFilter.education_level || !this.catalogFilter.subject) return [];
+      
+      const filtered = this.catalogs.filter(
+        c => c.education_level === this.catalogFilter.education_level &&
+             c.subject === this.catalogFilter.subject
+      );
+      const grades = [...new Set(filtered.map(c => c.grade).filter(Boolean))];
+      return grades.sort((a, b) => parseInt(a) - parseInt(b));
+    },
+
+    // 可用的册别列表（根据前面的筛选条件）
+    availableVolumes() {
+      if (!this.catalogFilter.education_level || !this.catalogFilter.subject || !this.catalogFilter.grade) {
+        return [];
+      }
+      
+      const filtered = this.catalogs.filter(
+        c => c.education_level === this.catalogFilter.education_level &&
+             c.subject === this.catalogFilter.subject &&
+             c.grade === this.catalogFilter.grade
+      );
+      const volumes = [...new Set(filtered.map(c => c.volume).filter(Boolean))];
+      return volumes.sort();
+    },
+
+    // 可用的版本列表（根据前面的筛选条件）
+    availableVersions() {
+      if (!this.catalogFilter.education_level || !this.catalogFilter.subject || 
+          !this.catalogFilter.grade || !this.catalogFilter.volume) {
+        return [];
+      }
+      
+      const filtered = this.catalogs.filter(
+        c => c.education_level === this.catalogFilter.education_level &&
+             c.subject === this.catalogFilter.subject &&
+             c.grade === this.catalogFilter.grade &&
+             c.volume === this.catalogFilter.volume
+      );
+      const versions = [...new Set(filtered.map(c => c.textbook_version).filter(Boolean))];
+      return versions.sort();
+    },
+
+    // 是否所有筛选条件都已选择
+    allFiltersSelected() {
+      return !!(
+        this.catalogFilter.education_level &&
+        this.catalogFilter.subject &&
+        this.catalogFilter.grade &&
+        this.catalogFilter.volume &&
+        this.catalogFilter.textbook_version
+      );
+    },
+
+    // 匹配的教材目录
+    matchedCatalog() {
+      if (!this.allFiltersSelected) return null;
+      
+      const matched = this.filteredCatalogs.find(
+        c => c.education_level === this.catalogFilter.education_level &&
+             c.subject === this.catalogFilter.subject &&
+             c.grade === this.catalogFilter.grade &&
+             c.volume === this.catalogFilter.volume &&
+             c.textbook_version === this.catalogFilter.textbook_version
+      );
+      
+      return matched || null;
     },
   },
 
@@ -383,23 +832,88 @@ export default defineComponent({
     },
 
     fillEditForm() {
+      // 如果资源已绑定教材目录，不应该填充 grade、subject、textbook 字段
+      // 这些信息应该由 catalog_info 管理，避免用户误操作覆盖
+      // 只有在未绑定教材目录时，才从 resource 或 auto_meta_result 获取
+      let gradeValue = "";
+      let subjectValue = "";
+      let textbookValue = "";
+      
+      if (this.resource?.catalog_info || this.resource?.catalog_id) {
+        // 已绑定教材目录，不填充这些字段，避免覆盖 catalog_info
+        gradeValue = "";
+        subjectValue = "";
+        textbookValue = "";
+        console.log("[PostEdit] 资源已绑定教材目录，不填充 grade/subject/textbook 字段");
+      } else {
+        // 未绑定教材目录，从 resource 或 auto_meta_result 获取
+        gradeValue = this.resource.grade || this.getFieldFromAutoMeta("grade") || "";
+        subjectValue = this.resource.subject || this.getFieldFromAutoMeta("subject") || "";
+        textbookValue = this.resource.version || this.getFieldFromAutoMeta("textbook_version") || "";
+      }
+
       // 使用现有的数据填充编辑表单
       this.editForm = {
         title: this.resource.title || "",
         category: this.resource.category || "",
         description: this.resource.description || "",
-        grade: this.resource.grade || this.getFieldFromAutoMeta("grade") || "",
-        subject:
-          this.resource.subject || this.getFieldFromAutoMeta("subject") || "",
-        textbook:
-          this.resource.version ||
-          this.getFieldFromAutoMeta("textbook_version") ||
-          "",
+        grade: gradeValue,
+        subject: subjectValue,
+        textbook: textbookValue,
         chapter_info: this.resource.chapter_info || "",
         cover_url: this.resource.cover_url || "",
+        unit: this.resource.unit || "",
+        unit_index: this.resource.unit_index || null,
+        source_attribution: this.resource.source_attribution || "",
       };
 
       console.log("[PostEdit] 编辑表单已填充:", this.editForm);
+      console.log("[PostEdit] 资源单元信息:", {
+        unit: this.resource.unit,
+        unit_index: this.resource.unit_index,
+        catalog_id: this.resource.catalog_id,
+        catalog_info: this.resource.catalog_info,
+        editForm_unit: this.editForm.unit,
+        editForm_unit_index: this.editForm.unit_index
+      });
+
+      // 如果资源已绑定教材目录，设置 selectedCatalogId
+      if (this.resource?.catalog_id) {
+        this.selectedCatalogId = this.resource.catalog_id;
+        console.log("[PostEdit] 已设置 selectedCatalogId:", this.selectedCatalogId);
+      }
+
+      // 检查单元信息输入框显示条件
+      const shouldShowUnitInfo = this.editForm.unit || 
+                                 this.selectedCatalogId || 
+                                 this.resource?.catalog_info || 
+                                 this.resource?.catalog_id;
+      console.log("[PostEdit] 单元信息输入框显示条件检查:", {
+        editForm_unit: this.editForm.unit,
+        selectedCatalogId: this.selectedCatalogId,
+        has_catalog_info: !!this.resource?.catalog_info,
+        catalog_id: this.resource?.catalog_id,
+        shouldShow: shouldShowUnitInfo
+      });
+
+      // 如果资源已绑定教材目录，填充筛选条件
+      if (this.resource?.catalog_info) {
+        const info = this.resource.catalog_info;
+        this.catalogFilter = {
+          education_level: info.education_level || "",
+          subject: info.subject || "",
+          grade: info.grade || "",
+          volume: info.volume || "",
+          textbook_version: info.textbook_version || "",
+        };
+        // 查找对应的 catalog_id
+        this.findCatalogIdByInfo(info);
+      } else if (this.resource?.catalog_id) {
+        // 如果资源有 catalog_id，直接使用
+        this.selectedCatalogId = this.resource.catalog_id;
+        // 尝试根据 catalog_id 填充筛选条件
+        this.fillFilterFromCatalogId(this.resource.catalog_id);
+      }
     },
 
     getFieldFromAutoMeta(fieldName) {
@@ -414,6 +928,363 @@ export default defineComponent({
 
       const mappedField = fieldMap[fieldName];
       return autoMeta[mappedField] || null;
+    },
+
+    /**
+     * 格式化年级显示
+     */
+    formatGrade(grade) {
+      if (typeof grade === "number") {
+        const gradeNames = [
+          "",
+          "一",
+          "二",
+          "三",
+          "四",
+          "五",
+          "六",
+          "七",
+          "八",
+          "九",
+        ];
+        return gradeNames[grade] || `${grade}`;
+      }
+      // 如果是字符串，尝试提取数字
+      const match = grade.toString().match(/(\d+)/);
+      if (match) {
+        const num = parseInt(match[1]);
+        const gradeNames = [
+          "",
+          "一",
+          "二",
+          "三",
+          "四",
+          "五",
+          "六",
+          "七",
+          "八",
+          "九",
+        ];
+        return gradeNames[num] || num;
+      }
+      return grade;
+    },
+
+    /**
+     * 根据 catalog_info 查找对应的 catalog_id
+     */
+    async findCatalogIdByInfo(catalogInfo) {
+      try {
+        console.log("[PostEdit] 根据 catalog_info 查找 catalog_id:", catalogInfo);
+        
+        const params = {
+          education_level: catalogInfo.education_level === '小学' ? '小学' : 
+                          catalogInfo.education_level === 'elementary' ? '小学' :
+                          catalogInfo.education_level === '初中' ? '初中' :
+                          catalogInfo.education_level === 'middle' ? '初中' :
+                          catalogInfo.education_level,
+          grade: catalogInfo.grade,
+          subject: catalogInfo.subject,
+          textbook_version: catalogInfo.textbook_version,
+          limit: 1
+        };
+
+        // 如果有 volume，也作为筛选条件（如果后端支持）
+        if (catalogInfo.volume) {
+          // 注意：后端可能不支持 volume 参数，先不传
+        }
+
+        const response = await apiHttpClient.get("/api/catalogs", { params });
+        
+        if (response.data?.data && response.data.data.length > 0) {
+          this.selectedCatalogId = response.data.data[0].id;
+          console.log("[PostEdit] 找到对应的 catalog_id:", this.selectedCatalogId);
+        } else {
+          console.warn("[PostEdit] 未找到匹配的教材目录");
+        }
+      } catch (error) {
+        console.error("[PostEdit] 查找 catalog_id 失败:", error);
+      }
+    },
+
+    /**
+     * 加载教材目录列表
+     * 获取所有教材目录数据，用于提取筛选选项
+     */
+    async loadCatalogs() {
+      try {
+        this.loadingCatalogs = true;
+        
+        // 先获取第一页，查看总数
+        const firstResponse = await apiHttpClient.get("/api/catalogs", {
+          params: {
+            page: 1,
+            limit: 1000, // 使用较大的limit值
+          },
+        });
+
+        console.log("[PostEdit] 筛选选项API响应:", firstResponse.data);
+
+        if (firstResponse.data) {
+          let allData = [];
+          // 处理响应数据结构：可能是 { data: [...], pagination: {...} } 或直接是数组
+          if (firstResponse.data.data && Array.isArray(firstResponse.data.data)) {
+            allData = firstResponse.data.data;
+          } else if (Array.isArray(firstResponse.data)) {
+            allData = firstResponse.data;
+          }
+
+          const pagination = firstResponse.data?.pagination;
+          const total = pagination?.total || allData.length;
+          
+          console.log("[PostEdit] 数据总数:", total, "已获取:", allData.length);
+
+          // 如果总数超过已获取的数量，需要分页获取所有数据
+          if (pagination && total > allData.length) {
+            console.log("[PostEdit] 需要获取更多数据，开始分页获取...");
+            const limit = pagination.limit || 1000;
+            const totalPages = pagination.total_pages || Math.ceil(total / limit);
+            
+            // 获取剩余页面的数据
+            const promises = [];
+            for (let page = 2; page <= totalPages; page++) {
+              promises.push(
+                apiHttpClient.get("/api/catalogs", {
+                  params: {
+                    page,
+                    limit,
+                  },
+                })
+              );
+            }
+
+            // 等待所有请求完成
+            const responses = await Promise.all(promises);
+            
+            // 合并所有数据
+            responses.forEach((response) => {
+              if (response.data) {
+                let pageData = [];
+                if (response.data.data && Array.isArray(response.data.data)) {
+                  pageData = response.data.data;
+                } else if (Array.isArray(response.data)) {
+                  pageData = response.data;
+                }
+                allData = [...allData, ...pageData];
+              }
+            });
+
+            console.log("[PostEdit] 分页获取完成，总数据量:", allData.length);
+          }
+
+          // 去重（根据id）
+          const uniqueData = [];
+          const seenIds = new Set();
+          for (const item of allData) {
+            if (item.id && !seenIds.has(item.id)) {
+              seenIds.add(item.id);
+              uniqueData.push(item);
+            }
+          }
+
+          this.catalogs = uniqueData;
+          console.log("[PostEdit] 加载教材目录成功，去重后数量:", this.catalogs.length);
+        } else {
+          this.catalogs = [];
+        }
+      } catch (error) {
+        console.error("[PostEdit] 加载教材目录失败:", error);
+        notification.warning("加载教材目录失败，可能无法绑定教材目录");
+        this.catalogs = [];
+      } finally {
+        this.loadingCatalogs = false;
+      }
+    },
+
+    /**
+     * 筛选条件变化
+     */
+    onFilterChange() {
+      console.log("[PostEdit] 筛选条件变化:", this.catalogFilter);
+      
+      // 如果后面的筛选条件被清空，清空后续的筛选条件
+      if (!this.catalogFilter.education_level) {
+        this.catalogFilter.subject = "";
+        this.catalogFilter.grade = "";
+        this.catalogFilter.volume = "";
+        this.catalogFilter.textbook_version = "";
+      } else if (!this.catalogFilter.subject) {
+        this.catalogFilter.grade = "";
+        this.catalogFilter.volume = "";
+        this.catalogFilter.textbook_version = "";
+      } else if (!this.catalogFilter.grade) {
+        this.catalogFilter.volume = "";
+        this.catalogFilter.textbook_version = "";
+      } else if (!this.catalogFilter.volume) {
+        this.catalogFilter.textbook_version = "";
+      }
+      
+      // 如果所有条件都选择了，自动匹配 catalog_id
+      if (this.matchedCatalog) {
+        this.selectedCatalogId = this.matchedCatalog.id;
+        this.isUnbindingCatalog = false; // 用户重新选择了，取消解除绑定标记
+        console.log("[PostEdit] 自动匹配到 catalog_id:", this.selectedCatalogId);
+      } else {
+        this.selectedCatalogId = null;
+      }
+    },
+
+    /**
+     * 确认绑定教材目录
+     */
+    confirmCatalogSelection() {
+      if (this.matchedCatalog) {
+        this.selectedCatalogId = this.matchedCatalog.id;
+        this.isUnbindingCatalog = false; // 用户重新选择了，取消解除绑定标记
+        // 更新 resource.catalog_info 以便立即显示新的绑定信息
+        if (!this.resource.catalog_info) {
+          this.resource.catalog_info = {};
+        }
+        this.resource.catalog_info.education_level = this.matchedCatalog.education_level;
+        this.resource.catalog_info.subject = this.matchedCatalog.subject;
+        this.resource.catalog_info.grade = this.matchedCatalog.grade;
+        this.resource.catalog_info.volume = this.matchedCatalog.volume;
+        this.resource.catalog_info.textbook_version = this.matchedCatalog.textbook_version;
+        this.resource.catalog_id = this.matchedCatalog.id;
+        console.log("[PostEdit] 确认绑定教材目录 ID:", this.selectedCatalogId);
+        console.log("[PostEdit] 已更新 resource.catalog_info:", this.resource.catalog_info);
+        notification.success("已选择教材目录，请填写所属单元");
+      }
+    },
+
+    /**
+     * 教材目录选择变化（保留用于兼容）
+     */
+    onCatalogChange() {
+      console.log("[PostEdit] 选择的教材目录 ID:", this.selectedCatalogId);
+      // 如果选择了新的教材目录，清空单元信息（让用户重新填写）
+      if (this.selectedCatalogId && !this.resource?.catalog_info) {
+        this.editForm.unit = "";
+        this.editForm.unit_index = null;
+      }
+    },
+
+    /**
+     * 根据 catalog_id 填充筛选条件
+     */
+    async fillFilterFromCatalogId(catalogId) {
+      try {
+        const catalog = this.catalogs.find(c => c.id === catalogId);
+        if (catalog) {
+          this.catalogFilter = {
+            education_level: catalog.education_level || "",
+            subject: catalog.subject || "",
+            grade: catalog.grade || "",
+            volume: catalog.volume || "",
+            textbook_version: catalog.textbook_version || "",
+          };
+        }
+      } catch (error) {
+        console.error("[PostEdit] 填充筛选条件失败:", error);
+      }
+    },
+
+    /**
+     * 解除绑定
+     */
+    unbindCatalog() {
+      this.selectedCatalogId = null;
+      this.isUnbindingCatalog = true; // 标记用户明确要解除绑定
+      this.editForm.unit = "";
+      this.editForm.unit_index = null;
+      this.catalogFilter = {
+        education_level: "",
+        subject: "",
+        grade: "",
+        volume: "",
+        textbook_version: "",
+      };
+      // 清除 resource.catalog_info 以便立即隐藏当前绑定显示
+      if (this.resource) {
+        this.resource.catalog_info = null;
+        this.resource.catalog_id = null;
+      }
+      console.log("[PostEdit] 已解除教材目录绑定");
+    },
+
+    /**
+     * 获取资源出处历史记录
+     */
+    getSourceAttributionHistory() {
+      try {
+        const history = localStorage.getItem('source_attribution_history');
+        return history ? JSON.parse(history) : [];
+      } catch (error) {
+        console.error("[PostEdit] 获取资源出处历史记录失败:", error);
+        return [];
+      }
+    },
+
+    /**
+     * 保存资源出处到历史记录
+     */
+    saveSourceAttributionToHistory(value) {
+      if (!value || !value.trim()) return;
+      
+      try {
+        const history = this.getSourceAttributionHistory();
+        const trimmedValue = value.trim();
+        
+        // 移除重复项
+        const filteredHistory = history.filter(item => item !== trimmedValue);
+        
+        // 添加到最前面
+        filteredHistory.unshift(trimmedValue);
+        
+        // 只保留最近20条记录
+        const limitedHistory = filteredHistory.slice(0, 20);
+        
+        localStorage.setItem('source_attribution_history', JSON.stringify(limitedHistory));
+      } catch (error) {
+        console.error("[PostEdit] 保存资源出处历史记录失败:", error);
+      }
+    },
+
+    /**
+     * 资源出处输入事件
+     */
+    onSourceAttributionInput() {
+      const value = this.editForm.source_attribution || '';
+      if (!value.trim()) {
+        this.sourceAttributionSuggestions = [];
+        return;
+      }
+
+      const history = this.getSourceAttributionHistory();
+      const lowerValue = value.toLowerCase();
+      
+      // 过滤匹配的历史记录
+      this.sourceAttributionSuggestions = history.filter(item => 
+        item.toLowerCase().includes(lowerValue)
+      ).slice(0, 5); // 最多显示5条建议
+    },
+
+    /**
+     * 选择资源出处建议
+     */
+    selectSourceAttribution(suggestion) {
+      this.editForm.source_attribution = suggestion;
+      this.showSourceAttributionSuggestions = false;
+    },
+
+    /**
+     * 隐藏资源出处建议列表
+     */
+    hideSourceAttributionSuggestions() {
+      // 延迟隐藏，以便点击建议项时能触发
+      setTimeout(() => {
+        this.showSourceAttributionSuggestions = false;
+      }, 200);
     },
 
     // 处理封面上传
@@ -627,38 +1498,229 @@ export default defineComponent({
 
         let response;
 
+        // 构建更新数据对象（至少包含必填字段）
+        const updateData = {
+          title: this.editForm.title,
+          category: this.editForm.category,
+        };
+
+        // 添加可选字段
+        // description: 如果为空字符串，明确设置为空字符串以清空；如果有值，使用 trim 后的值
+        if (this.editForm.description !== undefined) {
+          if (this.editForm.description && this.editForm.description.trim()) {
+            updateData.description = this.editForm.description.trim();
+          } else {
+            updateData.description = ""; // 清空描述（发送空字符串）
+          }
+        }
+        
+        // source_attribution: 如果为空字符串，明确设置为空字符串以清空；如果有值，使用 trim 后的值
+        if (this.editForm.source_attribution !== undefined) {
+          if (this.editForm.source_attribution && this.editForm.source_attribution.trim()) {
+            updateData.source_attribution = this.editForm.source_attribution.trim();
+          } else {
+            updateData.source_attribution = ""; // 清空出处（发送空字符串）
+          }
+        }
+        // 如果资源已绑定教材目录，不应该发送 grade、subject、version 等字段
+        // 这些信息应该由 catalog_info 管理，避免覆盖
+        // 只有在未绑定教材目录时，才允许用户手动填写这些字段
+        const hasCatalogBindingForFields = this.resource?.catalog_id || this.resource?.catalog_info || this.selectedCatalogId;
+        
+        if (!hasCatalogBindingForFields) {
+          // 未绑定教材目录，允许手动填写这些字段
+          if (this.editForm.grade && this.editForm.grade.trim()) {
+            updateData.grade = this.editForm.grade.trim();
+          }
+          if (this.editForm.subject && this.editForm.subject.trim()) {
+            updateData.subject = this.editForm.subject.trim();
+          }
+          if (this.editForm.textbook && this.editForm.textbook.trim()) {
+            updateData.version = this.editForm.textbook.trim(); // 后端字段名是 version
+          }
+        } else {
+          // 已绑定教材目录，不发送这些字段，避免覆盖 catalog_info
+          console.log("[PostEdit] 资源已绑定教材目录，跳过 grade/subject/version 字段的提交");
+        }
+        
+        // chapter_info 可以独立更新（不受教材目录绑定影响）
+        if (this.editForm.chapter_info && this.editForm.chapter_info.trim()) {
+          updateData.chapter_info = this.editForm.chapter_info.trim();
+        }
+        
+        // 添加教材目录绑定字段
+        // 根据文档，catalog_id 应该是数字
+        console.log("[PostEdit] 提交时的 selectedCatalogId:", this.selectedCatalogId, "类型:", typeof this.selectedCatalogId);
+        console.log("[PostEdit] 提交时的 resource.catalog_id:", this.resource?.catalog_id);
+        console.log("[PostEdit] 提交时的 resource.catalog_info:", this.resource?.catalog_info);
+        
+        // 确定要使用的 catalog_id
+        // 如果用户新选择了教材目录，使用新值
+        // 如果用户没有重新选择，但资源之前已绑定，保持原绑定
+        // 如果资源有 catalog_info 但没有 catalog_id，尝试根据 catalog_info 查找
+        // 只有在用户明确解除绑定且没有重新选择时，才设置为 null
+        let catalogIdToUse = null;
+        if (this.isUnbindingCatalog && !this.selectedCatalogId) {
+          // 用户明确点击了"解除绑定"按钮，且没有重新选择新的教材目录
+          catalogIdToUse = null;
+          updateData.catalog_id = null;
+          console.log("[PostEdit] 用户解除绑定且未重新选择，设置 catalog_id = null");
+        } else if (this.selectedCatalogId) {
+          // 用户新选择了教材目录
+          const catalogIdValue = Number(this.selectedCatalogId);
+          if (isNaN(catalogIdValue)) {
+            console.error("[PostEdit] 错误：selectedCatalogId 不是有效数字:", this.selectedCatalogId);
+            notification.error("教材目录ID格式错误，请重新选择");
+            this.isSaving = false;
+            return;
+          }
+          catalogIdToUse = catalogIdValue;
+          updateData.catalog_id = catalogIdToUse;
+          console.log("[PostEdit] 使用新选择的 catalog_id =", catalogIdToUse, "(数字)");
+        } else if (this.resource?.catalog_id) {
+          // 用户没有重新选择，但资源之前已绑定，保持原绑定
+          catalogIdToUse = this.resource.catalog_id;
+          updateData.catalog_id = catalogIdToUse;
+          console.log("[PostEdit] 保持原有绑定，catalog_id =", catalogIdToUse);
+        } else if (this.resource?.catalog_info && !this.resource?.catalog_id) {
+          // 资源有 catalog_info 但没有 catalog_id，尝试根据 catalog_info 查找
+          console.log("[PostEdit] 资源有 catalog_info 但没有 catalog_id，尝试查找对应的 catalog_id");
+          try {
+            const catalogInfo = this.resource.catalog_info;
+            const params = {
+              education_level: catalogInfo.education_level,
+              grade: catalogInfo.grade,
+              subject: catalogInfo.subject,
+              textbook_version: catalogInfo.textbook_version,
+              limit: 1
+            };
+            
+            const response = await apiHttpClient.get("/api/catalogs", { params });
+            if (response.data?.data && response.data.data.length > 0) {
+              catalogIdToUse = response.data.data[0].id;
+              updateData.catalog_id = catalogIdToUse;
+              console.log("[PostEdit] 根据 catalog_info 找到对应的 catalog_id:", catalogIdToUse);
+            } else {
+              console.warn("[PostEdit] 根据 catalog_info 未找到匹配的 catalog_id");
+            }
+          } catch (error) {
+            console.error("[PostEdit] 查找 catalog_id 失败:", error);
+          }
+        }
+        // 注意：如果 catalogIdToUse 为 null，且 resource.catalog_id 也不存在，说明资源本来就没有绑定
+        // 这种情况下不设置 updateData.catalog_id，让后端保持原值
+        
+        // 处理 unit：如果绑定了教材目录但单元留空，自动设置为"整本教材"
+        // 判断是否有教材目录绑定：新选择、保持原有绑定、或有 catalog_info
+        const hasCatalogBinding = catalogIdToUse !== null || 
+                                  (this.resource?.catalog_info && !this.isUnbindingCatalog);
+        
+        console.log("[PostEdit] 处理 unit 字段:");
+        console.log("  - catalogIdToUse:", catalogIdToUse);
+        console.log("  - resource.catalog_id:", this.resource?.catalog_id);
+        console.log("  - resource.catalog_info:", this.resource?.catalog_info);
+        console.log("  - isUnbindingCatalog:", this.isUnbindingCatalog);
+        console.log("  - hasCatalogBinding:", hasCatalogBinding);
+        console.log("  - editForm.unit:", this.editForm.unit);
+        
+        if (hasCatalogBinding) {
+          // 如果绑定了教材目录（新绑定、保持原有绑定、或有 catalog_info）
+          if (this.editForm.unit && this.editForm.unit.trim()) {
+            // 有填写单元，使用填写的值
+            updateData.unit = this.editForm.unit.trim();
+            console.log("[PostEdit] ✅ 使用填写的单元:", updateData.unit);
+          } else {
+            // 单元留空，自动设置为"整本教材"
+            updateData.unit = "整本教材";
+            console.log("[PostEdit] ✅ 单元留空，自动设置为「整本教材」");
+          }
+        } else if (this.editForm.unit && this.editForm.unit.trim()) {
+          // 没有绑定教材目录，但有填写单元，也添加
+          updateData.unit = this.editForm.unit.trim();
+          console.log("[PostEdit] ✅ 未绑定教材目录，使用填写的单元:", updateData.unit);
+        } else {
+          console.log("[PostEdit] ⚠️ 未设置 unit 字段（没有绑定教材目录且单元为空）");
+        }
+        
+        // 确保 unit 字段被包含在 updateData 中（用于调试）
+        console.log("[PostEdit] 最终 updateData.unit:", updateData.unit);
+        if (this.editForm.unit_index !== null && this.editForm.unit_index !== undefined) {
+          updateData.unit_index = this.editForm.unit_index;
+        }
+
         // 如果有新上传的封面文件，使用 FormData 发送（multipart/form-data）
         if (this.coverFile) {
           console.log("[PostEdit] 使用 FormData 发送，包含封面文件");
           
           const formData = new FormData();
           
-          // 添加文本字段
-          formData.append("title", this.editForm.title);
-          formData.append("category", this.editForm.category);
-          if (this.editForm.description) {
-            formData.append("description", this.editForm.description);
+          // 添加必填字段
+          formData.append("title", updateData.title);
+          formData.append("category", updateData.category);
+          
+          // 添加可选字段
+          if (updateData.description !== undefined) {
+            formData.append("description", updateData.description || "");
           }
-          if (this.editForm.grade) {
-            formData.append("grade", this.editForm.grade);
+          if (updateData.source_attribution !== undefined) {
+            formData.append("source_attribution", updateData.source_attribution || "");
           }
-          if (this.editForm.subject) {
-            formData.append("subject", this.editForm.subject);
+          // 如果资源已绑定教材目录，不发送 grade、subject、version 字段
+          const hasCatalogBindingForFields = this.resource?.catalog_id || this.resource?.catalog_info || this.selectedCatalogId;
+          if (!hasCatalogBindingForFields) {
+            if (updateData.grade) formData.append("grade", updateData.grade);
+            if (updateData.subject) formData.append("subject", updateData.subject);
+            if (updateData.version) formData.append("version", updateData.version);
           }
-          if (this.editForm.textbook) {
-            formData.append("version", this.editForm.textbook); // 后端字段名是 version
+          if (updateData.chapter_info) formData.append("chapter_info", updateData.chapter_info);
+          
+          // 添加教材目录绑定字段
+          // 如果用户明确解绑（isUnbindingCatalog = true），需要明确发送 null 或空字符串
+          if (this.isUnbindingCatalog && !this.selectedCatalogId) {
+            // 用户明确解绑，发送空字符串或 null 给后端
+            formData.append("catalog_id", "");
+            console.log("[PostEdit] FormData 中明确设置 catalog_id 为空（解除绑定）");
+          } else if (updateData.catalog_id !== null && updateData.catalog_id !== undefined) {
+            // 正常绑定或保持绑定
+            const catalogIdValue = Number(updateData.catalog_id);
+            if (!isNaN(catalogIdValue)) {
+              formData.append("catalog_id", String(catalogIdValue));
+              console.log("[PostEdit] FormData 中添加 catalog_id:", catalogIdValue, "(数字，转换为字符串)");
+            } else {
+              console.error("[PostEdit] 错误：updateData.catalog_id 不是有效数字:", updateData.catalog_id);
+            }
           }
-          if (this.editForm.chapter_info) {
-            formData.append("chapter_info", this.editForm.chapter_info);
+          // 处理 unit 字段：如果解绑，也需要清空 unit
+          if (this.isUnbindingCatalog && !this.selectedCatalogId) {
+            // 解绑时，清空 unit
+            formData.append("unit", "");
+            formData.append("unit_index", "");
+            console.log("[PostEdit] FormData 中清空 unit 和 unit_index（解除绑定）");
+          } else if (updateData.unit) {
+            formData.append("unit", updateData.unit);
+          }
+          if (updateData.unit_index !== null && updateData.unit_index !== undefined) {
+            formData.append("unit_index", String(updateData.unit_index));
           }
           
           // 添加封面文件，字段名为 cover（根据后端 API 要求）
           formData.append("cover", this.coverFile);
-          console.log("[PostEdit] 已添加封面文件到 FormData:", {
-            name: this.coverFile.name,
-            size: this.coverFile.size,
-            type: this.coverFile.type,
-          });
+          
+          // 如果有 cover_url，也传递（用于覆盖）
+          if (this.editForm.cover_url && this.editForm.cover_url.trim()) {
+            formData.append("cover_url", this.editForm.cover_url.trim());
+          }
+          
+          // 只在开发环境输出详细日志
+          if (process.env.NODE_ENV === 'development') {
+            console.log("[PostEdit] FormData 字段:", {
+              title: updateData.title,
+              category: updateData.category,
+              catalog_id: updateData.catalog_id,
+              unit: updateData.unit,
+              hasCover: !!this.coverFile,
+            });
+          }
 
           // 使用 PUT 方法发送 FormData
           response = await apiHttpClient.put(
@@ -672,23 +1734,27 @@ export default defineComponent({
           );
         } else {
           // 如果没有新文件，使用 JSON 数据发送
-          console.log("[PostEdit] 使用 JSON 发送，cover_url:", this.editForm.cover_url);
+          console.log("[PostEdit] 使用 JSON 发送");
           
-          const updateData = {
-            title: this.editForm.title,
-            category: this.editForm.category,
-            description: this.editForm.description || null,
-            grade: this.editForm.grade || null,
-            subject: this.editForm.subject || null,
-            version: this.editForm.textbook || null, // 后端字段名是 version
-            chapter_info: this.editForm.chapter_info || null,
-            // 如果有 cover_url，传递它；如果没有，传递 null（而不是空字符串）
-            cover_url: this.editForm.cover_url && this.editForm.cover_url.trim() 
-              ? this.editForm.cover_url.trim() 
-              : null,
-          };
+          // 如果有 cover_url，添加到更新数据中
+          if (this.editForm.cover_url && this.editForm.cover_url.trim()) {
+            updateData.cover_url = this.editForm.cover_url.trim();
+          }
 
-          console.log("[PostEdit] 发送的 JSON 数据:", updateData);
+          // 确保解绑时 catalog_id 被明确设置为 null
+          if (this.isUnbindingCatalog && !this.selectedCatalogId) {
+            updateData.catalog_id = null;
+            updateData.unit = null;
+            updateData.unit_index = null;
+            console.log("[PostEdit] JSON 提交：明确设置 catalog_id = null（解除绑定）");
+          }
+
+          // 只在开发环境输出详细日志
+          if (process.env.NODE_ENV === 'development') {
+            console.log("[PostEdit] 发送的 JSON 数据:", updateData);
+            console.log("[PostEdit] catalog_id:", updateData.catalog_id, "unit:", updateData.unit);
+            console.log("[PostEdit] isUnbindingCatalog:", this.isUnbindingCatalog, "selectedCatalogId:", this.selectedCatalogId);
+          }
 
           // 使用 PUT 方法发送 JSON 数据
           response = await apiHttpClient.put(
@@ -696,8 +1762,44 @@ export default defineComponent({
             updateData
           );
         }
+        
+        // 检查响应中是否包含 catalog_id 和 unit
+        console.log("[PostEdit] 更新成功，响应数据:", response.data);
+        console.log("[PostEdit] 响应数据的完整结构:", JSON.stringify(response.data, null, 2));
+        
+        const responseCatalogId = response.data?.catalog_id || response.data?.data?.catalog_id;
+        const responseUnit = response.data?.unit || response.data?.data?.unit;
+        
+        console.log("[PostEdit] 响应中的 catalog_id:", responseCatalogId);
+        console.log("[PostEdit] 响应中的 unit:", responseUnit);
+        console.log("[PostEdit] 提交的 catalog_id:", updateData.catalog_id);
+        console.log("[PostEdit] 提交的 unit:", updateData.unit);
+        
+        if (updateData.catalog_id && !responseCatalogId) {
+          console.warn("[PostEdit] ⚠️ 警告：提交了 catalog_id 但响应中没有返回，可能后端没有保存");
+        } else if (updateData.catalog_id && responseCatalogId) {
+          console.log("[PostEdit] ✅ 确认：catalog_id 已保存，响应值:", responseCatalogId);
+        }
+        
+        if (updateData.unit && !responseUnit) {
+          console.warn("[PostEdit] ⚠️ 警告：提交了 unit 但响应中没有返回，可能后端没有保存");
+        } else if (updateData.unit && responseUnit) {
+          console.log("[PostEdit] ✅ 确认：unit 已保存，响应值:", responseUnit);
+        }
 
         console.log("[PostEdit] 修改成功:", response.data);
+        
+        // 如果资源出处有值，保存到历史记录
+        if (updateData.source_attribution && updateData.source_attribution.trim()) {
+          this.saveSourceAttributionToHistory(updateData.source_attribution);
+        }
+        
+        // 如果更新了教材目录绑定，重新获取资源数据以更新显示
+        if (updateData.catalog_id !== undefined || this.isUnbindingCatalog) {
+          console.log("[PostEdit] 教材目录绑定已更新，重新获取资源数据");
+          await this.fetchResource();
+        }
+        
         notification.success("资源已成功更新！3秒后返回详情页...", 3000);
 
         // 清除封面文件状态
@@ -968,6 +2070,152 @@ export default defineComponent({
   min-width: 140px;
 }
 
+/* 教材目录选择器样式 */
+.catalog-selector {
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.catalog-filter-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.filter-item {
+  flex: 1;
+  min-width: 120px;
+}
+
+.filter-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #495057;
+  margin-bottom: 0.5rem;
+  white-space: nowrap;
+}
+
+.filter-item .form-select {
+  width: 100%;
+  transition: all 0.2s;
+}
+
+.filter-item .form-select:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.filter-item .form-select:disabled {
+  background-color: #e9ecef;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 匹配结果样式 */
+.catalog-match-result {
+  margin-top: 1rem;
+}
+
+.match-success {
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, #d1e7dd 0%, #c3e6cb 100%);
+  border: 1px solid #badbcc;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(25, 135, 84, 0.1);
+}
+
+.match-warning {
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  color: #856404;
+  display: flex;
+  align-items: center;
+}
+
+.catalog-info-display {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.catalog-badge {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  background: #fff;
+  border: 1px solid #198754;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #198754;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.current-catalog {
+  background: linear-gradient(135deg, #e7f1ff 0%, #d0e7ff 100%);
+  border: 1px solid #b3d9ff;
+}
+
+/* 资源出处自动完成样式 */
+.autocomplete-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 2px;
+}
+
+.autocomplete-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s;
+}
+
+.autocomplete-item:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-item:hover {
+  background-color: #f8f9fa;
+}
+
+.autocomplete-item:active {
+  background-color: #e9ecef;
+}
+
+/* 深色主题适配 */
+[data-theme="dark"] .autocomplete-suggestions {
+  background: #2d3748;
+  border-color: #4a5568;
+}
+
+[data-theme="dark"] .autocomplete-item {
+  border-bottom-color: #4a5568;
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .autocomplete-item:hover {
+  background-color: #4a5568;
+}
+
+[data-theme="dark"] .autocomplete-item:active {
+  background-color: #2d3748;
+}
+
 /* 响应式调整 */
 @media (max-width: 768px) {
   .action-buttons-container {
@@ -978,6 +2226,30 @@ export default defineComponent({
   .btn-save,
   .btn-cancel {
     width: 100%;
+  }
+
+  .catalog-filter-row {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .filter-item {
+    min-width: 100%;
+  }
+
+  .catalog-info-display {
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .catalog-badge {
+    width: fit-content;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 992px) {
+  .filter-item {
+    min-width: calc(50% - 0.5rem);
   }
 }
 </style>

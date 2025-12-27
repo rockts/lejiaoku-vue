@@ -21,9 +21,9 @@
   margin: auto;
 }
 .resource-cover-full {
-  width: 100%;
-  max-width: 300px;
-  height: 180px;
+  width: 100% !important;
+  max-width: 200px !important;
+  height: 150px !important;
   background: var(--surface, #fff);
   border-radius: 8px;
   overflow: hidden;
@@ -35,10 +35,10 @@
   margin: 0 auto 12px auto;
 }
 .resource-cover-full img {
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
-  height: auto;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: auto !important;
+  height: auto !important;
   display: block;
   background: var(--surface, #fff);
   object-position: center;
@@ -64,8 +64,8 @@
 
 @media (max-width: 768px) {
   .resource-cover-full { 
-    max-width: 100%;
-    height: 140px; 
+    max-width: 100% !important;
+    height: 120px !important; 
   }
   .resource-cover-full .cover-placeholder i {
     font-size: 40px;
@@ -132,8 +132,11 @@
             </button>
           </div>
         </div>
-        <!-- 封面展示（宽度100%，高度固定） -->
-        <div class="resource-cover-full">
+        <!-- 封面展示（根据图片方向自适应大小） -->
+        <div 
+          class="resource-cover-full"
+          :class="{ 'cover-portrait': coverRatio && coverRatio < 1, 'cover-landscape': coverRatio && coverRatio >= 1 }"
+        >
           <template v-if="resourceCoverURL && !coverFailed">
             <img
               :src="resourceCoverURL"
@@ -141,7 +144,6 @@
               @load="onCoverLoad"
               @error="onCoverError"
               :class="coverClass"
-              :style="{ maxWidth: '100%', maxHeight: '100%', objectFit: coverFit }"
             />
           </template>
           <template v-else>
@@ -152,42 +154,43 @@
         </div>
       </section>
 
-      <!-- 教材信息（直接展示 auto_meta_result）-->
-      <section v-if="resource.auto_meta_result" class="card section">
+      <!-- 教材信息（统一显示，优先使用 catalog_info） -->
+      <section v-if="catalogInfo" class="card section">
         <h5 class="section-title">【教材信息】</h5>
         <p class="text-muted mb-2">
-          {{ resource.auto_meta_result.textbook_info?.version || resource.auto_meta_result.textbook_version || "-" }} ·
-          {{ resource.auto_meta_result.textbook_info?.subject || resource.auto_meta_result.subject || "-" }} ·
-          {{ resource.auto_meta_result.textbook_info?.grade || resource.auto_meta_result.grade || "-"
-          }}{{ resource.auto_meta_result.textbook_info?.volume || resource.auto_meta_result.volume || "" }}
+          {{ formattedCatalogInfo }}
         </p>
-        <div v-if="resource.auto_meta_result.textbook_structure?.length">
-          <p class="mb-1"><strong>单元列表：</strong></p>
-          <ul class="structure">
-            <li
-              v-for="(item, idx) in resource.auto_meta_result.textbook_structure"
-              :key="idx"
-            >
-              {{ item.name || item }}
-            </li>
-          </ul>
+        <!-- 所属单元：使用 resource.unit 字段，如果没有则尝试从标题提取 -->
+        <div v-if="displayUnit" class="mb-2">
+          <strong>所属单元：</strong>
+          <span class="badge bg-primary">{{ displayUnit }}</span>
+          <span v-if="resource.unit_index" class="text-muted small ms-2">
+            (序号: {{ resource.unit_index }})
+          </span>
+          <span v-if="!resource.unit && displayUnit" class="text-muted small ms-2">
+            <i class="bi bi-info-circle" title="从标题自动提取"></i>
+          </span>
         </div>
-        <div v-else-if="resource.auto_meta_result.structure?.length">
-          <p class="mb-1"><strong>单元列表：</strong></p>
-          <ul class="structure">
-            <li
-              v-for="(item, idx) in resource.auto_meta_result.structure"
-              :key="idx"
-            >
-              {{ item.unit }}：{{ item.title }}
-            </li>
-          </ul>
+        <div v-else-if="resource.unit === '整本教材'" class="mb-2">
+          <strong>所属单元：</strong>
+          <span class="badge bg-info">整本教材</span>
+          <span v-if="wholeTextbookResourceCount" class="badge rounded-pill bg-secondary ms-2">
+            {{ wholeTextbookResourceCount }}
+          </span>
         </div>
-        <p v-else class="text-muted small">教材结构信息正在提取中...</p>
+        <div v-else-if="resource.catalog_id || resource.catalog_info" class="mb-2">
+          <strong>所属单元：</strong>
+          <span class="badge bg-secondary">待整理</span>
+        </div>
+        <!-- 资源出处 -->
+        <div v-if="resource.source_attribution && resource.source_attribution.trim()" class="mt-3 pt-3 border-top">
+          <strong>资源出处：</strong>
+          <span class="badge bg-info">{{ resource.source_attribution }}</span>
+        </div>
       </section>
-      
-      <!-- 如果 auto_meta_result 不存在，显示提示 -->
-      <section v-else-if="resource && !resource.auto_meta_result" class="card section">
+
+      <!-- 如果既没有 catalog_info 也没有 auto_meta_result，显示提示 -->
+      <section v-else-if="resource && !resource.catalog_info && !resource.auto_meta_result" class="card section">
         <h5 class="section-title">【教材信息】</h5>
         <p class="text-muted">
           <i class="bi bi-info-circle me-2"></i>
@@ -198,62 +201,41 @@
         </button>
       </section>
 
-      <!-- 2. 教材目录绑定信息 -->
-      <section v-if="catalogInfo" class="card section">
-        <h5 class="section-title">
-          {{ catalogInfo.isCatalog ? "📚 所属教材" : "📚 AI识别教材" }}
-        </h5>
-        <p class="text-muted mb-2">
-          {{ catalogInfo.version }} · {{ catalogInfo.subject }} ·
-          {{ catalogInfo.grade }} · {{ catalogInfo.volume }}
-        </p>
-        <!-- 所属单元：使用 resource.unit 字段 -->
-        <div v-if="resource.unit" class="mb-2">
-          <strong>所属单元：</strong>
-          <span class="badge bg-primary">{{ resource.unit }}</span>
-        </div>
-        <div v-else-if="resource.catalog_id" class="mb-2">
-          <strong>所属单元：</strong>
-          <span class="badge bg-secondary">待整理</span>
+      <!-- 教材结构（显示单元列表，调用 /api/catalogs/:catalogId/units） -->
+      <!-- 只有当有具体单元时才显示，整本教材的情况已经在【教材信息】中显示了 -->
+      <section v-if="resource.catalog_id && hasSpecificUnits" class="card section">
+        <h5 class="section-title">【教材结构】</h5>
+        <p class="text-muted mb-3">单元列表：</p>
+        <div class="unit-list">
+          <router-link
+            v-for="(unit, idx) in specificUnits"
+            :key="idx"
+            :to="`/catalog/${resource.catalog_id}/unit/${encodeURIComponent(unit.unit)}`"
+            class="unit-item"
+          >
+            <div class="unit-item-content">
+              <i class="bi bi-book-half unit-icon"></i>
+              <span class="unit-name">{{ unit.unit }}</span>
+              <span v-if="unit.resource_count !== undefined && unit.resource_count > 0" class="unit-badge">
+                {{ unit.resource_count }}
+              </span>
+            </div>
+            <i class="bi bi-chevron-right unit-arrow"></i>
+          </router-link>
         </div>
       </section>
-
-      <!-- 3. 教材结构（只读） -->
-      <section v-if="resource.auto_meta_result && typeof resource.auto_meta_result === 'object'" class="card section">
-        <h5 class="section-title">教材结构</h5>
-        <p class="text-muted mb-2">
-          📘
-          {{ resource.auto_meta_result.textbook_info?.version || resource.auto_meta_result.textbook_version || "-" }} ·
-          {{ resource.auto_meta_result.textbook_info?.subject || resource.auto_meta_result.subject || "-" }} ·
-          {{ resource.auto_meta_result.textbook_info?.grade || resource.auto_meta_result.grade || "-" }} ·
-          {{ resource.auto_meta_result.textbook_info?.volume || resource.auto_meta_result.volume || "-" }}
+      
+      <!-- 如果已绑定 catalog_id 但还没有单元数据，显示加载状态 -->
+      <section v-else-if="resource.catalog_id && loadingUnits" class="card section">
+        <h5 class="section-title">【教材结构】</h5>
+        <p class="text-muted">
+          <i class="bi bi-arrow-repeat spinner-border spinner-border-sm me-2"></i>
+          正在加载单元列表...
         </p>
-        <ul
-          v-if="resource.auto_meta_result.textbook_structure?.length"
-          class="structure"
-        >
-          <li
-            v-for="unit in resource.auto_meta_result.textbook_structure"
-            :key="unit.id || unit.name"
-          >
-            {{ unit.name }}
-          </li>
-        </ul>
-        <ul
-          v-else-if="resource.auto_meta_result.structure?.length"
-          class="structure"
-        >
-          <li
-            v-for="(item, idx) in resource.auto_meta_result.structure"
-            :key="idx"
-          >
-            {{ item.unit }}：{{ item.title }}
-          </li>
-        </ul>
       </section>
 
       <!-- 4. 资源说明 -->
-      <section v-if="resource.description" class="card section">
+      <section v-if="resource.description && resource.description.trim()" class="card section">
         <h5 class="section-title">资源说明</h5>
         <p class="text-body">{{ resource.description }}</p>
       </section>
@@ -293,6 +275,9 @@ export default defineComponent({
       coverFit: "cover",
       coverFailed: false,
       resolvedCover: "",
+      catalogUnits: [], // 教材单元列表
+      loadingUnits: false, // 加载单元列表状态
+      coverRatio: null, // 图片宽高比，用于动态调整容器大小
     };
   },
 
@@ -333,9 +318,9 @@ export default defineComponent({
         return "";
       }
 
-      // 教材信息中也可能包含封面
-      if (this.resource?.textbook_info?.cover_url) {
-        const tc = this.resource.textbook_info.cover_url;
+      // catalog_info 中可能包含封面（如果有的话）
+      if (this.resource?.catalog_info?.cover_url) {
+        const tc = this.resource.catalog_info.cover_url;
         if (tc.startsWith("http")) return tc;
         // 只处理 uploads/cover 路径的缩略图
         const m =
@@ -387,44 +372,173 @@ export default defineComponent({
       return user.role === "admin";
     },
 
-    catalogInfo() {
-      console.log("[catalogInfo] 开始计算，resource:", this.resource);
-
-      // 优先级1：如果存在 catalog_info，显示所属教材
-      if (this.resource?.catalog_info) {
-        console.log("[catalogInfo] 使用 catalog_info");
-        return {
-          isCatalog: true,
-          version: this.resource.catalog_info.version || "-",
-          subject: this.resource.catalog_info.subject || "-",
-          grade: this.resource.catalog_info.grade || "-",
-          volume: this.resource.catalog_info.volume || "-",
-          units: null, // catalog_info 不显示单元列表
-        };
+    // 尝试从标题中提取单元信息（作为后备方案）
+    extractedUnitFromTitle() {
+      if (!this.resource || !this.resource.title) return null;
+      try {
+        const title = this.resource.title;
+        // 匹配"第X单元"或"第X课"等格式
+        const unitMatch = title.match(/第[一二三四五六七八九十\d]+单元/);
+        if (unitMatch) {
+          return unitMatch[0];
+        }
+      } catch (error) {
+        console.error("[PostShow] 提取单元信息出错:", error);
       }
-
-      // 优先级2：如果存在 auto_meta_result，显示 AI 识别教材
-      if (this.resource?.auto_meta_result?.textbook_info) {
-        console.log("[catalogInfo] 使用 auto_meta_result");
-        const textbookInfo = this.resource.auto_meta_result.textbook_info;
-        const units =
-          this.resource.auto_meta_result.textbook_structure?.map(
-            (unit) => unit.name
-          ) || [];
-
-        return {
-          isCatalog: false,
-          version: textbookInfo.version || "-",
-          subject: textbookInfo.subject || "-",
-          grade: textbookInfo.grade || "-",
-          volume: textbookInfo.volume || "-",
-          units: units.length > 0 ? units : null,
-        };
-      }
-
-      // 都不存在，返回 null（区块不显示）
-      console.log("[catalogInfo] 都不存在，返回 null");
       return null;
+    },
+
+    // 实际显示的单元信息（优先使用 resource.unit，如果没有则尝试从标题提取）
+    displayUnit() {
+      if (!this.resource) return null;
+      try {
+        if (this.resource.unit && typeof this.resource.unit === 'string' && this.resource.unit.trim() && this.resource.unit !== '整本教材') {
+          return this.resource.unit;
+        }
+        // 如果后端没有返回 unit，但标题中有单元信息，尝试提取
+        if (!this.resource.unit) {
+          const extracted = this.extractedUnitFromTitle();
+          if (extracted) {
+            console.log("[PostShow] 从标题提取单元信息:", extracted);
+            return extracted;
+          }
+        }
+      } catch (error) {
+        console.error("[PostShow] displayUnit 计算出错:", error);
+      }
+      return null;
+    },
+
+    wholeTextbookResourceCount() {
+      // 从 catalogUnits 中查找"整本教材"的资源数量
+      if (this.catalogUnits && this.catalogUnits.length > 0) {
+        const wholeTextbook = this.catalogUnits.find(unit => 
+          unit.unit === '整本教材' || unit.unit === null || unit.unit === ''
+        );
+        if (wholeTextbook && wholeTextbook.resource_count !== undefined) {
+          return wholeTextbook.resource_count;
+        }
+      }
+      // 如果单元列表为空，说明当前资源就是整本教材
+      if (this.catalogUnits.length === 0 && this.resource?.catalog_id && !this.loadingUnits) {
+        return 1; // 至少当前这个资源
+      }
+      return null;
+    },
+
+    // 过滤出具体的单元（排除"整本教材"）
+    specificUnits() {
+      if (!this.catalogUnits || this.catalogUnits.length === 0) {
+        return [];
+      }
+      return this.catalogUnits.filter(unit => {
+        const unitName = unit.unit;
+        return unitName && 
+               unitName !== '整本教材' && 
+               unitName !== null && 
+               unitName !== '';
+      });
+    },
+
+    // 是否有具体单元（排除"整本教材"）
+    hasSpecificUnits() {
+      return this.specificUnits.length > 0;
+    },
+
+    catalogInfo() {
+      if (!this.resource) return null;
+      
+      try {
+        console.log("[catalogInfo] 开始计算，resource:", this.resource);
+
+        // 优先级1：如果存在 catalog_info，使用 catalog_info（已绑定教材目录）
+        if (this.resource.catalog_info) {
+          console.log("[catalogInfo] 使用 catalog_info");
+          return {
+            education_level: this.resource.catalog_info.education_level || "",
+            subject: this.resource.catalog_info.subject || "",
+            grade: this.resource.catalog_info.grade || "",
+            volume: this.resource.catalog_info.volume || "",
+            textbook_version: this.resource.catalog_info.textbook_version || "",
+          };
+        }
+
+        // 优先级2：如果存在 auto_meta_result，使用 auto_meta_result（AI 识别）
+        if (this.resource.auto_meta_result) {
+          console.log("[catalogInfo] 使用 auto_meta_result");
+          let autoMeta = this.resource.auto_meta_result;
+          
+          // 如果 auto_meta_result 是字符串，尝试解析
+          if (typeof autoMeta === 'string') {
+            try {
+              autoMeta = JSON.parse(autoMeta);
+            } catch (e) {
+              console.warn("[PostShow] auto_meta_result 解析失败:", e);
+            }
+          }
+          
+          // 尝试从多个可能的路径获取数据
+          const education_level = autoMeta?.education_level || 
+                                 autoMeta?.textbook_info?.education_level || "";
+          const subject = autoMeta?.subject || 
+                         autoMeta?.textbook_info?.subject || "";
+          const grade = autoMeta?.grade || 
+                       autoMeta?.textbook_info?.grade || "";
+          const volume = autoMeta?.volume || 
+                        autoMeta?.textbook_info?.volume || "";
+          const textbook_version = autoMeta?.textbook_version || 
+                                  autoMeta?.textbook_info?.version || "";
+
+          return {
+            education_level,
+            subject,
+            grade,
+            volume,
+            textbook_version,
+          };
+        }
+
+        // 优先级3：兜底使用 resource 的直接字段
+        console.log("[catalogInfo] 使用 resource 直接字段");
+        return {
+          education_level: "",
+          subject: this.resource.subject || "",
+          grade: this.resource.grade || "",
+          volume: "",
+          textbook_version: this.resource.textbook || "",
+        };
+      } catch (error) {
+        console.error("[PostShow] catalogInfo 计算出错:", error);
+        return null;
+      }
+    },
+
+    // 格式化教材信息显示
+    formattedCatalogInfo() {
+      if (!this.catalogInfo) return "-";
+      
+      const parts = [];
+      
+      if (this.catalogInfo.education_level) {
+        parts.push(this.catalogInfo.education_level);
+      }
+      
+      if (this.catalogInfo.subject) {
+        parts.push(this.catalogInfo.subject);
+      }
+      
+      // 年级和上下册组合在一起
+      if (this.catalogInfo.grade) {
+        const gradeFormatted = this.formatGrade(this.catalogInfo.grade);
+        const volume = this.catalogInfo.volume || "";
+        parts.push(gradeFormatted + volume);
+      }
+      
+      if (this.catalogInfo.textbook_version) {
+        parts.push(this.catalogInfo.textbook_version);
+      }
+      
+      return parts.length > 0 ? parts.join(" ") : "-";
     },
   },
 
@@ -515,9 +629,27 @@ export default defineComponent({
         this.coverFailed = false;
 
         // 详细日志输出
-        console.log("resource detail:", this.resource);
-        console.log("auto_meta_result:", this.resource?.auto_meta_result);
-        console.log("catalog_info:", this.resource?.catalog_info);
+        console.log("[PostShow] 资源详情:", this.resource);
+        console.log("[PostShow] auto_meta_result:", this.resource?.auto_meta_result);
+        console.log("[PostShow] catalog_info:", this.resource?.catalog_info);
+        console.log("[PostShow] 单元信息:", {
+          unit: this.resource?.unit,
+          unit_index: this.resource?.unit_index,
+          catalog_id: this.resource?.catalog_id,
+          has_catalog_info: !!this.resource?.catalog_info
+        });
+        console.log("[PostShow] 资源出处信息:", {
+          source_attribution: this.resource?.source_attribution,
+          source_attribution_type: typeof this.resource?.source_attribution,
+          has_source_attribution: !!this.resource?.source_attribution,
+          source_attribution_trimmed: this.resource?.source_attribution?.trim?.()
+        });
+        
+        // 如果资源已绑定教材目录，获取单元列表
+        if (this.resource?.catalog_id) {
+          this.fetchCatalogUnits(this.resource.catalog_id);
+        }
+        
         // 尝试解析可用的封面 URL（异步探测），优先使用缩略图
         this.resolveCoverUrl();
       } catch (error) {
@@ -577,9 +709,9 @@ export default defineComponent({
           if (m) {
             const filename = m[1]; // 完整文件名，例如 "1766517324895-cover.jpg"
             // 根据文档，格式应该是：/uploads/cover/resized/{filename}-thumbnail
-            candidates.push(
+              candidates.push(
               `/uploads/cover/resized/${filename}-thumbnail`
-            );
+              );
           }
           // 不添加原始大图路径，只使用缩略图
           // 如果缩略图不存在，显示占位符
@@ -595,13 +727,14 @@ export default defineComponent({
           candidates.push(path);
         }
       }
-      if (this.resource?.textbook_info?.cover_url) {
-        if (this.resource.textbook_info.cover_url.startsWith("http")) {
-          candidates.push(this.resource.textbook_info.cover_url);
+      // catalog_info 中可能包含封面
+      if (this.resource?.catalog_info?.cover_url) {
+        if (this.resource.catalog_info.cover_url.startsWith("http")) {
+          candidates.push(this.resource.catalog_info.cover_url);
         } else {
-          const path = this.resource.textbook_info.cover_url.startsWith("/")
-            ? this.resource.textbook_info.cover_url
-            : `/${this.resource.textbook_info.cover_url}`;
+          const path = this.resource.catalog_info.cover_url.startsWith("/")
+            ? this.resource.catalog_info.cover_url
+            : `/${this.resource.catalog_info.cover_url}`;
           candidates.push(path);
         }
       }
@@ -657,10 +790,87 @@ export default defineComponent({
       try {
         const img = e.target;
         const ratio = img.naturalWidth / img.naturalHeight;
+        this.coverRatio = ratio;
         this.coverFit = ratio < 0.9 ? "contain" : "cover";
       } catch (err) {
         this.coverFit = "cover";
+        this.coverRatio = null;
       }
+    },
+
+    /**
+     * 获取教材单元列表
+     */
+    async fetchCatalogUnits(catalogId) {
+      if (!catalogId) return;
+      
+      this.loadingUnits = true;
+      try {
+        const response = await apiHttpClient.get(`/api/catalogs/${catalogId}/units`);
+        console.log("[PostShow] 获取单元列表响应:", response.data);
+        
+        if (response.data && response.data.data && Array.isArray(response.data.data)) {
+          this.catalogUnits = response.data.data;
+        } else if (Array.isArray(response.data)) {
+          this.catalogUnits = response.data;
+        } else {
+          this.catalogUnits = [];
+        }
+        
+        console.log("[PostShow] 单元列表:", this.catalogUnits);
+      } catch (error) {
+        console.warn("[PostShow] 获取单元列表失败:", error);
+        // 不显示错误提示，只是没有单元列表
+        this.catalogUnits = [];
+      } finally {
+        this.loadingUnits = false;
+      }
+    },
+
+    /**
+     * 格式化年级显示
+     */
+    formatGrade(grade) {
+      if (!grade) return "";
+      if (typeof grade === "number") {
+        const gradeNames = [
+          "",
+          "一年级",
+          "二年级",
+          "三年级",
+          "四年级",
+          "五年级",
+          "六年级",
+          "七年级",
+          "八年级",
+          "九年级",
+          "高一",
+          "高二",
+          "高三",
+        ];
+        return gradeNames[grade] || `${grade}年级`;
+      }
+      // 如果是字符串，尝试转换
+      const gradeNum = parseInt(grade);
+      if (!isNaN(gradeNum) && gradeNum > 0) {
+        const gradeNames = [
+          "",
+          "一年级",
+          "二年级",
+          "三年级",
+          "四年级",
+          "五年级",
+          "六年级",
+          "七年级",
+          "八年级",
+          "九年级",
+          "高一",
+          "高二",
+          "高三",
+        ];
+        return gradeNames[gradeNum] || `${grade}年级`;
+      }
+      return grade;
     },
 
     async handleDelete() {
@@ -773,6 +983,104 @@ export default defineComponent({
   margin-bottom: 4px;
 }
 
+/* 教材结构单元列表样式 */
+.unit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+
+.unit-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e9ecef);
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text, #1f2937);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.unit-item:hover {
+  background: var(--bg, #f8f9fa);
+  border-color: var(--primary, #3b82f6);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+  transform: translateY(-1px);
+}
+
+.unit-item-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.unit-icon {
+  font-size: 18px;
+  color: var(--primary, #3b82f6);
+  flex-shrink: 0;
+}
+
+.unit-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text, #1f2937);
+  flex: 1;
+}
+
+.unit-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  background: linear-gradient(135deg, var(--primary, #3b82f6) 0%, #2563eb 100%);
+  color: #ffffff;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.unit-arrow {
+  font-size: 16px;
+  color: var(--muted, #94a3b8);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.unit-item:hover .unit-arrow {
+  color: var(--primary, #3b82f6);
+  transform: translateX(2px);
+}
+
+@media (max-width: 768px) {
+  .unit-item {
+    padding: 10px 14px;
+  }
+  
+  .unit-icon {
+    font-size: 16px;
+  }
+  
+  .unit-name {
+    font-size: 14px;
+  }
+  
+  .unit-badge {
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    font-size: 11px;
+  }
+}
+
 .text-body {
   margin: 0;
   color: var(--text, #1f2937);
@@ -785,5 +1093,90 @@ export default defineComponent({
   object-fit: contain;
   object-position: center;
   display: block;
+}
+
+/* 资源详情页封面样式 */
+.resource-cover-full {
+  width: 100% !important;
+  background: var(--surface, #fff);
+  border-radius: 8px;
+  overflow: hidden;
+  box-sizing: border-box;
+  border: 1px solid var(--border, #e9ecef);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px auto;
+}
+
+/* 竖版图片（高度大于宽度） */
+.resource-cover-full.cover-portrait {
+  max-width: 280px !important;
+  height: 380px !important;
+}
+
+/* 横版图片（宽度大于高度） */
+.resource-cover-full.cover-landscape {
+  max-width: 500px !important;
+  height: 300px !important;
+}
+
+/* 默认（未检测到方向时） */
+.resource-cover-full:not(.cover-portrait):not(.cover-landscape) {
+  max-width: 280px !important;
+  height: 380px !important;
+}
+
+.resource-cover-full img {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  display: block;
+  background: var(--surface, #fff);
+  object-position: center;
+  object-fit: contain;
+}
+
+.resource-cover-full img.fit-cover { 
+  object-fit: cover !important; 
+}
+
+.resource-cover-full img.fit-contain { 
+  object-fit: contain !important; 
+}
+
+.resource-cover-full .cover-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--bg, #f5f7fa) 0%, var(--surface, #e8ecf1) 100%);
+  border: none;
+}
+
+.resource-cover-full .cover-placeholder i {
+  font-size: 48px;
+  color: var(--muted, #94a3b8);
+  opacity: 0.6;
+}
+
+@media (max-width: 768px) {
+  .resource-cover-full.cover-portrait { 
+    max-width: 200px !important;
+    height: 270px !important; 
+  }
+  .resource-cover-full.cover-landscape {
+    max-width: 100% !important;
+    height: 200px !important;
+  }
+  .resource-cover-full:not(.cover-portrait):not(.cover-landscape) {
+    max-width: 200px !important;
+    height: 270px !important;
+  }
+  .resource-cover-full .cover-placeholder i {
+    font-size: 40px;
+  }
 }
 </style>

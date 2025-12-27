@@ -49,8 +49,8 @@ export default defineComponent({
     // 如果已登录，从后端获取最新用户信息并更新 store
     const token = localStorage.getItem('auth_token');
     if (token) {
-      try {
-        const response = await apiHttpClient.get("/user");
+    try {
+      const response = await apiHttpClient.get("/user");
         const userData = response.data;
         console.log("[App] 从 /user 接口获取的用户数据:", userData);
         console.log("[App] userData.id:", userData?.id);
@@ -124,10 +124,10 @@ export default defineComponent({
           this.$store.commit("auth/setUser", mergedUserData);
           this.user = mergedUserData;
         }
-      } catch (error) {
-        console.log("获取用户信息失败:", error);
-        this.user = null;
-      }
+    } catch (error) {
+      console.log("获取用户信息失败:", error);
+      this.user = null;
+    }
     }
   },
 

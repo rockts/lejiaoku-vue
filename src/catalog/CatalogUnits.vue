@@ -8,7 +8,7 @@
             <router-link to="/catalog">教材目录</router-link>
           </li>
           <li class="breadcrumb-item active" aria-current="page">
-            {{ catalogInfo.displayName || `教材 #${catalogId}` }}
+            {{ catalogInfo?.displayName || `教材 #${catalogId}` }}
           </li>
         </ol>
       </nav>
@@ -44,135 +44,77 @@
 
       <!-- 教材章节内容 -->
       <div v-else-if="catalogInfo">
-        <!-- 从任务跳转提示 -->
+        <!-- 从任务跳转提示（保留原有功能） -->
         <div v-if="fromTaskId" class="alert alert-info mb-3">
           <div class="d-flex justify-content-between align-items-start">
             <div class="flex-grow-1">
               <i class="bi bi-info-circle me-2"></i>
               <strong>来自任务：</strong>你正在查看任务关联的教材
               <span v-if="targetUnit">，目标单元：<strong>{{ targetUnit }}</strong></span>
-              <div class="mt-2">
-                <div v-if="!catalogInfo.view_state || catalogInfo.view_state === 'no_action'" class="task-guide">
-                  <p class="mb-1"><strong>如何执行任务：</strong></p>
-                  <ul class="mb-0 small">
-                    <li v-if="fromTaskId">
-                      <strong>补充教材资源：</strong>点击下方的"补充教材资源"按钮创建任务，或点击"上传资源"按钮直接上传资源
-                    </li>
-                    <li v-if="fromTaskId">
-                      <strong>整理教材单元：</strong>点击下方的"整理教材单元"按钮创建任务，然后上传包含单元信息的资源，系统会自动提取单元结构
-                    </li>
-                  </ul>
-                </div>
-              </div>
             </div>
             <router-link to="/me/tasks" class="btn btn-sm btn-outline-primary ms-3">
               <i class="bi bi-arrow-left me-1"></i>返回我的任务
             </router-link>
           </div>
         </div>
-        
-        <!-- Catalog 级行为按钮 -->
-        <div v-if="catalogInfo.view_state && catalogInfo.view_state !== 'no_action'" class="catalog-action-top mb-4">
-          <button
-            v-if="catalogInfo.view_state === 'add_resources'"
-            class="btn btn-primary btn-lg"
-            @click="createCatalogTask('add_resources')"
-            :disabled="creatingTask"
-          >
-            <i class="bi bi-plus-circle me-2"></i>补充教材资源
-          </button>
-          <button
-            v-else-if="catalogInfo.view_state === 'organize_units'"
-            class="btn btn-primary btn-lg"
-            @click="createCatalogTask('organize_units')"
-            :disabled="creatingTask"
-          >
-            <i class="bi bi-list-check me-2"></i>整理教材单元
-          </button>
-        </div>
-        
-        <!-- 备用按钮：当 view_state 为空时，显示通用任务创建按钮 -->
-        <div v-else-if="!catalogInfo.view_state || catalogInfo.view_state === 'no_action'" class="catalog-action-top mb-2">
-          <div class="alert alert-light border">
-            <h6 class="alert-heading mb-2">
-              <i class="bi bi-lightbulb me-2"></i>执行任务
-            </h6>
-            <p class="mb-2 small">该教材暂无单元信息，建议先整理单元结构，再补充资源内容。</p>
-            <div class="d-flex gap-2 mb-2">
-              <button
-                class="btn btn-primary"
-                @click="goToUpload"
-                title="直接上传资源（推荐）"
-              >
-                <i class="bi bi-cloud-upload me-2"></i>上传资源
-              </button>
-              <button
-                class="btn btn-outline-primary"
-                @click="createCatalogTask('organize_units')"
-                :disabled="creatingTask"
-                title="创建整理单元任务"
-              >
-                <i class="bi bi-list-check me-2"></i>整理教材单元
-              </button>
-              <button
-                class="btn btn-outline-secondary"
-                @click="createCatalogTask('add_resources')"
-                :disabled="creatingTask"
-                title="创建补充资源任务"
-              >
-                <i class="bi bi-plus-circle me-2"></i>补充资源
-              </button>
-            </div>
-            <p class="text-muted small mb-0">
-              <i class="bi bi-info-circle me-1"></i>
-              <strong>推荐：</strong>直接点击"上传资源"按钮，上传包含单元信息的资源文件，系统会自动提取并整理单元结构
-            </p>
-          </div>
-        </div>
-        
-        <!-- 调试信息（开发时可见，帮助排查按钮显示问题） -->
-        <div v-if="catalogInfo" class="alert alert-info mb-2" style="font-size: 0.875rem;">
-          <strong>调试信息：</strong><br>
-          catalogId: {{ catalogId }}<br>
-          view_state: {{ catalogInfo.view_state || '(null/undefined)' }}<br>
-          action_hint: {{ catalogInfo.action_hint || '(null/undefined)' }}<br>
-          units 数量: {{ units.length }}<br>
-          <span v-if="!catalogInfo.view_state || catalogInfo.view_state === 'no_action'" class="text-warning">
-            ⚠️ view_state 为空或为 'no_action'，所以 Catalog 级按钮不会显示
-          </span>
-        </div>
 
-        <!-- 教材信息展示（只读） -->
+        <!-- 顶部：Catalog 基本信息卡片（文档要求：在行为提示区域之前） -->
         <div class="catalog-info-card mb-3">
           <div class="card">
             <div class="card-body">
-              <h2 class="card-title mb-3">
-                <i class="bi bi-book-half me-2"></i>
-                {{ catalogInfo.displayName }}
-              </h2>
-              <div class="catalog-meta">
-                <span class="badge bg-primary me-2">
-                  {{ catalogInfo.subject || "未知学科" }}
-                </span>
-                <span class="badge bg-info me-2">
-                  {{ formatGrade(catalogInfo.grade) }}
-                </span>
-                <span class="badge bg-warning me-2">
-                  {{ catalogInfo.volume || "未知册别" }}
-                </span>
-                <span class="badge bg-success">
-                  {{ catalogInfo.textbook_version || "未知版本" }}
-                </span>
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h2 class="card-title mb-3">
+                    {{ catalogInfo.education_level || '' }} {{ catalogInfo.subject || '' }} {{ formatGrade(catalogInfo.grade) }} {{ catalogInfo.volume || '' }} {{ catalogInfo.textbook_version || '' }}
+                  </h2>
+                  <div class="catalog-stats">
+                    <span>单元总数：{{ catalogInfo.unit_total || 0 }}</span>
+                    <span class="mx-2">|</span>
+                    <span>资源总数：{{ catalogInfo.resource_total || 0 }}</span>
+                  </div>
+                </div>
+                <div>
+                  <button
+                    class="btn btn-primary"
+                    @click="goToUpload"
+                  >
+                    <i class="bi bi-cloud-upload me-2"></i>上传资源
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- 单元列表 -->
+        <!-- 行为提示区域（根据 view_state 显示） -->
+        <div v-if="catalogInfo.view_state" class="action-prompt mb-4" :class="`action-prompt-${catalogInfo.view_state}`">
+          <p class="mb-2">{{ catalogInfo.action_hint || getActionHint(catalogInfo.view_state) }}</p>
+          
+          <!-- view_state = "add_resources" -->
+          <div v-if="catalogInfo.view_state === 'add_resources'">
+            <!-- 上传资源按钮已删除，统一从 /catalog/:catalogId 页面进入 -->
+          </div>
+          
+          <!-- view_state = "organize_units" -->
+          <div v-else-if="catalogInfo.view_state === 'organize_units'">
+            <button
+              v-if="isAdmin"
+              class="btn btn-warning"
+              @click="createCatalogTask('organize_units')"
+              :disabled="creatingTask"
+            >
+              整理单元
+            </button>
+          </div>
+          
+          <!-- view_state = "no_action" -->
+          <div v-else-if="catalogInfo.view_state === 'no_action'">
+            <span class="badge bg-success">内容充足</span>
+          </div>
+        </div>
+
+        <!-- 主体：Unit 列表 -->
         <div class="units-section">
-          <h3 class="section-title mb-3">
-            <i class="bi bi-list-ul me-2"></i>选择单元
-          </h3>
 
           <div v-if="units.length === 0" class="text-center py-5">
             <i class="bi bi-inbox display-1 text-muted"></i>
@@ -180,6 +122,12 @@
             <p class="text-muted small mb-4">
               可能该教材尚未绑定资源，或资源中未包含单元信息
             </p>
+            <div v-if="catalogInfo.resource_total > 0" class="alert alert-info mb-3">
+              <i class="bi bi-info-circle me-2"></i>
+              <strong>提示：</strong>该教材已绑定 {{ catalogInfo.resource_total }} 个资源，但这些资源可能没有填写"所属单元"字段。
+              <br>
+              请前往资源编辑页面，为资源填写"所属单元"信息。
+            </div>
             <div class="d-flex justify-content-center gap-3">
               <button
                 class="btn btn-primary"
@@ -188,12 +136,12 @@
               >
                 <i class="bi bi-list-check me-2"></i>创建整理单元任务
               </button>
-              <router-link
-                to="/resources/create"
+              <button
                 class="btn btn-outline-primary"
+                @click="goToUpload"
               >
                 <i class="bi bi-cloud-upload me-2"></i>上传资源
-              </router-link>
+              </button>
             </div>
           </div>
 
@@ -201,32 +149,24 @@
             <div
               v-for="(unit, index) in units"
               :key="index"
-              class="unit-card"
-              @click="goToResources(unit)"
+              class="unit-item unit-card"
+              :class="`unit-${unit.unit_state || 'unknown'}`"
+              @click="goToUnitResources(unit)"
             >
               <div class="unit-card-body">
-                <div class="unit-number">
-                  <span class="unit-index">{{ index + 1 }}</span>
+                <div class="unit-header">
+                  <h3 class="unit-title">{{ unit.unit || unit.name }}</h3>
+                  <span class="badge" :class="`badge-${unit.unit_state || 'unknown'}`">
+                    {{ getUnitStateLabel(unit.unit_state) }}
+                  </span>
                 </div>
-                <div class="unit-content">
-                  <h4 class="unit-title">{{ unit.name || unit.unit || unit.title }}</h4>
-                  <p v-if="unit.title && unit.name !== unit.title" class="unit-subtitle text-muted">
-                    {{ unit.title }}
-                  </p>
-                </div>
-                <div class="unit-actions">
-                  <button
-                    v-if="unit.unit_state === 'empty' || unit.unit_state === 'sparse'"
-                    class="btn btn-sm btn-outline-primary unit-action-btn"
-                    @click.stop="createUnitTask(unit)"
-                    :disabled="creatingTask"
-                  >
-                    <i class="bi bi-plus-circle me-1"></i>补充资源
-                  </button>
-                  <div v-else class="unit-arrow">
-                    <i class="bi bi-arrow-right"></i>
-                  </div>
-                </div>
+                <p class="unit-description">
+                  {{ getUnitDescription(unit.unit_state, unit.resource_count) }}
+                </p>
+                <p v-if="unit.resource_count !== undefined" class="resource-count">
+                  {{ unit.resource_count }} 个资源
+                </p>
+                <!-- 上传资源按钮已删除，统一从 /catalog/:catalogId 页面进入 -->
               </div>
             </div>
           </div>
@@ -239,6 +179,7 @@
 <script>
 import { defineComponent } from "vue";
 import { apiHttpClient } from "@/app/app.service";
+import { mapGetters } from "vuex";
 
 export default defineComponent({
   name: "CatalogUnits",
@@ -254,12 +195,28 @@ export default defineComponent({
     return {
       loading: false,
       error: null,
-      catalogInfo: null,
+      catalogInfo: {
+        id: null,
+        subject: null,
+        grade: null,
+        volume: null,
+        textbook_version: null,
+        education_level: null,
+        unit_total: 0,
+        resource_total: 0,
+        displayName: null,
+      }, // 初始化为空对象，避免模板报错
       units: [], // 单元列表
       creatingTask: false, // 创建任务中
       fromTaskId: null, // 来自任务的 ID
       targetUnit: null, // 目标单元（如果有）
     };
+  },
+
+  computed: {
+    ...mapGetters({
+      isAdmin: "auth/isAdmin",
+    }),
   },
 
   created() {
@@ -286,121 +243,116 @@ export default defineComponent({
   methods: {
     /**
      * 获取教材数据
+     * 根据文档要求，使用 /api/catalogs/:catalogId/info 和 /api/catalogs/:catalogId/units
      */
     async fetchCatalogData() {
       this.loading = true;
       this.error = null;
 
       try {
-        // 1. 优先从 catalog 接口获取
-        let catalogData = null;
-        try {
-          const response = await apiHttpClient.get(`/api/catalogs/${this.catalogId}`);
-          console.log("[CatalogUnits] Catalog API 响应:", response.data);
+        // 并行获取两个接口
+        const [catalogInfoResponse, unitsResponse] = await Promise.all([
+          apiHttpClient.get(`/api/catalogs/${this.catalogId}/info`).catch(err => {
+            console.warn("[CatalogUnits] /info API 失败，尝试备用接口:", err);
+            // 如果 /info 接口不存在，尝试使用旧的接口
+            return apiHttpClient.get(`/api/catalogs/${this.catalogId}`).catch(() => null);
+          }),
+          apiHttpClient.get(`/api/catalogs/${this.catalogId}/units`).catch(err => {
+            console.warn("[CatalogUnits] /units API 失败:", err);
+            return null;
+          }),
+        ]);
 
-          // 处理不同的响应格式
-          if (response.data) {
-            if (response.data.data) {
-              catalogData = response.data.data;
-            } else if (response.data.catalog) {
-              catalogData = response.data.catalog;
-            } else {
-              catalogData = response.data;
-            }
+        // 处理 catalog 信息
+        let catalogData = null;
+        if (catalogInfoResponse && catalogInfoResponse.data) {
+          if (catalogInfoResponse.data.data) {
+            catalogData = catalogInfoResponse.data.data;
+          } else if (catalogInfoResponse.data.catalog) {
+            catalogData = catalogInfoResponse.data.catalog;
+          } else {
+            catalogData = catalogInfoResponse.data;
           }
-        } catch (error) {
-          console.warn("[CatalogUnits] Catalog API 失败，尝试从资源中提取:", error);
-          // 如果接口不存在或失败，catalogData 保持为 null，后续会从资源中提取
         }
 
-        // 2. 如果 catalog 接口返回了数据
         if (catalogData) {
-          console.log("[CatalogUnits] catalogData.view_state:", catalogData.view_state);
-          console.log("[CatalogUnits] catalogData.action_hint:", catalogData.action_hint);
-          
-          this.catalogInfo = {
-            id: catalogData.id || this.catalogId,
+          // 更新 catalogInfo 对象的属性，保持响应式
+          Object.assign(this.catalogInfo, {
+            id: catalogData.catalog_id || catalogData.id || this.catalogId,
             subject: catalogData.subject,
             grade: catalogData.grade,
             volume: catalogData.volume,
             textbook_version: catalogData.textbook_version,
             education_level: catalogData.education_level,
-            displayName: this.buildDisplayName(catalogData),
+            unit_total: catalogData.unit_total || 0,
+            resource_total: catalogData.resource_total || 0,
+            quality_state: catalogData.quality_state,
             view_state: catalogData.view_state || null,
             action_hint: catalogData.action_hint || null,
-          };
-          
-          console.log("[CatalogUnits] catalogInfo.view_state:", this.catalogInfo.view_state);
-
-          // 尝试从 catalog 数据中提取 units
-          if (catalogData.units && Array.isArray(catalogData.units)) {
-            this.units = catalogData.units.map((u, idx) => {
-              const unitObj = {
-                name: typeof u === "string" ? u : u.name || u.unit || u.title,
-                title: typeof u === "string" ? null : u.title || null,
-                index: idx,
-                unit_state: typeof u === "object" ? u.unit_state : null,
-              };
-              console.log(`[CatalogUnits] 单元 ${idx}:`, unitObj.name, "unit_state:", unitObj.unit_state);
-              return unitObj;
-            });
-            console.log("[CatalogUnits] 从 catalog 数据中提取到单元:", this.units);
-          } else if (catalogData.structure && Array.isArray(catalogData.structure)) {
-            this.units = catalogData.structure.map((s, idx) => ({
-              name: s.name || s.unit || s.title,
-              title: s.title || null,
-              index: idx,
-              unit_state: s.unit_state || null,
-            }));
-            console.log("[CatalogUnits] 从 catalog structure 中提取到单元:", this.units);
-          } else if (catalogData.chapters && Array.isArray(catalogData.chapters)) {
-            this.units = catalogData.chapters.map((c, idx) => ({
-              name: c.name || c.unit || c.title,
-              title: c.title || null,
-              index: idx,
-              unit_state: c.unit_state || null,
-            }));
-            console.log("[CatalogUnits] 从 catalog chapters 中提取到单元:", this.units);
-          } else {
-            // catalog 没有单元信息，从资源中提取
-            await this.extractUnitsFromResources();
-          }
+            displayName: this.buildDisplayName(catalogData),
+          });
         } else {
-          // catalog 接口失败，从资源中提取
-          console.log("[CatalogUnits] Catalog API 未返回数据，从资源中提取");
-          this.catalogInfo = {
+          // 如果接口失败，设置默认值（保持对象结构）
+          Object.assign(this.catalogInfo, {
             id: this.catalogId,
             subject: null,
             grade: null,
             volume: null,
             textbook_version: null,
             education_level: null,
-            displayName: `教材 #${this.catalogId}`,
-            view_state: null, // 从资源中提取时，view_state 为 null
+            unit_total: 0,
+            resource_total: 0,
+            view_state: null,
             action_hint: null,
-          };
+            displayName: `教材 #${this.catalogId}`,
+          });
+        }
+
+        // 处理单元列表
+        if (unitsResponse && unitsResponse.data) {
+          let unitsData = null;
+          if (unitsResponse.data.data && Array.isArray(unitsResponse.data.data)) {
+            unitsData = unitsResponse.data.data;
+          } else if (Array.isArray(unitsResponse.data)) {
+            unitsData = unitsResponse.data;
+          }
+
+          if (unitsData && unitsData.length > 0) {
+            this.units = unitsData.map((u) => ({
+              unit: u.unit,
+              unit_index: u.unit_index,
+              resource_count: u.resource_count || 0,
+              unit_state: u.unit_state || null,
+              name: u.unit, // 兼容旧代码
+            }));
+          } else {
+            // 如果没有单元数据，尝试从资源中提取（作为后备方案）
+            await this.extractUnitsFromResources();
+          }
+        } else {
+          // 如果 /units 接口失败，尝试从资源中提取
           await this.extractUnitsFromResources();
         }
-        } catch (error) {
-          console.error("[CatalogUnits] 获取教材数据失败:", error);
-          
-          // 根据错误类型提供更友好的提示
-          if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
-            this.error = "请求超时，请检查网络连接或稍后重试";
-          } else if (error.code === 'ERR_NETWORK' || error.message?.includes('Network Error')) {
-            this.error = "网络连接失败，请检查后端服务是否正常运行";
-          } else if (error.response?.status === 500) {
-            this.error = "服务器内部错误，请稍后重试";
-          } else if (error.response?.status === 503) {
-            this.error = "服务暂时不可用，请稍后重试";
-          } else if (error.response?.status === 404) {
-            this.error = `教材 ID ${this.catalogId} 不存在`;
-          } else {
-            this.error =
-              error.response?.data?.message ||
-              error.message ||
-              "获取教材数据失败";
-          }
+      } catch (error) {
+        console.error("[CatalogUnits] 获取教材数据失败:", error);
+        
+        // 根据错误类型提供更友好的提示
+        if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+          this.error = "请求超时，请检查网络连接或稍后重试";
+        } else if (error.code === 'ERR_NETWORK' || error.message?.includes('Network Error')) {
+          this.error = "网络连接失败，请检查后端服务是否正常运行";
+        } else if (error.response?.status === 500) {
+          this.error = "服务器内部错误，请稍后重试";
+        } else if (error.response?.status === 503) {
+          this.error = "服务暂时不可用，请稍后重试";
+        } else if (error.response?.status === 404) {
+          this.error = `教材 ID ${this.catalogId} 不存在`;
+        } else {
+          this.error =
+            error.response?.data?.message ||
+            error.message ||
+            "获取教材数据失败";
+        }
       } finally {
         this.loading = false;
       }
@@ -412,40 +364,158 @@ export default defineComponent({
      */
     async extractUnitsFromResources() {
       try {
-        console.log("[CatalogUnits] 从资源中提取单元信息，catalogId:", this.catalogId);
-
-        // 获取已绑定该 catalog 的资源
-        const response = await apiHttpClient.get("/api/resources", {
-          params: {
-            catalog_id: this.catalogId,
-            limit: 1000, // 获取足够多的资源以提取单元信息
-          },
-        });
-
-        console.log("[CatalogUnits] 资源列表响应:", response.data);
-
-        // 处理不同的响应格式
-        let resources = [];
-        if (response.data) {
-          if (response.data.data && Array.isArray(response.data.data)) {
-            resources = response.data.data;
-          } else if (response.data.resources && Array.isArray(response.data.resources)) {
-            resources = response.data.resources;
-          } else if (Array.isArray(response.data)) {
-            resources = response.data;
-          }
+        // 只在开发环境输出详细日志
+        if (process.env.NODE_ENV === 'development') {
+          console.log("[CatalogUnits] 从资源中提取单元信息，catalogId:", this.catalogId);
         }
 
-        // 只处理已绑定 catalog 的资源
-        resources = resources.filter(
-          (r) => r.catalog_id === Number(this.catalogId) || r.catalog_id === String(this.catalogId)
-        );
+        // 尝试多种 API 路径和参数格式
+        // 注意：可能需要包含所有状态的资源（包括已审核的），所以不添加 status 过滤
+        let resources = [];
+        const possiblePaths = [
+          { path: "/api/resources", params: { catalog_id: this.catalogId, limit: 1000, status: "approved" } }, // 优先获取已审核的资源
+          { path: "/api/resources", params: { catalog_id: this.catalogId, limit: 1000 } }, // 不指定状态，让后端决定
+          { path: "/api/resources", params: { catalog_id: Number(this.catalogId), limit: 1000 } },
+          { path: "/api/resources", params: { catalogId: this.catalogId, limit: 1000 } },
+          { path: "/my/resources", params: { catalog_id: this.catalogId, limit: 1000 } }, // 尝试使用 /my/resources（返回所有状态的资源）
+          { path: "/api/resources", params: { limit: 1000, status: "approved" } }, // 获取所有已审核的资源，然后手动过滤
+          { path: "/api/resources", params: { limit: 1000 } }, // 获取所有资源，然后手动过滤
+          { path: "/my/resources", params: { limit: 1000 } }, // 获取当前用户的所有资源，然后手动过滤
+        ];
 
-        console.log("[CatalogUnits] 已绑定 catalog 的资源数量:", resources.length);
+        for (const { path, params } of possiblePaths) {
+          try {
+            const response = await apiHttpClient.get(path, { params });
+
+            // 处理不同的响应格式
+            let responseResources = [];
+            if (response.data) {
+              if (response.data.data && Array.isArray(response.data.data)) {
+                responseResources = response.data.data;
+              } else if (response.data.resources && Array.isArray(response.data.resources)) {
+                responseResources = response.data.resources;
+              } else if (Array.isArray(response.data)) {
+                responseResources = response.data;
+              }
+            }
+
+            // 如果后端支持 catalog_id 参数，直接使用结果
+            if (params.catalog_id || params.catalogId) {
+              resources = responseResources;
+              // 输出调试信息
+              if (process.env.NODE_ENV === 'development') {
+                console.log(`[CatalogUnits] 从 ${path} 获取到 ${resources.length} 个资源（使用 catalog_id 参数）`);
+                if (resources.length > 0) {
+                  console.log(`[CatalogUnits] 前3个资源的详情:`, resources.slice(0, 3).map(r => ({
+                    id: r.id,
+                    title: r.title,
+                    catalog_id: r.catalog_id,
+                    status: r.status,
+                    unit: r.unit,
+                  })));
+                } else {
+                  // 如果没有找到资源，输出所有资源的 catalog_id 用于调试
+                  if (responseResources.length > 0) {
+                    console.log(`[CatalogUnits] 查询参数 catalog_id=${this.catalogId}，但返回的资源 catalog_id 为:`, 
+                      responseResources.slice(0, 10).map(r => ({
+                        id: r.id,
+                        catalog_id: r.catalog_id,
+                        catalogId: r.catalogId,
+                      }))
+                    );
+                  }
+                }
+              }
+              // 即使返回了资源，也检查一下 catalog_id 是否匹配（防止后端返回了所有资源）
+              if (resources.length > 0) {
+                const matchedResources = resources.filter(r => {
+                  const catalogId = r.catalog_id || r.catalogId;
+                  return catalogId === Number(this.catalogId) || 
+                         catalogId === String(this.catalogId) ||
+                         String(catalogId) === String(this.catalogId);
+                });
+                if (matchedResources.length !== resources.length) {
+                  console.warn(`[CatalogUnits] 警告：后端返回了 ${resources.length} 个资源，但只有 ${matchedResources.length} 个匹配 catalog_id=${this.catalogId}`);
+                  resources = matchedResources;
+                }
+              }
+              if (resources.length > 0) {
+                break;
+              }
+            } else {
+              // 如果后端不支持 catalog_id 参数，手动过滤
+              resources = responseResources.filter(
+                (r) => {
+                  const catalogId = r.catalog_id || r.catalogId;
+                  const matches = catalogId === Number(this.catalogId) || 
+                         catalogId === String(this.catalogId) ||
+                         String(catalogId) === String(this.catalogId);
+                  return matches;
+                }
+              );
+              if (process.env.NODE_ENV === 'development') {
+                console.log(`[CatalogUnits] 从 ${path} 获取到 ${responseResources.length} 个资源，过滤后 ${resources.length} 个匹配 catalog_id=${this.catalogId}`);
+                if (resources.length === 0 && responseResources.length > 0) {
+                  // 输出前几个资源的完整信息用于调试
+                  console.log(`[CatalogUnits] 查询 catalog_id=${this.catalogId} (类型: ${typeof this.catalogId})，但返回的资源没有匹配的 catalog_id`);
+                  
+                  // 输出前3个资源的完整对象（用于查看所有字段）- 使用 JSON.stringify 确保展开显示
+                  const first3Resources = responseResources.slice(0, 3);
+                  console.log(`[CatalogUnits] 前3个资源的完整信息:`, JSON.parse(JSON.stringify(first3Resources)));
+                  
+                  // 输出所有可能的 catalog_id 相关字段
+                  const sampleResources = responseResources.slice(0, 5).map(r => {
+                    // 检查所有可能的字段名
+                    const allFields = Object.keys(r);
+                    const catalogFields = allFields.filter(key => 
+                      key.toLowerCase().includes('catalog') || 
+                      key.toLowerCase().includes('textbook')
+                    );
+                    
+                    const result = {
+                      id: r.id,
+                      title: r.title,
+                      // 列出所有可能的 catalog 相关字段
+                      catalogFields: catalogFields,
+                      // 列出所有字段名（用于调试）
+                      allFields: allFields,
+                    };
+                    
+                    // 直接输出这些字段的值
+                    catalogFields.forEach(key => {
+                      result[key] = r[key];
+                    });
+                    
+                    return result;
+                  });
+                  console.log(`[CatalogUnits] 前5个资源的 catalog 相关字段:`, JSON.parse(JSON.stringify(sampleResources)));
+                  
+                  // 统计有多少个资源有 catalog_id
+                  const withCatalogId = responseResources.filter(r => r.catalog_id || r.catalogId || r.textbook_catalog_id);
+                  console.log(`[CatalogUnits] 返回的 ${responseResources.length} 个资源中，有 ${withCatalogId.length} 个有 catalog_id 字段`);
+                  
+                  // 如果没有任何资源有 catalog_id，输出第一个资源的所有字段和值
+                  if (withCatalogId.length === 0 && responseResources.length > 0) {
+                    const firstResource = responseResources[0];
+                    console.log(`[CatalogUnits] 第一个资源的所有字段和值 (完整 JSON):`, JSON.stringify(firstResource, null, 2));
+                    console.log(`[CatalogUnits] 第一个资源的所有字段名:`, Object.keys(firstResource));
+                  }
+                }
+              }
+              if (resources.length > 0) {
+                break;
+              }
+            }
+          } catch (error) {
+            // 继续尝试下一个路径
+            continue;
+          }
+        }
 
         // 只从 resource.unit 字段提取单元信息
         const unitSet = new Set();
         const unitMap = new Map();
+        let resourcesWithoutUnit = 0;
 
         resources.forEach((resource) => {
           // 只使用 resource.unit 字段
@@ -455,28 +525,72 @@ export default defineComponent({
             if (!unitMap.has(unitName)) {
               unitMap.set(unitName, {
                 name: unitName,
+                unit: unitName,
                 title: null, // unit 字段不包含 title
+                resource_count: 0, // 初始化资源计数
               });
             }
+            // 增加该单元的资源计数
+            const unitData = unitMap.get(unitName);
+            unitData.resource_count = (unitData.resource_count || 0) + 1;
+          } else {
+            // 没有 unit 字段的资源，归类到"整本教材"
+            resourcesWithoutUnit++;
+            const wholeTextbookUnit = "整本教材";
+            if (!unitMap.has(wholeTextbookUnit)) {
+              unitMap.set(wholeTextbookUnit, {
+                name: wholeTextbookUnit,
+                unit: wholeTextbookUnit,
+                title: null,
+                resource_count: 0,
+              });
+            }
+            // 增加"整本教材"的资源计数
+            const wholeTextbookData = unitMap.get(wholeTextbookUnit);
+            wholeTextbookData.resource_count = (wholeTextbookData.resource_count || 0) + 1;
           }
         });
 
         // 转换为数组并排序
         this.units = Array.from(unitMap.values()).sort((a, b) => {
+          // "整本教材"始终排在最后
+          if (a.unit === "整本教材") return 1;
+          if (b.unit === "整本教材") return -1;
           // 尝试按单元名称中的数字排序
           const aNum = parseInt(a.name.match(/\d+/)?.[0] || "999");
           const bNum = parseInt(b.name.match(/\d+/)?.[0] || "999");
           return aNum - bNum;
         });
 
-        console.log("[CatalogUnits] 从 resource.unit 字段提取到单元:", this.units);
+        // 输出详细日志
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`[CatalogUnits] 资源提取结果:`, {
+            totalResources: resources.length,
+            resourcesWithoutUnit,
+            extractedUnits: this.units.length,
+            units: this.units.map(u => u.unit || u.name),
+          });
+          
+          // 显示前几个资源的详细信息
+          if (resources.length > 0) {
+            console.log(`[CatalogUnits] 前3个资源详情:`, resources.slice(0, 3).map(r => ({
+              id: r.id,
+              title: r.title,
+              catalog_id: r.catalog_id,
+              unit: r.unit,
+            })));
+          }
+        }
 
         // 如果从资源中提取到了 catalog 信息，更新 catalogInfo
         if (resources.length > 0) {
+          // 更新资源总数
+          this.catalogInfo.resource_total = resources.length;
+          
           const firstResource = resources[0];
           if (firstResource.catalog_info) {
-            this.catalogInfo = {
-              ...this.catalogInfo,
+            // 使用 Object.assign 更新属性，保持响应式
+            Object.assign(this.catalogInfo, {
               subject: firstResource.catalog_info.subject || this.catalogInfo.subject,
               grade: firstResource.catalog_info.grade || this.catalogInfo.grade,
               volume: firstResource.catalog_info.volume || this.catalogInfo.volume,
@@ -485,11 +599,31 @@ export default defineComponent({
                 firstResource.catalog_info.textbook_version ||
                 this.catalogInfo.textbook_version,
               displayName: this.buildDisplayName(firstResource.catalog_info),
-            };
+            });
+          }
+        }
+
+        // 如果没有找到资源，显示提示
+        if (resources.length === 0) {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(`[CatalogUnits] 未找到绑定到 catalog ${this.catalogId} 的资源`);
+          }
+        } else if (this.units.length === 0) {
+          // 有资源但没有单元信息
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(`[CatalogUnits] 找到 ${resources.length} 个资源，但都没有 unit 字段`);
           }
         }
       } catch (error) {
-        console.error("[CatalogUnits] 从资源中提取单元失败:", error);
+        // 只在开发环境输出详细错误日志
+        if (process.env.NODE_ENV === 'development') {
+          console.error("[CatalogUnits] 从资源中提取单元失败:", error);
+          console.error("[CatalogUnits] 错误详情:", {
+            message: error.message,
+            response: error.response?.data,
+            status: error.response?.status,
+          });
+        }
         // 不抛出错误，只是没有单元信息
         this.units = [];
       }
@@ -594,24 +728,24 @@ export default defineComponent({
     },
 
     /**
-     * 跳转到资源列表页
+     * 跳转到单元资源列表页
+     * 根据文档要求，跳转到 /catalog/:catalogId/unit/:unit
      */
-    goToResources(unit) {
-      const query = {
-        catalog_id: this.catalogId,
-        unit: unit.name, // 使用单元名称
-      };
-
-      // 如果单元有索引，也可以传递
-      if (unit.index !== undefined) {
-        query.unit_index = unit.index;
+    goToUnitResources(unit) {
+      const unitName = unit.unit || unit.name;
+      if (!unitName) {
+        console.warn("[CatalogUnits] 单元名称为空，无法跳转");
+        return;
       }
 
-      console.log("[CatalogUnits] 跳转到资源列表，query:", query);
+      console.log("[CatalogUnits] 跳转到单元资源列表:", {
+        catalogId: this.catalogId,
+        unit: unitName,
+      });
 
+      // 根据文档，跳转到 /catalog/:catalogId/unit/:unit
       this.$router.push({
-        path: "/resources",
-        query,
+        path: `/catalog/${this.catalogId}/unit/${encodeURIComponent(unitName)}`,
       });
     },
 
@@ -695,6 +829,74 @@ export default defineComponent({
       } finally {
         this.creatingTask = false;
       }
+    },
+
+    /**
+     * 辅助函数：获取行为提示文本
+     */
+    getActionHint(viewState) {
+      const hints = {
+        'add_resources': this.catalogInfo.resource_total === 0 
+          ? '该教材暂无资源，建议优先补充内容'
+          : '该教材资源密度不足，建议补充更多资源',
+        'organize_units': '该教材有资源但缺少单元信息，建议整理单元',
+        'no_action': '该教材内容充足，无需行动',
+      };
+      return hints[viewState] || '';
+    },
+
+    /**
+     * 辅助函数：获取单元状态标签
+     */
+    getUnitStateLabel(unitState) {
+      const labels = {
+        'empty': '空',
+        'sparse': '稀疏',
+        'healthy': '健康',
+      };
+      return labels[unitState] || '';
+    },
+
+    /**
+     * 辅助函数：获取单元描述
+     */
+    getUnitDescription(unitState, resourceCount) {
+      if (unitState === 'empty') {
+        return '该单元暂无资源';
+      } else if (unitState === 'sparse') {
+        return '该单元资源较少，建议补充';
+      } else if (unitState === 'healthy') {
+        return '该单元内容充足';
+      }
+      return '';
+    },
+
+    /**
+     * 为该单元上传资源
+     */
+    handleUploadForUnit(unit) {
+      const unitName = unit.unit || unit.name;
+      this.$router.push({
+        path: "/resources/create",
+        query: {
+          catalog_id: this.catalogId,
+          unit: unitName,
+        },
+      });
+    },
+
+    /**
+     * 为该单元补充资源
+     */
+    handleAddResourcesForUnit(unit) {
+      const unitName = unit.unit || unit.name;
+      this.$router.push({
+        path: "/resources/create",
+        query: {
+          catalog_id: this.catalogId,
+          unit: unitName,
+        },
+      });
     },
 
     /**
@@ -811,11 +1013,13 @@ export default defineComponent({
   margin-bottom: 0;
 }
 
-.catalog-meta {
+.catalog-stats {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 1rem;
   align-items: center;
+  color: var(--text-muted, #6c757d);
+  font-size: 0.95rem;
 }
 
 .section-title {
@@ -830,7 +1034,7 @@ export default defineComponent({
   gap: 1rem;
 }
 
-.unit-card {
+.unit-item {
   background: var(--surface, #ffffff);
   border: 2px solid var(--border, #e9ecef);
   border-radius: 12px;
@@ -839,17 +1043,95 @@ export default defineComponent({
   overflow: hidden;
 }
 
-.unit-card:hover {
-  border-color: var(--primary, #4f8cff);
+.unit-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(79, 140, 255, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 单元状态样式 */
+.unit-empty {
+  border-left: 4px solid #f44336;
+  background-color: #ffebee;
+}
+
+.unit-sparse {
+  border-left: 4px solid #ff9800;
+  background-color: #fff3e0;
+}
+
+.unit-healthy {
+  border-left: 4px solid #4caf50;
+  background-color: #e8f5e9;
+}
+
+.unit-unknown {
+  border-left: 4px solid #e9ecef;
+}
+
+/* 行为提示区域样式 */
+.action-prompt {
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  border-left: 4px solid;
+}
+
+.action-prompt-add_resources {
+  background-color: #e3f2fd;
+  border-left-color: #2196f3;
+}
+
+.action-prompt-organize_units {
+  background-color: #fff3e0;
+  border-left-color: #ff9800;
+}
+
+.action-prompt-no_action {
+  background-color: #e8f5e9;
+  border-left-color: #4caf50;
+}
+
+/* 单元状态徽章 */
+.badge-empty {
+  background-color: #f44336;
+  color: white;
+}
+
+.badge-sparse {
+  background-color: #ff9800;
+  color: white;
+}
+
+.badge-healthy {
+  background-color: #4caf50;
+  color: white;
+}
+
+.badge-unknown {
+  background-color: #6c757d;
+  color: white;
 }
 
 .unit-card-body {
-  display: flex;
-  align-items: center;
   padding: 1.25rem;
-  gap: 1rem;
+}
+
+.unit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.unit-description {
+  color: var(--text-muted, #6c757d);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.resource-count {
+  color: var(--text-muted, #6c757d);
+  font-size: 0.85rem;
+  margin-bottom: 0.75rem;
 }
 
 .unit-number {

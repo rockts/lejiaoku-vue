@@ -54,10 +54,17 @@
                   <li v-if="item.unit">
                     <span style="font-weight: bold">所属单元：</span
                     >{{ item.unit }}
+                    <span v-if="item.unit_index" class="text-muted small ms-1">
+                      (序号: {{ item.unit_index }})
+                    </span>
                   </li>
                   <li v-else-if="item.catalog_id">
                     <span style="font-weight: bold">所属单元：</span
                     ><span class="text-muted">待整理</span>
+                  </li>
+                  <li v-if="item.source_attribution">
+                    <span style="font-weight: bold">资源出处：</span
+                    ><span class="badge bg-info">{{ item.source_attribution }}</span>
                   </li>
                 </ul>
               </div>
@@ -226,10 +233,10 @@ export default defineComponent({
           if (m) {
             const filename = m[1]; // 完整文件名，例如 "1766517324895-cover.jpg"
             // 根据文档，格式应该是：/uploads/cover/resized/{filename}-thumbnail
-            candidates.push(
+              candidates.push(
               `/uploads/cover/resized/${filename}-thumbnail`
-            );
-          }
+              );
+            }
         }
       }
       if (this.item?.cover?.id && API_BASE_URL) {
