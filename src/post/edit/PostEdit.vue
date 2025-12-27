@@ -1537,10 +1537,15 @@ export default defineComponent({
         // 确保已绑定教材目录时，updateData 中不包含这些字段（即使 editForm 中有值）
         if (hasCatalogBindingForFields) {
           // 已绑定教材目录，明确删除这些字段，确保不会发送
+          // 同时清空 editForm 中的这些字段，防止任何地方引用它们
           delete updateData.grade;
           delete updateData.subject;
           delete updateData.version;
-          console.log("[PostEdit] 资源已绑定教材目录，明确删除 grade/subject/version 字段");
+          // 清空 editForm 中的这些字段，确保不会在任何地方被使用
+          this.editForm.grade = "";
+          this.editForm.subject = "";
+          this.editForm.textbook = "";
+          console.log("[PostEdit] 资源已绑定教材目录，明确删除 grade/subject/version 字段并清空 editForm");
           console.log("[PostEdit] JSON 提交绑定状态检查:", {
             catalog_id: this.resource?.catalog_id,
             has_catalog_info: !!this.resource?.catalog_info,
@@ -1789,9 +1794,25 @@ export default defineComponent({
             console.log("[PostEdit] JSON 提交：明确设置 catalog_id = null（解除绑定）");
           }
 
+          // 最终检查：确保已绑定教材目录时，updateData 中不包含 grade、subject、version 字段
+          if (hasCatalogBindingForFields) {
+            // 再次明确删除，确保万无一失
+            delete updateData.grade;
+            delete updateData.subject;
+            delete updateData.version;
+            console.log("[PostEdit] ⚠️ 最终检查：已绑定教材目录，再次删除 grade/subject/version 字段");
+            console.log("[PostEdit] 最终 updateData 对象:", JSON.stringify(updateData, null, 2));
+            console.log("[PostEdit] 最终检查 - updateData 中是否还有这些字段:", {
+              has_grade: 'grade' in updateData,
+              has_subject: 'subject' in updateData,
+              has_version: 'version' in updateData
+            });
+          }
+          
           // 只在开发环境输出详细日志
           if (process.env.NODE_ENV === 'development') {
             console.log("[PostEdit] 发送的 JSON 数据:", updateData);
+            console.log("[PostEdit] 发送的 JSON 数据（字符串）:", JSON.stringify(updateData));
             console.log("[PostEdit] catalog_id:", updateData.catalog_id, "unit:", updateData.unit);
             console.log("[PostEdit] isUnbindingCatalog:", this.isUnbindingCatalog, "selectedCatalogId:", this.selectedCatalogId);
           }
