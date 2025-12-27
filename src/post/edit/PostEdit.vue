@@ -1534,7 +1534,24 @@ export default defineComponent({
         // 重要：即使 selectedCatalogId 为 null，只要 resource.catalog_id 或 resource.catalog_info 存在，就认为已绑定
         const hasCatalogBindingForFields = !!(this.resource?.catalog_id || this.resource?.catalog_info || this.selectedCatalogId);
         
-        if (!hasCatalogBindingForFields) {
+        // 确保已绑定教材目录时，updateData 中不包含这些字段（即使 editForm 中有值）
+        if (hasCatalogBindingForFields) {
+          // 已绑定教材目录，明确删除这些字段，确保不会发送
+          delete updateData.grade;
+          delete updateData.subject;
+          delete updateData.version;
+          console.log("[PostEdit] 资源已绑定教材目录，明确删除 grade/subject/version 字段");
+          console.log("[PostEdit] JSON 提交绑定状态检查:", {
+            catalog_id: this.resource?.catalog_id,
+            has_catalog_info: !!this.resource?.catalog_info,
+            catalog_info: this.resource?.catalog_info,
+            selectedCatalogId: this.selectedCatalogId,
+            hasCatalogBindingForFields,
+            editForm_grade: this.editForm.grade,
+            editForm_subject: this.editForm.subject,
+            editForm_textbook: this.editForm.textbook
+          });
+        } else {
           // 未绑定教材目录，允许手动填写这些字段
           if (this.editForm.grade && this.editForm.grade.trim()) {
             updateData.grade = this.editForm.grade.trim();
@@ -1545,16 +1562,6 @@ export default defineComponent({
           if (this.editForm.textbook && this.editForm.textbook.trim()) {
             updateData.version = this.editForm.textbook.trim(); // 后端字段名是 version
           }
-        } else {
-          // 已绑定教材目录，不发送这些字段，避免覆盖 catalog_info
-          console.log("[PostEdit] 资源已绑定教材目录，跳过 grade/subject/version 字段的提交");
-          console.log("[PostEdit] JSON 提交绑定状态检查:", {
-            catalog_id: this.resource?.catalog_id,
-            has_catalog_info: !!this.resource?.catalog_info,
-            catalog_info: this.resource?.catalog_info,
-            selectedCatalogId: this.selectedCatalogId,
-            hasCatalogBindingForFields
-          });
         }
         
         // chapter_info 可以独立更新（不受教材目录绑定影响）
@@ -1681,18 +1688,28 @@ export default defineComponent({
           }
           // 如果资源已绑定教材目录，不发送 grade、subject、version 字段
           // 重要：即使 selectedCatalogId 为 null，只要 resource.catalog_id 或 resource.catalog_info 存在，就认为已绑定
+          // 注意：即使 updateData 中有这些字段（可能来自之前的逻辑），也不发送
           const hasCatalogBindingForFields = !!(this.resource?.catalog_id || this.resource?.catalog_info || this.selectedCatalogId);
           if (!hasCatalogBindingForFields) {
+            // 未绑定教材目录，允许发送这些字段
             if (updateData.grade) formData.append("grade", updateData.grade);
             if (updateData.subject) formData.append("subject", updateData.subject);
             if (updateData.version) formData.append("version", updateData.version);
           } else {
+            // 已绑定教材目录，明确不发送这些字段，即使 updateData 中有值
             console.log("[PostEdit] FormData 提交：资源已绑定教材目录，跳过 grade/subject/version 字段");
             console.log("[PostEdit] FormData 绑定状态检查:", {
               catalog_id: this.resource?.catalog_id,
               has_catalog_info: !!this.resource?.catalog_info,
+              catalog_info: this.resource?.catalog_info,
               selectedCatalogId: this.selectedCatalogId,
-              hasCatalogBindingForFields
+              hasCatalogBindingForFields,
+              updateData_has_grade: !!updateData.grade,
+              updateData_has_subject: !!updateData.subject,
+              updateData_has_version: !!updateData.version,
+              editForm_grade: this.editForm.grade,
+              editForm_subject: this.editForm.subject,
+              editForm_textbook: this.editForm.textbook
             });
           }
           if (updateData.chapter_info) formData.append("chapter_info", updateData.chapter_info);
