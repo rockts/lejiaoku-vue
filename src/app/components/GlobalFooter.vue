@@ -4,10 +4,7 @@
     <div class="footer-main">
       <div class="footer-brand">
         <img :src="logoUrl" alt="乐教库" class="footer-logo" />
-        <div class="brand-text">
-          <span class="brand-name">乐教库</span>
-          <span class="brand-slogan">让教学资源触手可及</span>
-        </div>
+        <span class="brand-slogan">让教学资源触手可及</span>
       </div>
       <div class="footer-links">
         <router-link to="/legal/user-agreement" class="footer-link">用户协议</router-link>
@@ -18,6 +15,13 @@
         <span class="divider">|</span>
         <router-link to="/about" class="footer-link">关于我们</router-link>
       </div>
+    </div>
+    
+    <!-- 版权提示 -->
+    <div class="copyright-notice">
+      <i class="bi bi-shield-check me-2"></i>
+      <span>本站部分资源转载于网络，如有侵权请联系我们，我们将立即删除。</span>
+      <router-link to="/legal/copyright" class="copyright-link">查看版权声明</router-link>
     </div>
     
     <!-- 版权和备案信息 -->
@@ -32,13 +36,6 @@
           陇ICP备15002697号-4
         </a>
       </div>
-    </div>
-    
-    <!-- 版权提示 -->
-    <div class="copyright-notice">
-      <i class="bi bi-shield-check me-2"></i>
-      <span>本站部分资源转载于网络，如有侵权请联系我们，我们将立即删除。</span>
-      <router-link to="/legal/copyright" class="copyright-link">查看版权声明</router-link>
     </div>
   </div>
 </template>
@@ -91,21 +88,9 @@ export default defineComponent({
   object-fit: contain;
 }
 
-.brand-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.brand-name {
-  font-weight: 600;
-  color: var(--text, #212529);
-}
-
 .brand-slogan {
   color: var(--muted, #6c757d);
   font-size: 13px;
-  margin-left: 4px;
 }
 
 .footer-links {
@@ -172,9 +157,9 @@ export default defineComponent({
   justify-content: center;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 12px 20px 0;
-  margin-top: 12px;
-  border-top: 1px solid var(--border, #e9ecef);
+  padding: 0 20px 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border, #e9ecef);
   font-size: 13px;
   color: var(--muted, #6c757d);
   text-align: center;
@@ -199,10 +184,6 @@ export default defineComponent({
 }
 
 [data-theme="dark"] .footer-brand {
-  color: var(--text, #e6edf3);
-}
-
-[data-theme="dark"] .brand-name {
   color: var(--text, #e6edf3);
 }
 
@@ -231,7 +212,7 @@ export default defineComponent({
 }
 
 [data-theme="dark"] .copyright-notice {
-  border-top-color: var(--border, #2d333b);
+  border-bottom-color: var(--border, #2d333b);
   color: var(--muted, #768390);
 }
 
