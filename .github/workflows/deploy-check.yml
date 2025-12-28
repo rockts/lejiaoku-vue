@@ -1,0 +1,55 @@
+# 部署前检查工作流
+# 在合并到 main 分支前自动运行检查
+
+name: Deploy Check
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'yarn'
+      
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      
+      - name: Lint check
+        run: yarn lint
+      
+      - name: Build check
+        run: yarn build
+        env:
+          VUE_APP_API_BASE_URL: https://api.example.com
+          VUE_APP_NAME: 乐教库
+          NODE_ENV: production
+      
+      - name: Check for console.log
+        run: |
+          if grep -r "console\.log" dist/ --include="*.js" | grep -v "sourceMappingURL"; then
+            echo "⚠️ 警告：构建产物中包含 console.log，建议移除"
+          else
+            echo "✅ 构建产物中未发现 console.log"
+          fi
+      
+      - name: Check build size
+        run: |
+          SIZE=$(du -sh dist | cut -f1)
+          echo "构建产物大小: $SIZE"
+          if [ $(du -sm dist | cut -f1) -gt 10 ]; then
+            echo "⚠️ 警告：构建产物较大，建议检查是否有未优化的资源"
+          fi
+

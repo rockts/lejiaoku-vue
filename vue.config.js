@@ -1,6 +1,10 @@
 module.exports = {
   lintOnSave: false,
   transpileDependencies: ['vue-router'],
+  // 生产环境关闭 Source Map（减小文件大小，提高安全性）
+  productionSourceMap: false,
+  // 生产环境公共路径（如果使用 CDN，可以配置 CDN 地址）
+  publicPath: process.env.NODE_ENV === 'production' ? '/' : '/',
   devServer: {
     port: 8080,
     // 配置 historyApiFallback，确保前端路由返回 index.html
