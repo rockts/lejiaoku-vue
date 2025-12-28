@@ -94,6 +94,7 @@
         </div>
       </div>
     </div>
+    
     <LoginModal
       v-model="showLoginModal"
       @switch-to-register="handleSwitchToRegister"
@@ -665,5 +666,66 @@ export default defineComponent({
 .btn-apply-contributor-disabled:active {
   transform: none !important;
   pointer-events: none !important;
+}
+
+/* 版权说明区域 */
+.copyright-section {
+  width: 100%;
+  padding: 20px 0;
+  background: var(--bg, #f8f9fa);
+  border-top: 1px solid var(--border, #e9ecef);
+  margin-top: 40px;
+}
+
+.copyright-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 20px;
+  font-size: 13px;
+  color: var(--muted, #6c757d);
+  text-align: center;
+}
+
+.copyright-content i {
+  color: var(--primary, #4f8cff);
+  font-size: 14px;
+}
+
+.copyright-link {
+  color: var(--primary, #4f8cff);
+  text-decoration: none;
+  font-weight: 500;
+  margin-left: 4px;
+  transition: color 0.2s ease;
+}
+
+.copyright-link:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+[data-theme="dark"] .copyright-section {
+  background: var(--bg, #1a1d23);
+  border-top-color: var(--border, #2d333b);
+}
+
+[data-theme="dark"] .copyright-content {
+  color: var(--muted, #768390);
+}
+
+@media (max-width: 576px) {
+  .copyright-content {
+    font-size: 12px;
+    padding: 10px 16px;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .copyright-link {
+    margin-left: 0;
+  }
 }
 </style>

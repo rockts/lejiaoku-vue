@@ -4,6 +4,7 @@ import About from '@/app/components/About.vue';
 import UserAgreement from '@/app/components/UserAgreement.vue';
 import PrivacyPolicy from '@/app/components/PrivacyPolicy.vue';
 import ContributorResponsibilities from '@/app/components/ContributorResponsibilities.vue';
+import Copyright from '@/app/components/Copyright.vue';
 import LoginPage from '@/app/components/LoginPage.vue';
 
 /**
@@ -39,6 +40,11 @@ const routes: Array<RouteRecordRaw> = [
         path: '/legal/contributor-responsibilities',
         name: 'ContributorResponsibilities',
         component: ContributorResponsibilities,
+    },
+    {
+        path: '/legal/copyright',
+        name: 'Copyright',
+        component: Copyright,
     },
 ];
 

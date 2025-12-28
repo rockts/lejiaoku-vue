@@ -1,7 +1,7 @@
 <template>
   <div class="container py-5">
     <div class="legal-card">
-      <h1 class="legal-title">隐私政策</h1>
+      <h1 class="legal-title">版权声明</h1>
       <div class="legal-meta">
         <span class="meta-item">最后更新：2025年12月29日</span>
         <span class="meta-divider">|</span>
@@ -9,93 +9,89 @@
       </div>
       <div class="legal-content">
         <p class="legal-intro">
-          我们重视您的隐私。本隐私政策说明我们如何收集、使用、存储和保护您的个人信息。使用本平台即表示您同意本隐私政策的条款。
+          乐教库（LeJiaoKu.Com）致力于为教育工作者提供优质的教学资源，我们尊重知识产权，并严格遵守相关法律法规。本版权声明说明了平台对资源版权的处理方式。
         </p>
 
         <div class="section">
-          <h3 class="section-title">一、信息收集</h3>
+          <h3 class="section-title">一、资源来源说明</h3>
           <p class="section-text">
-            1.1 我们可能收集的信息包括：账户注册信息（如用户名、邮箱、昵称）、使用记录（如浏览、搜索、下载历史）、上传的内容以及设备信息（如IP地址、浏览器类型）。
+            1.1 本站部分资源转载于网络，包括但不限于课件、教案、试题、教材等教学资源。这些资源来源于公开渠道，我们努力确保资源的合法性和准确性。
           </p>
           <p class="section-text">
-            1.2 这些信息用于提供和优化我们的服务，改善用户体验，以及确保平台安全运行。
+            1.2 平台上的资源可能来自用户上传、网络收集或合作伙伴提供，我们会尽可能标注资源来源。
           </p>
           <p class="section-text">
-            1.3 我们不会收集与提供服务无关的个人敏感信息，除非您主动提供。
-          </p>
-        </div>
-
-        <div class="section">
-          <h3 class="section-title">二、信息使用</h3>
-          <p class="section-text">
-            2.1 收集的信息将用于：个性化资源推荐、改进平台功能、安全风控、以及在必要时与您联系（如服务通知、账户安全提醒）。
-          </p>
-          <p class="section-text">
-            2.2 我们不会将您的个人信息用于任何商业营销目的，除非获得您的明确同意。
-          </p>
-          <p class="section-text">
-            2.3 我们可能使用匿名化、去标识化的数据进行统计分析，以改进服务质量。
+            1.3 如资源标注了版权信息，我们将尊重并保留相关版权声明。
           </p>
         </div>
 
         <div class="section">
-          <h3 class="section-title">三、信息保护</h3>
+          <h3 class="section-title">二、版权保护</h3>
           <p class="section-text">
-            3.1 我们采用行业标准的技术与管理措施（如加密存储、访问控制、安全审计）来保护您的数据安全。
+            2.1 我们尊重所有原创作者的知识产权，支持原创内容的创作和传播。
           </p>
           <p class="section-text">
-            3.2 未经您的授权，我们不会向第三方出售、出租或披露您的个人信息。
+            2.2 如果您是某资源的版权所有者，发现本站存在侵犯您权益的内容，请及时与我们联系，我们将立即删除相关资源。
           </p>
           <p class="section-text">
-            3.3 如发生数据安全事件，我们将及时通知您，并采取必要措施减少损失。
-          </p>
-        </div>
-
-        <div class="section">
-          <h3 class="section-title">四、Cookies 使用</h3>
-          <p class="section-text">
-            4.1 我们使用 Cookies 技术来提升您的访问体验（如保持登录状态、记住您的偏好设置）。
-          </p>
-          <p class="section-text">
-            4.2 您可以通过浏览器设置管理或禁用 Cookies，但这可能会影响部分功能的使用。
-          </p>
-          <p class="section-text">
-            4.3 我们不会使用 Cookies 收集您的个人敏感信息。
+            2.3 我们鼓励用户上传原创资源，并会优先推荐和展示原创内容。
           </p>
         </div>
 
         <div class="section">
-          <h3 class="section-title">五、信息共享与披露</h3>
+          <h3 class="section-title">三、侵权处理</h3>
           <p class="section-text">
-            5.1 除法律法规要求或经您同意外，我们不会与第三方共享您的个人信息。
+            3.1 如您发现本站存在侵犯您知识产权的资源，请通过以下方式联系我们：
           </p>
+          <ul class="section-list">
+            <li>邮箱：<a href="mailto:gaopeng@lekee.cc">gaopeng@lekee.cc</a></li>
+            <li>请在邮件中提供：资源链接、版权证明、您的联系方式</li>
+            <li>我们将在收到通知后的 24 小时内处理并删除相关资源</li>
+            <li>对于恶意举报，我们将保留追究法律责任的权利</li>
+          </ul>
           <p class="section-text">
-            5.2 在以下情况下，我们可能会披露您的信息：法律法规要求、司法机关或行政机关依法要求、为保护平台和用户权益。
-          </p>
-        </div>
-
-        <div class="section">
-          <h3 class="section-title">六、您的权利</h3>
-          <p class="section-text">
-            6.1 您有权访问、更正、删除您的个人信息，或要求我们停止处理您的个人信息。
-          </p>
-          <p class="section-text">
-            6.2 您可以通过账户设置或联系我们行使上述权利。
+            3.2 我们承诺在收到有效的版权投诉后，将及时响应并采取必要措施。
           </p>
         </div>
 
         <div class="section">
-          <h3 class="section-title">七、未成年人保护</h3>
+          <h3 class="section-title">四、用户上传资源</h3>
           <p class="section-text">
-            7.1 如您是未成年人，请在监护人的陪同与指导下使用本平台。
+            4.1 用户上传的资源应确保拥有合法授权，不得上传侵犯他人知识产权的资源。
           </p>
           <p class="section-text">
-            7.2 我们致力于保护未成年人的个人信息安全，不会主动收集未成年人的个人信息。
+            4.2 上传者应对其上传的内容承担全部法律责任，包括但不限于版权、商标、专利等知识产权责任。
+          </p>
+          <p class="section-text">
+            4.3 如因用户上传内容引发版权纠纷，平台有权要求上传者提供授权证明，并可能暂时或永久删除相关资源。
+          </p>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">五、资源使用</h3>
+          <p class="section-text">
+            5.1 本站提供的资源仅供教学和学习使用，用户应遵守相关法律法规和平台使用规范。
+          </p>
+          <p class="section-text">
+            5.2 用户不得将平台资源用于商业盈利、非法传播或其他违法违规用途。
+          </p>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">六、免责声明</h3>
+          <p class="section-text">
+            6.1 本站提供的资源仅供教学和学习使用，不构成任何商业建议。
+          </p>
+          <p class="section-text">
+            6.2 用户使用本站资源所产生的任何后果，本站不承担责任。
+          </p>
+          <p class="section-text">
+            6.3 平台不对资源的准确性、完整性或适用性作任何明示或暗示的保证。
           </p>
         </div>
 
         <div class="legal-footer">
-          <p class="footer-text">如需删除或更正个人信息，或有任何隐私相关问题，请通过以下方式联系我们：</p>
+          <p class="footer-text">如有任何版权相关问题，请及时与我们联系，我们将积极配合处理：</p>
           <p class="footer-contact">
             <i class="bi bi-envelope me-2"></i>
             <a href="mailto:gaopeng@lekee.cc">gaopeng@lekee.cc</a>
@@ -109,7 +105,7 @@
 <script>
 import { defineComponent } from "vue";
 export default defineComponent({
-  name: "PrivacyPolicy",
+  name: "Copyright",
 });
 </script>
 
@@ -190,6 +186,32 @@ export default defineComponent({
   text-indent: 0;
 }
 
+.section-list {
+  margin-left: 24px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding-left: 0;
+  list-style-type: decimal;
+}
+
+.section-list li {
+  font-size: 15px;
+  line-height: 1.85;
+  color: var(--text, #4b5563);
+  margin-bottom: 8px;
+  text-align: left;
+}
+
+.section-list a {
+  color: var(--primary, #4f8cff);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.section-list a:hover {
+  text-decoration: underline;
+}
+
 .legal-footer {
   margin-top: 48px;
   padding-top: 32px;
@@ -239,7 +261,8 @@ export default defineComponent({
   border-bottom-color: var(--border, #444c56);
 }
 
-[data-theme="dark"] .section-text {
+[data-theme="dark"] .section-text,
+[data-theme="dark"] .section-list li {
   color: var(--text, #adbac7);
 }
 
@@ -271,8 +294,10 @@ export default defineComponent({
     font-size: 18px;
   }
 
-  .section-text {
+  .section-text,
+  .section-list li {
     font-size: 14px;
   }
 }
 </style>
+

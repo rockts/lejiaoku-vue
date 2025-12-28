@@ -6,5 +6,9 @@ module.exports = {
                 browsers: ['> 1%', 'last 2 versions', 'not ie <= 8']
             }
         }]
+    ],
+    plugins: [
+        '@babel/plugin-transform-optional-chaining',
+        '@babel/plugin-transform-nullish-coalescing-operator'
     ]
 }

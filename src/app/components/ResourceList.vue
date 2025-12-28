@@ -68,26 +68,51 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.resource-list {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
 .section {
   margin-top: 24px;
+  width: 100%;
 }
+
+.section:first-child {
+  margin-top: 0;
+}
+
 .section-title {
   font-size: 18px;
   font-weight: 600;
   text-align: left;
   margin-bottom: 12px;
   color: var(--text, #1f2937);
+  width: 100%;
 }
+
 .grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
 }
+
+/* 确保所有 grid 的列宽一致 */
+.grid > * {
+  min-width: 0; /* 防止内容溢出 */
+}
+
 @media (max-width: 992px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
 @media (max-width: 576px) {
   .grid {
     grid-template-columns: repeat(1, 1fr);
