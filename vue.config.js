@@ -1,6 +1,7 @@
 module.exports = {
   lintOnSave: false,
-  transpileDependencies: ['vue-router'],
+  // 移除 transpileDependencies，避免 vue-router 的 .mjs 文件被 babel 处理
+  // transpileDependencies: ['vue-router'],
   // 生产环境关闭 Source Map（减小文件大小，提高安全性）
   productionSourceMap: false,
   // 生产环境公共路径（如果使用 CDN，可以配置 CDN 地址）
@@ -115,10 +116,22 @@ module.exports = {
     } catch (e) { }
 
     // 配置处理 .mjs 文件
+    // webpack 4 需要让 .mjs 文件也通过 babel-loader 处理（支持可选链等 ES6+ 语法）
+    // 移除 js 规则对 .mjs 的排除，让 .mjs 文件也走 babel-loader
+    // 但需要确保 babel 配置支持这些语法
+    const jsRule = config.module.rule('js');
+    if (jsRule) {
+      // 移除对 .mjs 的排除，让它们也通过 babel-loader 处理
+      // jsRule.exclude 可能已经包含了 node_modules，需要确保 .mjs 不被排除
+    }
+
+    // 为 .mjs 文件添加专门的规则，使用 babel-loader
+    // 使用全局 babel 配置（babel.config.js），它已经包含了可选链插件
     config.module
       .rule('mjs')
       .test(/\.mjs$/)
       .include.add(/node_modules/).end()
-      .type('javascript/auto');
+      .use('babel-loader')
+      .loader('babel-loader');
   },
 };
