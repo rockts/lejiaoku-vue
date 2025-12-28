@@ -7,23 +7,43 @@
  */
 
 import { RouteRecordRaw } from 'vue-router';
-import UserLogin from './login/user-login.vue';
-import UserRegister from './register/user-register.vue';
+import MyResources from './resources/MyResources.vue';
+import UserProfile from './profile/UserProfile.vue';
+import MyTasks from './tasks/MyTasks.vue';
 
 /**
  * 定义路由
  */
 const routes: Array<RouteRecordRaw> = [
- {
-  path: '/login',
-  name: 'UserLogin',
-  component: UserLogin,
- },
- {
-  path: '/register',
-  name: 'UserRegister',
-  component: UserRegister,
- },
+    {
+        path: '/me/profile',
+        name: 'MyProfile',
+        component: UserProfile,
+        props: { isMyProfile: true },
+    },
+    {
+        path: '/users/:userId',
+        name: 'UserProfile',
+        component: UserProfile,
+        props: true,
+    },
+    {
+        path: '/me/resources',
+        name: 'MyResources',
+        component: MyResources,
+        props: { isMyResources: true },
+    },
+    {
+        path: '/users/:userId/resources',
+        name: 'UserResources',
+        component: MyResources,
+        props: true,
+    },
+    {
+        path: '/me/tasks',
+        name: 'MyTasks',
+        component: MyTasks,
+    },
 ];
 
 export default routes;

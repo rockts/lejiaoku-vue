@@ -1,67 +1,100 @@
 <template>
-    <div class="card">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4 cover" v-if="item.cover">
-                    <img
-                        :src="postCoverURL"
-                        :alt="item.title"
-                        class="img-fluid img-thumbnail"
-                    />
-                </div>
-                <div v-else class="col-md-4 cover">
-                    <img
-                        src="@/assets/img/catagory.png"
-                        alt="默认封面"
-                        class="img-fluid img-thumbnail"
-                    />
-                </div>
-                <div class="col-md-8">
-                    <div class="card-body">
-                        <h5><span class="posttype  badge badge-success">
-                            {{item.category}}
-                        </span>
-                        </h5>
-                        <h5 class="card-title text-justify">
-                            <router-link :to="{name: 'postShow', params: {postId: item.id}}">
-                                {{ item.title }}
-                            </router-link>
-                        </h5>
-                     
-                    
-                        <div class="content">
-                            <p class="card-text text-justify">
-                            资源介绍：{{ item.description }}
-                            </p>
-                            <p class="text-muted">
-                                <ul class="attr">
-                                    <li><span  style="font-weight: bold">年级：</span>{{item.grade}}</li>
-                                    <li><span  style="font-weight: bold">学科：</span>{{item.subject}}</li>
-                                    <li><span  style="font-weight: bold">版本：</span>{{item.version}}</li>
-                                </ul>
-                            </p>
-                        </div>
-                    
-                        <div class="author">  
-                            <img
-                                v-if="item.user.avatar === null"
-                                src="@/assets/img/avatar.png"
-                                :alt="item.user.name"
-                                class="avatar"
-                            />
-                            <img v-if="item.user.avatar === 1" :src="userAvatarURL" :alt="item.user.name" class="avatar">
-                            <div class="author__text">
-                                <p>贡献者：{{item.user.name}}</p>
-                                <small>更新于：{{ moment(item.updated_at).fromNow() }}</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <div class="card resource-item-clickable" @click="goToResource">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 cover">
+          <template v-if="resolvedCover && !coverFailed">
+            <img
+              :src="resolvedCover"
+              :alt="item.title"
+              class="img-fluid img-thumbnail"
+              @load="onCoverLoad"
+              @error="onCoverError"
+              :class="coverClass"
+            />
+          </template>
+          <template v-else>
+            <template v-if="resourceCoverURL">
+              <img
+                :src="resourceCoverURL"
+                :alt="item.title"
+                class="img-fluid img-thumbnail"
+                @load="onCoverLoad"
+                @error="onCoverError"
+              />
+            </template>
+            <template v-else>
+              <div class="cover-placeholder">
+                <i class="bi bi-file-earmark-text"></i>
+              </div>
+            </template>
+          </template>
         </div>
-    </div>
+        <div class="col-md-8">
+          <div class="card-body">
+            <h5>
+              <span class="posttype badge badge-success">
+                {{ item.category }}
+              </span>
+            </h5>
+            <h5 class="card-title text-justify">
+              <span class="resource-title-link">{{ item.title }}</span>
+            </h5>
 
- <!-- <div class="col sm-6 mb-4 lg-3">
+            <div class="content">
+              <p class="card-text text-justify">
+                资源介绍：{{ item.description || "暂无介绍" }}
+              </p>
+              <div class="text-muted">
+                <ul class="attr">
+                  <li>
+                    <span style="font-weight: bold">教材：</span
+                    >{{ textbookInfo }}
+                  </li>
+                  <li v-if="item.unit">
+                    <span style="font-weight: bold">所属单元：</span
+                    >{{ item.unit }}
+                    <span v-if="item.unit_index" class="text-muted small ms-1">
+                      (序号: {{ item.unit_index }})
+                    </span>
+                  </li>
+                  <li v-else-if="item.catalog_id">
+                    <span style="font-weight: bold">所属单元：</span
+                    ><span class="text-muted">待整理</span>
+                  </li>
+                  <li v-if="item.source_attribution">
+                    <span style="font-weight: bold">资源出处：</span
+                    ><span class="badge bg-info">{{ item.source_attribution }}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="author" v-if="item.user">
+              <img
+                v-if="item.user.avatar === null"
+                src="@/assets/img/avatar.png"
+                :alt="item.user.name"
+                class="avatar"
+              />
+              <img
+                v-if="item.user.avatar === 1"
+                :src="userAvatarURL"
+                :alt="item.user.name"
+                class="avatar"
+              />
+              <div class="author__text">
+                <p>贡献者：{{ item.user.name }}</p>
+                <small>更新于：{{ moment(item.updated_at).fromNow() }}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- <div class="col sm-6 mb-4 lg-3">
   <div class="card">
     <img v-if="item.cover" :src="postCoverURL" class="card-img-top img-fluid img-thumbnail" :alt="item.title">
     <img  v-else src="@/assets/img/catagory.png" alt="默认封面" class="img-fluid img-thumbnail" />
@@ -73,7 +106,7 @@
             </span>
         </h5>
         <h5 class="card-title" >
-            <router-link :to="{name: 'postShow', params: {postId: item.id}}">
+            <router-link :to="{name: 'resourceShow', params: {id: item.id}}">
                 {{ item.title }}
             </router-link>
         </h5>
@@ -89,7 +122,7 @@
                 <li><span  style="font-weight: bold">版本：</span>{{item.version}}</li>
             </ul>
         </p>
-         <router-link :to="{name: 'postShow', params: {postId: item.id}}" class="btn btn-outline-primary btn-sm">查看详情</router-link>
+         <router-link :to="{name: 'resourceShow', params: {id: item.id}}" class="btn btn-outline-primary btn-sm">查看详情</router-link>
     </div>
     <div class="card-footer">
         <div class="author">  
@@ -112,37 +145,313 @@
 </template>
 
 <script>
- import { defineComponent } from 'vue';
- import { API_BASE_URL } from '@/app/app.config';
- import moment from 'moment';
+import { defineComponent } from "vue";
+import { API_BASE_URL } from "@/app/app.config";
+import moment from "moment";
 
- export default defineComponent({
+export default defineComponent({
   props: {
-   item: Object,
+    item: Object,
+  },
+  data() {
+    return {
+      coverFit: "cover",
+      resolvedCover: "",
+      coverFailed: false,
+    };
+  },
+  watch: {
+    "item.cover_url": {
+      handler() {
+        this.resolveCoverUrl();
+      },
+      immediate: true,
+    },
+    "item.cover.id": {
+      handler() {
+        this.resolveCoverUrl();
+      },
+      immediate: true,
+    },
+  },
+  mounted() {
+    console.debug(
+      "[PostListItem] mounted for",
+      this.item?.id,
+      "title:",
+      this.item?.title
+    );
+    this.resolveCoverUrl();
   },
   methods: {
-   moment(...args) {
-    return moment(...args);
-   },
+    goToResource() {
+      this.$router.push({ name: 'resourceShow', params: { id: this.item.id } });
+    },
+    moment(...args) {
+      return moment(...args);
+    },
+    onCoverLoad(e) {
+      try {
+        const img = e.target;
+        const ratio = img.naturalWidth / img.naturalHeight;
+        this.coverFit = ratio < 0.9 ? "contain" : "cover";
+      } catch (err) {
+        this.coverFit = "cover";
+      }
+    },
+    // auto-resolve cover when component mounts or props change
+    resolvedCoverComputed() {
+      return this.resolvedCover;
+    },
+    async resolveCoverUrl() {
+      this.coverFailed = false;
+      // 如果有直接可拼接的 resourceCoverURL，先让它作为初始展示，避免空白
+      if (this.resourceCoverURL) {
+        this.resolvedCover = this.resourceCoverURL;
+        console.log(
+          "[PostListItem] initial resolvedCover set to resourceCoverURL for",
+          this.item.id,
+          this.resolvedCover
+        );
+      } else {
+        this.resolvedCover = "";
+      }
+      const candidates = [];
+      const cv = this.item?.cover_url;
+      if (cv) {
+        if (cv.startsWith("http")) {
+          candidates.push(cv);
+        } else {
+          // 确保路径以 / 开头（使用代理）
+          const path = cv.startsWith("/") ? cv : `/${cv}`;
+          // 先尝试原始封面（更可靠），再尝试缩略图
+          candidates.push(path);
+          
+          const m =
+            cv.match(/(?:\/)??uploads\/cover\/(.+)$/) ||
+            cv.match(/uploads\/cover\/(.+)$/);
+          if (m) {
+            const filename = m[1]; // 完整文件名，例如 "1766517324895-cover.jpg"
+            // 根据文档，格式应该是：/uploads/cover/resized/{filename}-thumbnail
+              candidates.push(
+              `/uploads/cover/resized/${filename}-thumbnail`
+              );
+            }
+        }
+      }
+      if (this.item?.cover?.id && API_BASE_URL) {
+        candidates.push(
+          `${API_BASE_URL}/covers/${this.item.cover.id}?size=thumbnail`
+        );
+      }
+
+      console.log(
+        "[PostListItem] probe candidates for",
+        this.item.id,
+        candidates
+      );
+      let found = false;
+      for (const url of candidates) {
+        if (!url) continue;
+        const ok = await new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => resolve(true);
+          img.onerror = () => resolve(false);
+          img.src = url;
+        });
+        if (ok) {
+          this.resolvedCover = url;
+          found = true;
+          console.log("[PostListItem] resolved cover for", this.item.id, url);
+          break;
+        }
+      }
+      // 如果所有候选都失败，但有原始 cover_url，则兜底显示原图
+      if (!found && this.item.cover_url) {
+        if (this.item.cover_url.startsWith("http")) {
+          this.resolvedCover = this.item.cover_url;
+        } else {
+          // 使用代理路径
+          const path = this.item.cover_url.startsWith("/")
+            ? this.item.cover_url
+            : `/${this.item.cover_url}`;
+          this.resolvedCover = path;
+        }
+        console.log(
+          "[PostListItem] fallback to raw cover_url for",
+          this.item.id,
+          this.resolvedCover
+        );
+      }
+      if (!this.resolvedCover) {
+        this.coverFailed = true;
+        console.log("[PostListItem] no valid cover found for", this.item.id);
+      }
+    },
+    onCoverError(e) {
+      try {
+        const failedUrl = e.target && e.target.src;
+        console.log(
+          "[PostListItem] cover load error for",
+          this.item.id,
+          failedUrl
+        );
+        
+        // 如果失败的是缩略图，尝试回退到原始封面
+        if (failedUrl && failedUrl.includes("/resized/") && this.item.cover_url) {
+          const originalPath = this.item.cover_url.startsWith("/")
+            ? this.item.cover_url
+            : `/${this.item.cover_url}`;
+          // 避免重复尝试
+          if (this.resolvedCover !== originalPath) {
+            console.log(
+              "[PostListItem] retrying with original cover for",
+              this.item.id,
+              originalPath
+            );
+            this.resolvedCover = originalPath;
+            this.coverFailed = false;
+            return;
+          }
+        }
+      } catch (err) {
+        console.log(
+          "[PostListItem] cover load error (no src available) for",
+          this.item.id
+        );
+      }
+      this.coverFailed = true;
+    },
   },
   computed: {
-   postCoverURL() {
-    return `${API_BASE_URL}/covers/${this.item.cover.id}?size=thumbnail`;
-   },
-   userAvatarURL() {
-    return `${API_BASE_URL}/users/${this.item.user.id}/avatar`;
-   },
+    coverClass() {
+      return this.coverFit === "contain" ? "fit-contain" : "fit-cover";
+    },
+    resourceCoverURL() {
+      if (this.item.cover_url) {
+        // 如果是完整URL，直接返回
+        if (this.item.cover_url.startsWith("http")) {
+          return this.item.cover_url;
+        }
+        // 优先返回原始封面路径（更可靠），缩略图可能不存在
+        // 确保路径以 / 开头（使用代理）
+        const path = this.item.cover_url.startsWith("/")
+          ? this.item.cover_url
+          : `/${this.item.cover_url}`;
+        return path;
+      }
+      // 兼容旧数据格式
+      if (this.item.cover?.id && API_BASE_URL) {
+        return `${API_BASE_URL}/covers/${this.item.cover.id}?size=thumbnail`;
+      }
+      return "";
+    },
+    userAvatarURL() {
+      if (this.item.user?.id) {
+        return `${API_BASE_URL}/users/${this.item.user.id}/avatar`;
+      }
+      return "";
+    },
+    textbookInfo() {
+      // 优先使用 catalog_info，fallback 到 auto_meta_result
+      const info = this.item.catalog_info || this.item.auto_meta_result || {};
+      const grade = info.grade || this.item.grade || "-";
+      const volume = info.volume || "";
+      const subject = info.subject || this.item.subject || "-";
+      const version =
+        info.textbook_version || info.version || this.item.textbook || "";
+      return version
+        ? `${version} · ${grade}${volume} · ${subject}`
+        : `${grade}${volume} · ${subject}`;
+    },
   },
- });
+});
 </script>
 
 <style scoped>
- .attr > li {
+.attr > li {
   list-style: none;
   text-align: left;
- }
+}
 
- .posttype {
+.posttype {
   float: right;
- }
+}
+
+/* 列表页卡片封面自适应且居中 */
+.cover {
+  width: 100%;
+  height: 220px;
+  background: var(--surface, #fff);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border, #e9ecef);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.cover img {
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  background: var(--surface, #fff);
+  margin: auto;
+  object-fit: contain;
+  object-position: center;
+}
+
+.cover img.fit-cover {
+  object-fit: cover;
+  object-position: center;
+}
+
+.cover img.fit-contain {
+  object-fit: contain;
+  object-position: center;
+}
+
+.cover img.default-cover {
+  opacity: 0.6;
+  object-fit: cover;
+}
+
+.cover .cover-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--bg, #f5f7fa) 0%, var(--surface, #e8ecf1) 100%);
+  border: none;
+}
+
+.cover .cover-placeholder i {
+  font-size: 56px;
+  color: var(--muted, #94a3b8);
+  opacity: 0.6;
+}
+
+/* 整个卡片可点击 */
+.resource-item-clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.resource-item-clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.resource-title-link {
+  color: var(--primary, #0d6efd);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.resource-item-clickable:hover .resource-title-link {
+  color: var(--primary, #0a58ca);
+  text-decoration: underline;
+}
 </style>

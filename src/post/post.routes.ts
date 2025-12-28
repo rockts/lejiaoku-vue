@@ -10,27 +10,53 @@ import { RouteRecordRaw } from 'vue-router';
 import PostIndex from './index/PostIndex.vue';
 import PostShow from './show/PostShow.vue';
 import PostCreate from './create/PostCreate.vue';
+import PostEdit from './edit/PostEdit.vue';
 
 /**
  * 定义路由
  */
 const routes: Array<RouteRecordRaw> = [
- {
-  path: '/posts',
-  name: 'postIndex',
-  component: PostIndex,
- },
- {
-  path: '/posts/:postId',
-  name: 'postShow',
-  component: PostShow,
-  props: true,
- },
- {
-  path: '/posts/create',
-  name: 'postCreate',
-  component: PostCreate,
- },
+    {
+        path: '/resources',
+        name: 'resourceIndex',
+        component: PostIndex,
+    },
+    {
+        path: '/resources/:id',
+        name: 'resourceShow',
+        component: PostShow,
+        props: true,
+    },
+    {
+        path: '/resources/create',
+        name: 'resourceCreate',
+        component: PostCreate,
+    },
+    {
+        path: '/resources/:id/edit',
+        name: 'resourceEdit',
+        component: PostEdit,
+        props: true,
+    },
+    // 历史兼容重定向（保留 query 参数）
+    {
+        path: '/posts',
+        redirect: (to) => {
+            // 如果有 query 参数，保留它们
+            if (Object.keys(to.query).length > 0) {
+                return { path: '/resources', query: to.query };
+            }
+            return '/resources';
+        },
+    },
+    {
+        path: '/posts/:id',
+        redirect: (to) => ({ path: `/resources/${to.params.id}` }),
+    },
+    {
+        path: '/posts/create',
+        redirect: '/resources/create',
+    },
 ];
 
 export default routes;

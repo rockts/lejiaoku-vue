@@ -1,3 +1,25 @@
+/* 列表页卡片封面自适应且居中 */
+.cover {
+  width: 100%;
+  height: 220px;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border, #e9ecef);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+.cover img {
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  background: #fff;
+  margin: auto;
+}
+.fit-cover { object-fit: cover; object-position: center; }
+.fit-contain { object-fit: contain; object-position: center; }
 <template>
 
     <div class="card">
@@ -23,8 +45,8 @@
                             {{item.category}}
                         </span>
                         </h4>
-                        <h5 class="card-title">
-                            <router-link :to="{name: 'postShow', params: {postId: item.id}}">
+                        <h5 class="card-title" >
+                            <router-link :to="{name: 'resourceShow', params: {id: item.id}}">
                                 {{ item.title }}
                             </router-link>
                         </h5>
@@ -66,10 +88,9 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
-import { API_BASE_URL } from '@/app/app.config';
-import moment from 'moment';
-
+import { defineComponent } from "vue";
+import { API_BASE_URL } from "@/app/app.config";
+import moment from "moment";
 
 export default defineComponent({
   props: {
@@ -77,18 +98,28 @@ export default defineComponent({
   },
   methods: {
     moment(...args) {
-    return moment(...args);
-   },
+      return moment(...args);
+    },
   },
   computed: {
     postCoverURL() {
+      // prefer resized upload path when available
+      if (this.item.cover_url) {
+        if (this.item.cover_url.startsWith("http")) return this.item.cover_url;
+        const m =
+          this.item.cover_url.match(/(?:\/)??uploads\/cover\/(.+)$/) ||
+          this.item.cover_url.match(/uploads\/cover\/(.+)$/);
+        if (m) return `${API_BASE_URL}/uploads/cover/resized/${m[1]}-thumbnail`;
+        return `${API_BASE_URL}${this.item.cover_url}`;
+      }
+      if (this.item.cover?.id)
         return `${API_BASE_URL}/covers/${this.item.cover.id}?size=thumbnail`;
+      return "";
     },
     userAvatarURL() {
-        return `${API_BASE_URL}/users/${this.item.user.id}/avatar`;
-    }
+      return `${API_BASE_URL}/users/${this.item.user.id}/avatar`;
+    },
   },
-
 });
 </script>
 
@@ -104,7 +135,14 @@ export default defineComponent({
 }
 
 .posttype {
-    float:right;
+  float: right;
+}
 
+.cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
 }
 </style>

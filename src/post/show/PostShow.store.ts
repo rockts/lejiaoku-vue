@@ -3,68 +3,70 @@ import { apiHttpClient } from '../../app/app.service';
 import { RootState } from '../../app/app.store';
 
 export interface Post {
- id: number;
- title: string;
- description: string;
- grade: string;
- subject: string;
- version: string;
- category: string;
- created_at: Date;
- updated_at: Date;
- file?: string;
+    id: number;
+    title: string;
+    description: string;
+    grade: string;
+    subject: string;
+    version: string;
+    category: string;
+    created_at: Date;
+    updated_at: Date;
+    file?: string;
 }
 
 export interface PostShowStoreState {
- loading: boolean;
- post: Post;
+    loading: boolean;
+    resource: Post;
 }
 
 export const postShowStoreModule: Module<PostShowStoreState, RootState> = {
- namespaced: true,
+    namespaced: true,
 
- state: {
-  loading: false,
-  post: {},
- } as PostShowStoreState,
+    state: {
+        loading: false,
+        resource: {},
+    } as PostShowStoreState,
 
- getters: {
-  loading(state) {
-   return state.loading;
-  },
+    getters: {
+        loading(state) {
+            return state.loading;
+        },
 
-  post(state) {
-   return Object.keys(state.post).length ? state.post : null;
-  },
- },
+        resource(state) {
+            return Object.keys(state.resource).length ? state.resource : null;
+        },
+    },
 
- mutations: {
-  setLoading(state, data) {
-   state.post = data;
-  },
+    mutations: {
+        setLoading(state, data) {
+            state.loading = data;
+        },
 
-  setPost(state, data) {
-   state.post = data;
-  },
- },
+        setResource(state, data) {
+            console.log('[PostShow.store] setResource 被调用，数据:', data);
+            state.resource = data;
+            console.log('[PostShow.store] state.resource 已设置:', state.resource);
+        },
+    },
 
- actions: {
-  async getPostById({ commit }, postId) {
-   commit('setLoading', true);
+    actions: {
+        async getResourceById({ commit }, resourceId) {
+            commit('setLoading', true);
 
-   try {
-    const response = await apiHttpClient.get(`/posts/${postId}`);
-    commit('setLoading', false);
-    commit('setPost', response.data);
+            try {
+                const response = await apiHttpClient.get(`/api/resources/${resourceId}`);
+                commit('setLoading', false);
+                commit('setResource', response.data);
 
-    console.log('返回数据：', response);
+                console.log('返回数据：', response);
 
-    return response;
-   } catch (error) {
-    commit('setLoading', false);
+                return response;
+            } catch (error: any) {
+                commit('setLoading', false);
 
-    throw error.response;
-   }
-  },
- },
+                throw error.response;
+            }
+        },
+    },
 };

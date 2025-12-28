@@ -1,23 +1,53 @@
-.DS_Store
-node_modules
-/dist
+# 依赖
+node_modules/
+.pnp
+.pnp.js
 
+# 测试覆盖率
+coverage
 
-# local env files
+# 生产构建
+dist/
+build/
+
+# 环境变量文件（不提交到 git，包含敏感信息）
+.env
 .env.local
-.env.*.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+# 注意：只提交 .env.*.example 文件作为模板
 
-# Log files
+# 日志
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
+lerna-debug.log*
 
-# Editor directories and files
-.idea
-.vscode
+# 编辑器目录和文件
+.DS_Store
+.idea/
+.vscode/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# 可选的 npm 缓存目录
+.npm
+
+# 可选的 yarn 文件
+.yarn-integrity
+yarn.lock
+
+# IDE
+*.iml
+.project
+.classpath
+.settings/
+.factorypath
+node_modules

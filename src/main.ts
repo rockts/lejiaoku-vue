@@ -12,8 +12,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 moment.locale('zh-cn');
+const savedTheme = localStorage.getItem('theme') || 'light';
+document.documentElement.setAttribute('data-theme', savedTheme);
 createApp(App)
- .use(store)
- .use(router)
- .mixin(titleMixin)
- .mount('#app');
+    .use(store)
+    .use(router)
+    .mixin(titleMixin)
+    .mount('#app');
