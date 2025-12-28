@@ -263,7 +263,7 @@ export default defineComponent({
     user: {
       type: Object,
       default: null,
-    },
+  },
   },
   emits: ['showLogin'],
 
@@ -449,23 +449,23 @@ export default defineComponent({
       if (!this.resource) return null;
       
       try {
-        console.log("[catalogInfo] 开始计算，resource:", this.resource);
+      console.log("[catalogInfo] 开始计算，resource:", this.resource);
 
         // 优先级1：如果存在 catalog_info，使用 catalog_info（已绑定教材目录）
         if (this.resource.catalog_info) {
-          console.log("[catalogInfo] 使用 catalog_info");
-          return {
+        console.log("[catalogInfo] 使用 catalog_info");
+        return {
             education_level: this.resource.catalog_info.education_level || "",
             subject: this.resource.catalog_info.subject || "",
             grade: this.resource.catalog_info.grade || "",
             volume: this.resource.catalog_info.volume || "",
             textbook_version: this.resource.catalog_info.textbook_version || "",
-          };
-        }
+        };
+      }
 
         // 优先级2：如果存在 auto_meta_result，使用 auto_meta_result（AI 识别）
         if (this.resource.auto_meta_result) {
-          console.log("[catalogInfo] 使用 auto_meta_result");
+        console.log("[catalogInfo] 使用 auto_meta_result");
           let autoMeta = this.resource.auto_meta_result;
           
           // 如果 auto_meta_result 是字符串，尝试解析
@@ -489,7 +489,7 @@ export default defineComponent({
           const textbook_version = autoMeta?.textbook_version || 
                                   autoMeta?.textbook_info?.version || "";
 
-          return {
+        return {
             education_level,
             subject,
             grade,
@@ -509,7 +509,7 @@ export default defineComponent({
         };
       } catch (error) {
         console.error("[PostShow] catalogInfo 计算出错:", error);
-        return null;
+      return null;
       }
     },
 
@@ -720,7 +720,7 @@ export default defineComponent({
       if (this.resource?.auto_cover_url) {
         if (this.resource.auto_cover_url.startsWith("http")) {
           candidates.push(this.resource.auto_cover_url);
-        } else {
+            } else {
           const path = this.resource.auto_cover_url.startsWith("/")
             ? this.resource.auto_cover_url
             : `/${this.resource.auto_cover_url}`;

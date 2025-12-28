@@ -468,11 +468,11 @@
                       target="_blank"
                         class="btn btn-sm btn-light"
                         title="新窗口预览"
-                      >
+                    >
                         <i class="bi bi-eye"></i>
                       </a>
-                    </div>
                   </div>
+                </div>
                   <div v-else class="cover-preview-empty">
                     <i class="bi bi-image text-muted"></i>
                     <p class="text-muted small mb-0 mt-2">暂无封面</p>
@@ -507,11 +507,11 @@
                           class="btn btn-sm btn-danger"
                           @click.stop="removeCover"
                           title="移除"
-                        >
+                >
                           <i class="bi bi-trash"></i>
                         </button>
-                      </div>
-                    </div>
+                </div>
+              </div>
                     <div v-else class="cover-upload-placeholder">
                       <i class="bi bi-cloud-upload cover-upload-icon"></i>
                       <p class="cover-upload-text">拖拽图片到此处</p>
@@ -645,7 +645,7 @@ export default defineComponent({
     user: {
       type: Object,
       default: null,
-    },
+  },
   },
   emits: ['showLogin'],
   data() {
@@ -1718,7 +1718,7 @@ export default defineComponent({
             });
           }
           if (updateData.chapter_info) formData.append("chapter_info", updateData.chapter_info);
-          
+
           // 添加教材目录绑定字段
           // 如果用户明确解绑（isUnbindingCatalog = true），需要明确发送 null 或空字符串
           if (this.isUnbindingCatalog && !this.selectedCatalogId) {
@@ -1819,9 +1819,9 @@ export default defineComponent({
 
           // 使用 PUT 方法发送 JSON 数据
           response = await apiHttpClient.put(
-            `/api/resources/${this.id}`,
-            updateData
-          );
+          `/api/resources/${this.id}`,
+          updateData
+        );
         }
         
         // 检查响应中是否包含 catalog_id 和 unit
