@@ -774,3 +774,64 @@ select:disabled {
 .btn-save {
   background: var(--primary) !important;
 }
+
+/* 版权说明区域 - 全局样式，放在页面最底部 */
+.copyright-section {
+  width: 100%;
+  padding: 16px 0;
+  background: var(--bg, #f8f9fa);
+  border-top: 1px solid var(--border, #e9ecef);
+  margin-top: 0;
+}
+
+.copyright-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 20px;
+  font-size: 13px;
+  color: var(--muted, #6c757d);
+  text-align: center;
+}
+
+.copyright-content i {
+  color: var(--primary, #4f8cff);
+  font-size: 14px;
+}
+
+.copyright-link {
+  color: var(--primary, #4f8cff);
+  text-decoration: none;
+  font-weight: 500;
+  margin-left: 4px;
+  transition: color 0.2s ease;
+}
+
+.copyright-link:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+[data-theme="dark"] .copyright-section {
+  background: var(--bg, #1a1d23);
+  border-top-color: var(--border, #2d333b);
+}
+
+[data-theme="dark"] .copyright-content {
+  color: var(--muted, #768390);
+}
+
+@media (max-width: 576px) {
+  .copyright-content {
+    font-size: 12px;
+    padding: 8px 16px;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .copyright-link {
+    margin-left: 0;
+  }
+}

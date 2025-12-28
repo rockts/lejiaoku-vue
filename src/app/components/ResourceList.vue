@@ -68,6 +68,11 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.resource-list {
+  max-width: 100%;
+  width: 100%;
+}
+
 .section {
   margin-top: 24px;
 }
@@ -82,6 +87,8 @@ export default defineComponent({
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
+  width: 100%;
+  max-width: 100%;
 }
 @media (max-width: 992px) {
   .grid {
